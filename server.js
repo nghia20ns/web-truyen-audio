@@ -1,4 +1,4 @@
-require('dotenv').config(); // Nạp bảo mật từ file .env
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -11,98 +11,112 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Cấu hình Session (Quan trọng cho bảo mật)
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secret_key',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 1000 } // Phiên đăng nhập tồn tại 1 tiếng
+    cookie: { maxAge: 60 * 60 * 1000 }
 }));
 
-// Kết nối MongoDB (Cập nhật mới)
-// Ưu tiên lấy link Online từ .env, nếu không có thì dùng link Offline
 const dbLink = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/web_truyen';
-
 mongoose.connect(dbLink)
     .then(() => console.log('✅ Đã kết nối MongoDB thành công!'))
     .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
-    
-// Schema Truyện (Cập nhật thêm cột link)
+
+// --- CẬP NHẬT SCHEMA ---
 const truyenSchema = new mongoose.Schema({
     name: String,
     introduction: String,
     totalChapters: Number,
-    link: String  // <--- THÊM DÒNG NÀY (Để lưu link truyện gốc/video)
+    link: String,
+    shortCode: { type: String, unique: true, required: true },
+    price: { type: Number, default: 1000 } // <--- THÊM: Giá tiền cho 1 tập (Mặc định 1000đ)
 });
 const Truyen = mongoose.model('Truyen', truyenSchema);
-// --- MIDDLEWARE BẢO VỆ (GATEKEEPER) ---
-// Hàm này chặn người lạ truy cập vào trang Admin
+
+
 const requireLogin = (req, res, next) => {
     if (req.session.isAdmin) {
-        next(); // Đã đăng nhập -> Cho qua
+        next();
     } else {
-        res.redirect('/login'); // Chưa đăng nhập -> Đá về trang login
+        res.redirect('/login');
     }
 };
 
 // --- ROUTES ---
 
-// 1. PUBLIC ROUTES (Ai cũng xem được)
-// --- SỬA LẠI ROUTE TRANG CHỦ ---
 app.get('/', async (req, res) => {
     try {
         let filter = {};
-        let keyword = req.query.q || ''; // Lấy từ khóa tìm kiếm từ URL
-
+        let keyword = req.query.q || '';
         if (keyword) {
-            // $regex: Tìm gần đúng (chứa từ khóa là được)
-            // $options: 'i' nghĩa là không phân biệt hoa thường (gõ 'dau pha' vẫn ra 'Đấu Phá')
             filter.name = { $regex: keyword, $options: 'i' };
         }
-
         const listTruyen = await Truyen.find(filter);
-        
-        // Truyền thêm biến 'keyword' ra để giữ lại chữ trong ô tìm kiếm
         res.render('index', { listTruyen, keyword }); 
     } catch (e) {
         res.status(500).send("Lỗi Server: " + e.message);
     }
 });
-
 app.get('/truyen/:id', async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.send("Lỗi ID");
     const truyen = await Truyen.findById(req.params.id);
     if (!truyen) return res.send('Không tìm thấy');
 
-    // Logic chia phần
     let parts = [];
     const chunkSize = 10;
     const totalParts = Math.ceil(truyen.totalChapters / chunkSize);
+    
+    // Lấy giá 1 tập (nếu admin quên nhập thì mặc định là 1000đ)
+    const pricePerChapter = truyen.price || 1000;
+
     for (let i = 0; i < totalParts; i++) {
         const start = i * chunkSize + 1;
         const end = Math.min((i + 1) * chunkSize, truyen.totalChapters);
-        parts.push({ name: `Phần ${start} - ${end}`, code: `${start}-${end}` });
+        
+        // TÍNH TIỀN TỰ ĐỘNG
+        const chapterCount = end - start + 1; // Số tập trong phần này (thường là 10, phần cuối có thể ít hơn)
+        const partPrice = chapterCount * pricePerChapter; // Nhân với giá 1 tập
+
+        parts.push({ 
+            name: `Phần ${start} - ${end}`, 
+            code: `${start}-${end}`,
+            price: partPrice,        // Lưu giá tiền để hiển thị
+            priceText: partPrice.toLocaleString('vi-VN') // Định dạng số đẹp (10.000)
+        });
     }
     res.render('detail', { truyen, parts });
 });
-
 app.get('/payment', async (req, res) => {
     const { truyenId, partCode } = req.query;
     if (!mongoose.Types.ObjectId.isValid(truyenId)) return res.redirect('/');
+    
     const truyen = await Truyen.findById(truyenId);
-    res.render('payment', { truyenName: truyen.name, partCode });
-});
+    
+    // TÍNH LẠI TIỀN Ở ĐÂY ĐỂ CHÍNH XÁC TUYỆT ĐỐI
+    // partCode có dạng "1-10" -> Tách ra lấy số đầu và cuối
+    const [start, end] = partCode.split('-').map(Number);
+    const chapterCount = end - start + 1;
+    const pricePerChapter = truyen.price || 1000;
+    const totalAmount = chapterCount * pricePerChapter;
 
-// 2. AUTH ROUTES (Đăng nhập/Đăng xuất)
+    res.render('payment', { 
+        truyenName: truyen.name, 
+        shortCode: truyen.shortCode,
+        partCode: partCode,
+        amount: totalAmount, // Truyền số tiền cần thanh toán sang giao diện
+        amountText: totalAmount.toLocaleString('vi-VN') // Truyền dạng chữ đẹp (10.000)
+    });
+});
+// AUTH
 app.get('/login', (req, res) => {
     res.render('admin/login', { error: null });
 });
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    // Kiểm tra với dữ liệu trong file .env
     if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
-        req.session.isAdmin = true; // Cấp thẻ bài Admin
+        req.session.isAdmin = true;
         res.redirect('/admin');
     } else {
         res.render('admin/login', { error: 'Sai tài khoản hoặc mật khẩu!' });
@@ -114,34 +128,61 @@ app.get('/logout', (req, res) => {
     res.redirect('/login');
 });
 
-// 3. ADMIN ROUTES (Được bảo vệ bởi requireLogin)
+// ADMIN
 app.get('/admin', requireLogin, async (req, res) => {
     const listTruyen = await Truyen.find();
     res.render('admin/dashboard', { listTruyen });
 });
 
-// Trang Thêm mới
+// --- UPDATE: TRANG THÊM MỚI ---
 app.get('/admin/add', requireLogin, (req, res) => {
-    res.render('admin/form', { truyen: null }); // Truyền null để biết là đang thêm mới
+    // Truyền error: null để không bị lỗi EJS
+    res.render('admin/form', { truyen: null, error: null }); 
 });
 
 app.post('/admin/add', requireLogin, async (req, res) => {
-    await Truyen.create(req.body);
-    res.redirect('/admin');
+    try {
+        await Truyen.create(req.body);
+        res.redirect('/admin');
+    } catch (err) {
+        // Mã 11000 là mã lỗi trùng lặp của MongoDB
+        if (err.code === 11000) {
+            res.render('admin/form', { 
+                truyen: req.body, // Giữ lại dữ liệu vừa nhập để đỡ phải gõ lại
+                error: '❌ Từ viết tắt này đã tồn tại! Vui lòng chọn từ khác.' 
+            });
+        } else {
+            res.send("Lỗi khác: " + err.message);
+        }
+    }
 });
 
-// Trang Sửa
+// --- UPDATE: TRANG SỬA ---
 app.get('/admin/edit/:id', requireLogin, async (req, res) => {
     const truyen = await Truyen.findById(req.params.id);
-    res.render('admin/form', { truyen }); // Truyền dữ liệu cũ vào form
+    res.render('admin/form', { truyen, error: null });
 });
 
 app.post('/admin/edit/:id', requireLogin, async (req, res) => {
-    await Truyen.findByIdAndUpdate(req.params.id, req.body);
-    res.redirect('/admin');
+    try {
+        await Truyen.findByIdAndUpdate(req.params.id, req.body);
+        res.redirect('/admin');
+    } catch (err) {
+        if (err.code === 11000) {
+            // Khi sửa bị trùng, ta cần ghép lại ID vào object để form biết là đang sửa
+            const truyenData = req.body;
+            truyenData._id = req.params.id; 
+            
+            res.render('admin/form', { 
+                truyen: truyenData, 
+                error: '❌ Từ viết tắt này đã bị trùng với truyện khác!' 
+            });
+        } else {
+            res.send("Lỗi: " + err.message);
+        }
+    }
 });
 
-// Chức năng Xóa
 app.get('/admin/delete/:id', requireLogin, async (req, res) => {
     await Truyen.findByIdAndDelete(req.params.id);
     res.redirect('/admin');

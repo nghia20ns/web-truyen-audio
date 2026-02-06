@@ -1,28 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= truyen ? 'Sửa Truyện' : 'Thêm Truyện' %></title>
-    <link rel="stylesheet" href="/css/style.css">\
-    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+    <title><%= truyen && truyen._id ? 'Sửa Truyện' : 'Thêm Truyện' %></title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
-        <h2><%= truyen ? 'Chỉnh Sửa Truyện' : 'Thêm Truyện Mới' %></h2>
+        <h2><%= truyen && truyen._id ? 'Chỉnh Sửa Truyện' : 'Thêm Truyện Mới' %></h2>
         
-        <form action="<%= truyen ? '/admin/edit/' + truyen._id : '/admin/add' %>" method="POST" class="card">
+        <% if (error) { %>
+            <div style="background: #fee2e2; color: #ef4444; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #fecaca; font-weight: bold;">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form action="<%= truyen && truyen._id ? '/admin/edit/' + truyen._id : '/admin/add' %>" method="POST" class="card">
+            
             <label>Tên Truyện:</label>
-            <input type="text" name="name" value="<%= truyen ? truyen.name : '' %>" required style="width: 100%; margin-bottom: 15px;">
+            <input type="text" name="name" value="<%= truyen ? truyen.name : '' %>" required>
+            
+            <label>Từ viết tắt (Duy nhất, ví dụ: dptk):</label>
+            <input type="text" name="shortCode" value="<%= truyen ? truyen.shortCode : '' %>" required placeholder="Không được trùng..." style="border: 2px solid #6366f1;">
             
             <label>Tổng số tập (Số):</label>
-            <input type="number" name="totalChapters" value="<%= truyen ? truyen.totalChapters : '' %>" required style="width: 100%; margin-bottom: 15px; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px;">
+            <input type="number" name="totalChapters" value="<%= truyen ? truyen.totalChapters : '' %>" required>
+            
+            <label>Giá tiền 1 tập (VNĐ):</label>
+            <input type="number" name="price" value="<%= truyen ? truyen.price : '1000' %>" required placeholder="Ví dụ: 1000 hoặc 1500" style="font-weight: bold; color: #16a34a;">
             <label>Link Truyện (Gốc/Youtube):</label>
-            <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://..." style="width: 100%; margin-bottom: 15px; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px;">
+            <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://...">
 
             <label>Giới thiệu:</label>
-            <textarea name="introduction" rows="5" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px; font-family: sans-serif;"><%= truyen ? truyen.introduction : '' %></textarea>
+            <textarea name="introduction" rows="5"><%= truyen ? truyen.introduction : '' %></textarea>
             
             <button type="submit" class="btn-primary" style="margin-top: 20px;">Lưu lại</button>
-            <a href="/admin" class="btn-back" style="text-align: center;">Hủy bỏ</a>
+            <a href="/admin" class="btn-secondary" style="text-align: center; display:block; margin-top:10px;">Hủy bỏ</a>
         </form>
     </div>
 </body>

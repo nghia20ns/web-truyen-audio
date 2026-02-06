@@ -25,11 +25,12 @@
         <div class="card">
             <h1 style="margin: 0 0 15px 0; color: var(--primary);"><%= truyen.name %></h1>
             
-            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Chọn phần nghe (10k/phần)</h3>
+        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Chọn phần nghe</h3>
             <div class="part-grid">
                 <% parts.forEach(function(part) { %>
                     <a href="/payment?truyenId=<%= truyen._id %>&partCode=<%= part.code %>" class="part-item">
-                        <%= part.name %>
+                        <div style="font-size: 1rem;"><%= part.name %></div>
+                        <div style="font-size: 0.8rem; color: #ef4444;"><%= part.priceText %>đ</div>
                     </a>
                 <% }); %>
             </div>

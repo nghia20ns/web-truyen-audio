@@ -6,6 +6,30 @@
     <title>Thanh Toán</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
+    <style>
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px dashed #ced4da;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-family: monospace;
+            color: #333;
+            word-break: break-all;
+        }
+        .guide-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #0d47a1;
+            border-left: 4px solid #2196f3;
+        }
+        .guide-box ul { padding-left: 20px; margin: 5px 0 0 0; }
+        .guide-box li { margin-bottom: 6px; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -30,44 +54,73 @@
                     Phần <%= partCode %>
                 </div>
                 <div style="font-size: 1.5rem; font-weight: bold; color: #10b981; margin-top: 10px;">
-                    10.000đ
+                    <%= amountText %>đ
                 </div>
             </div>
 
             <div id="input-section">
-                <label>Email nhận file:</label>
-                <input type="email" id="gmail" placeholder="vidu@gmail.com" required>
+                <label>Email (Hoặc chỉ cần tên Gmail):</label>
+                <input type="text" id="gmail" placeholder="Ví dụ: quocnghia1123" required>
                 <button class="btn-primary" onclick="generateQR()">Tạo mã QR</button>
             </div>
 
             <div id="qr-container" style="display: none; text-align: center;">
                 <img id="qr-img" src="" alt="QR Code" style="max-width: 100%; border-radius: 8px; border: 1px solid #eee;">
+                
                 <p style="font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
-                    Quét mã trên bằng App Ngân hàng.<br>Nội dung CK đã được điền tự động.
+                    Quét mã trên bằng App Ngân hàng.
                 </p>
+
+                <div class="info-box">
+                    <strong>Nội dung CK:</strong><br>
+                    <span id="ck-content-display" style="font-weight: bold; color: #d32f2f;"></span>
+                </div>
+
+                <div class="guide-box">
+                    <strong>🔔 Hướng dẫn:</strong>
+                    <ul>
+                        <li>Kiểm tra Gmail để nhận file (Admin sẽ gửi vào đúng tên mail bạn nhập).</li>
+                        <li>Nội dung chuyển khoản đã được rút gọn để giao dịch nhanh hơn.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
+    <%- include('partials/footer') %>
+
     <script>
         function generateQR() {
-            const gmail = document.getElementById('gmail').value;
-            const truyenName = "<%= truyenName %>";
+            // Lấy giá trị ô nhập
+            const rawInput = document.getElementById('gmail').value.trim();
+            const shortCode = "<%= shortCode %>"; 
             const partCode = "<%= partCode %>";
+            const amount = "<%= amount %>"; 
 
-            if (!gmail || !gmail.includes('@')) {
-                alert("Vui lòng nhập Email hợp lệ!");
+            if (!rawInput) {
+                alert("Vui lòng nhập tên Gmail!");
                 return;
             }
+
+            // --- XỬ LÝ QUAN TRỌNG Ở ĐÂY ---
+            // split('@')[0] sẽ lấy phần trước dấu @
+            // Nếu khách nhập "nghia" -> kết quả là "nghia"
+            // Nếu khách nhập "nghia@gmail.com" -> kết quả là "nghia"
+            const username = rawInput.split('@')[0];
 
             const BANK_ID = "MB"; 
             const ACCOUNT_NO = "017120299999";
             const TEMPLATE = "compact2";
-            const AMOUNT = "10000";
             
-            const content = `${gmail} ${truyenName} p${partCode}`;
+            // Nội dung CK bây giờ chỉ chứa username ngắn gọn
+            const content = `${username} ${shortCode} p${partCode}`;
+            
+            // Hiển thị ra màn hình
+            document.getElementById('ck-content-display').innerText = content;
+
+            // Tạo mã QR
             const description = encodeURIComponent(content);
-            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${AMOUNT}&addInfo=${description}`;
+            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${amount}&addInfo=${description}`;
 
             const img = document.getElementById('qr-img');
             img.src = qrUrl;
