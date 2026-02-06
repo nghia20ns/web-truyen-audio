@@ -79,7 +79,7 @@ app.get('/truyen/:id', async (req, res) => {
         const partPrice = chapterCount * pricePerChapter; // Nhân với giá 1 tập
 
         parts.push({ 
-            name: `Phần ${start} - ${end}`, 
+            name: `Tập ${start} - ${end}`, 
             code: `${start}-${end}`,
             price: partPrice,        // Lưu giá tiền để hiển thị
             priceText: partPrice.toLocaleString('vi-VN') // Định dạng số đẹp (10.000)
