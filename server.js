@@ -93,22 +93,25 @@ app.get('/payment', async (req, res) => {
     
     const truyen = await Truyen.findById(truyenId);
     
-    // TÍNH LẠI TIỀN Ở ĐÂY ĐỂ CHÍNH XÁC TUYỆT ĐỐI
-    // partCode có dạng "1-10" -> Tách ra lấy số đầu và cuối
+    // Tách số tập: "1-10" -> start=1, end=10
     const [start, end] = partCode.split('-').map(Number);
+
     const chapterCount = end - start + 1;
     const pricePerChapter = truyen.price || 1000;
     const totalAmount = chapterCount * pricePerChapter;
+
+    // --- TẠO CHUỖI "X den Y" Ở ĐÂY ---
+    const tapText = `${start} den ${end}`;
 
     res.render('payment', { 
         truyenName: truyen.name, 
         shortCode: truyen.shortCode,
         partCode: partCode,
-        amount: totalAmount, // Truyền số tiền cần thanh toán sang giao diện
-        amountText: totalAmount.toLocaleString('vi-VN') // Truyền dạng chữ đẹp (10.000)
+        tapText: tapText, // <--- Truyền cái này sang view để dùng
+        amount: totalAmount, 
+        amountText: totalAmount.toLocaleString('vi-VN') 
     });
-});
-// AUTH
+});// AUTH
 app.get('/login', (req, res) => {
     res.render('admin/login', { error: null });
 });

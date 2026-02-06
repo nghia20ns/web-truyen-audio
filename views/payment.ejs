@@ -51,7 +51,7 @@
                 <h3 style="margin: 0; color: var(--primary);">Xác nhận mua</h3>
                 <p style="color: var(--text-sub);">Truyện: <strong><%= truyenName %></strong></p>
                 <div class="badge" style="background: var(--secondary); color: white; display: inline-block;">
-                    Phần <%= partCode %>
+                    Tập <%= partCode %>
                 </div>
                 <div style="font-size: 1.5rem; font-weight: bold; color: #10b981; margin-top: 10px;">
                     <%= amountText %>đ
@@ -93,12 +93,11 @@
 
     <%- include('partials/footer') %>
 
-    <script>
+<script>
         function generateQR() {
-            // Lấy giá trị ô nhập
             const rawInput = document.getElementById('gmail').value.trim();
             const shortCode = "<%= shortCode %>"; 
-            const partCode = "<%= partCode %>";
+            const tapText = "<%= tapText %>"; 
             const amount = "<%= amount %>"; 
 
             if (!rawInput) {
@@ -106,23 +105,31 @@
                 return;
             }
 
-            // --- XỬ LÝ QUAN TRỌNG Ở ĐÂY ---
-            // split('@')[0] sẽ lấy phần trước dấu @
-            // Nếu khách nhập "nghia" -> kết quả là "nghia"
-            // Nếu khách nhập "nghia@gmail.com" -> kết quả là "nghia"
-            const username = rawInput.split('@')[0];
+            // 1. Lấy tên user (bỏ @gmail.com)
+            let username = rawInput.split('@')[0];
+
+            // 2. Hàm xóa dấu tiếng Việt (để đảm bảo 'không dấu' tuyệt đối)
+            function removeAccents(str) {
+                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                          .replace(/đ/g, "d").replace(/Đ/g, "D");
+            }
+
+            // Xử lý xóa dấu cho chắc chắn
+            const cleanUser = removeAccents(username);
+            const cleanCode = removeAccents(shortCode);
+
+            // 3. TẠO NỘI DUNG CÓ DẤU GẠCH ĐỨNG |
+            // Kết quả sẽ là: | nghiavo1234 | dptk | 1 den 10 |
+            const content = `xxx ${cleanUser} xxx ${cleanCode} xxx ${tapText} xxx`;
+            
+            // Hiển thị ra màn hình cho khách xem
+            document.getElementById('ck-content-display').innerText = content;
 
             const BANK_ID = "MB"; 
             const ACCOUNT_NO = "017120299999";
             const TEMPLATE = "compact2";
             
-            // Nội dung CK bây giờ chỉ chứa username ngắn gọn
-            const content = `${username} ${shortCode} p${partCode}`;
-            
-            // Hiển thị ra màn hình
-            document.getElementById('ck-content-display').innerText = content;
-
-            // Tạo mã QR
+            // Mã hóa nội dung để tạo link QR
             const description = encodeURIComponent(content);
             const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${amount}&addInfo=${description}`;
 
@@ -133,5 +140,6 @@
             document.getElementById('qr-container').style.display = 'block';
         }
     </script>
+    
 </body>
 </html>
