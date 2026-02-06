@@ -43,21 +43,64 @@ const requireLogin = (req, res, next) => {
     }
 };
 
-// --- ROUTES ---
+// --- TRONG FILE SERVER.JS ---
 
 app.get('/', async (req, res) => {
     try {
         let filter = {};
-        let keyword = req.query.q || '';
+        const keyword = req.query.q || ''; 
+        
+        // 1. Xử lý tìm kiếm
         if (keyword) {
-            filter.name = { $regex: keyword, $options: 'i' };
+            // Tìm tên truyện HOẶC giới thiệu có chứa từ khóa
+            filter = {
+                $or: [
+                    { name: { $regex: keyword, $options: 'i' } },
+                    { introduction: { $regex: keyword, $options: 'i' } }
+                ]
+            };
         }
-        const listTruyen = await Truyen.find(filter);
-        res.render('index', { listTruyen, keyword }); 
+
+        // 2. Xử lý phân trang
+        const page = parseInt(req.query.page) || 1; // Mặc định là trang 1
+        const limit = 12; // Số lượng truyện mỗi trang (bạn có thể sửa số này)
+        const skip = (page - 1) * limit;
+
+        // Đếm tổng số truyện để biết có bao nhiêu trang
+        const totalStories = await Truyen.countDocuments(filter);
+        const totalPages = Math.ceil(totalStories / limit);
+
+        // Lấy danh sách truyện theo trang
+        const listTruyen = await Truyen.find(filter)
+            .select('-link -price -shortCode') // Bỏ các trường bảo mật
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 }); // Sắp xếp truyện mới nhất lên đầu
+
+        // 3. NẾU LÀ AJAX (Client hỏi JSON) -> Trả về dữ liệu thô
+        if (req.query.type === 'json') {
+            return res.json({ 
+                listTruyen, 
+                currentPage: page, 
+                totalPages: totalPages,
+                totalStories
+            });
+        }
+
+        // 4. NẾU LÀ LẦN ĐẦU VÀO WEB -> Render giao diện EJS
+        res.render('index', { 
+            listTruyen, 
+            keyword,
+            currentPage: page,
+            totalPages
+        }); 
+
     } catch (e) {
+        console.error(e);
         res.status(500).send("Lỗi Server: " + e.message);
     }
 });
+
 app.get('/truyen/:id', async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.send("Lỗi ID");
     const truyen = await Truyen.findById(req.params.id);

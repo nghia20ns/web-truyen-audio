@@ -29,6 +29,24 @@
         }
         .guide-box ul { padding-left: 20px; margin: 5px 0 0 0; }
         .guide-box li { margin-bottom: 6px; }
+
+        /* --- STYLE MỚI CHO THÔNG BÁO NỔI BẬT --- */
+        #email-alert {
+            background-color: #fff3cd; /* Nền vàng nhạt */
+            color: #856404;           /* Chữ nâu đậm */
+            border: 2px solid #ffeeba; /* Viền vàng đậm */
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 1.1rem;        /* Chữ to hơn bình thường */
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Đổ bóng cho nổi */
+            animation: popIn 0.5s ease; /* Hiệu ứng hiện ra */
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -65,6 +83,9 @@
             </div>
 
             <div id="qr-container" style="display: none; text-align: center;">
+                
+                <div id="email-alert">
+                    </div>
                 <img id="qr-img" src="" alt="QR Code" style="max-width: 100%; border-radius: 8px; border: 1px solid #eee;">
                 
                 <p style="font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
@@ -79,12 +100,12 @@
                 <div class="guide-box">
                     <strong>🔔 Hướng dẫn:</strong>
                     <ul>
-                        <li>Vui lòng kiểm tra <strong>Gmail</strong> để nhận thông báo xem truyện. Nếu không thấy thì hãy nhắn tin qua zalo hoặc discord đễ được hỗ trợ sớm nhất</li>
+                        <li>Vui lòng kiểm tra kỹ trong <strong>thư rác, spam</strong>. Trong vòng 3-5h nếu không thấy thì hãy nhắn tin qua zalo hoặc discord đễ được hỗ trợ sớm nhất</li>
                         <li><strong>Lưu ý:</strong> Việc thêm vào nhóm Drive thực hiện thủ công, Admin không online thường xuyên nên có thể sẽ có độ trễ. Mong bạn thông cảm chờ đợi.</li>
                         <li>Đăng nhập Drive bằng <strong>đúng Gmail</strong> bạn đã điền ở trên để nghe.</li>
                         <li>Nếu file nghe không có tốc độ <strong>x1.5, x2</strong>, hãy <strong>cập nhật ứng dụng Google Drive</strong> lên phiên bản mới nhất.</li>
+                        <li>Còn nếu vẫn không nghe được <strong>x1.5, x2</strong>, nữa thì hãy <strong>Tải mp3 </strong>về nghe nhé anh em.</li>
                         <li>Mọi sai sót hoặc thắc mắc vui lòng liên hệ Admin qua <strong>Zalo</strong> hoặc <strong>Discord</strong>.</li>
-
                     </ul>
                 </div>
             </div>
@@ -93,7 +114,7 @@
 
     <%- include('partials/footer') %>
 
-<script>
+    <script>
         function generateQR() {
             const rawInput = document.getElementById('gmail').value.trim();
             const shortCode = "<%= shortCode %>"; 
@@ -105,31 +126,39 @@
                 return;
             }
 
-            // 1. Lấy tên user (bỏ @gmail.com)
+            // 1. Lấy tên user (bỏ @gmail.com) để làm nội dung CK
             let username = rawInput.split('@')[0];
 
-            // 2. Hàm xóa dấu tiếng Việt (để đảm bảo 'không dấu' tuyệt đối)
+            // 2. Xử lý hiển thị Full Email cho thông báo
+            // Nếu khách nhập "nghia" -> Tự thêm @gmail.com để hiện trong thông báo cho đẹp
+            let displayEmail = rawInput;
+            if (!displayEmail.includes('@')) {
+                displayEmail += '@gmail.com';
+            }
+
+            // --- CẬP NHẬT THÔNG BÁO NỔI BẬT ---
+            const alertBox = document.getElementById('email-alert');
+            // Dùng innerHTML để tô màu đỏ cho email
+            alertBox.innerHTML = `⚠️ Sau khi chuyển khoản trong vòng 3-5h không thấy thông báo từ gmail, Vui lòng kiểm tra hộp thư gmail <span style="color: #d32f2f; font-size: 1.2rem; text-decoration: underline;">${displayEmail}</span> để nhận truyện`;
+
+            // 3. Hàm xóa dấu tiếng Việt
             function removeAccents(str) {
                 return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                           .replace(/đ/g, "d").replace(/Đ/g, "D");
             }
 
-            // Xử lý xóa dấu cho chắc chắn
             const cleanUser = removeAccents(username);
             const cleanCode = removeAccents(shortCode);
 
-            // 3. TẠO NỘI DUNG CÓ DẤU GẠCH ĐỨNG |
-            // Kết quả sẽ là: | nghiavo1234 | dptk | 1 den 10 |
+            // 4. Tạo nội dung CK (dùng xxx như bạn yêu cầu)
             const content = `xxx ${cleanUser} xxx ${cleanCode} xxx ${tapText} xxx`;
             
-            // Hiển thị ra màn hình cho khách xem
             document.getElementById('ck-content-display').innerText = content;
 
             const BANK_ID = "MB"; 
             const ACCOUNT_NO = "017120299999";
             const TEMPLATE = "compact2";
             
-            // Mã hóa nội dung để tạo link QR
             const description = encodeURIComponent(content);
             const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${amount}&addInfo=${description}`;
 
@@ -140,6 +169,5 @@
             document.getElementById('qr-container').style.display = 'block';
         }
     </script>
-    
 </body>
 </html>

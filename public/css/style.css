@@ -108,10 +108,16 @@ body {
 }
 
 .story-card-title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    margin-bottom: 5px;
     color: var(--text-main);
+    margin-bottom: 8px;
+    line-height: 1.4;
+    
+    /* Tự động cắt nếu tên dài quá 2 dòng */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* --- NÚT BẤM (BUTTONS) --- */
@@ -357,4 +363,81 @@ input:focus, textarea:focus {
     background: var(--primary); /* Dùng màu chủ đạo của web cho đồng bộ */
     color: white;
     /* Các thuộc tính cũ giữ nguyên */
+}
+
+.story-card-intro {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    margin-bottom: 15px;
+    line-height: 1.5;
+    
+    /* Giới hạn 3 dòng */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    /* Đẩy phần này dãn ra để phần Badge trôi xuống đáy */
+    flex-grow: 1; 
+}
+
+/* --- SIMPLE FOOTER STYLE --- */
+.simple-footer {
+    background-color: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 20px 0;
+    margin-top: 50px;
+    font-size: 0.9rem;
+}
+
+.footer-flex {
+    display: flex;
+    justify-content: space-between; /* Đẩy 2 bên ra xa nhau */
+    align-items: center;
+    flex-wrap: wrap; /* Tự xuống dòng nếu màn hình quá nhỏ */
+    gap: 15px;
+}
+
+.copyright {
+    color: #64748b;
+}
+
+.footer-contact {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.contact-btn {
+    text-decoration: none;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: white;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Màu thương hiệu */
+.contact-btn.zalo {
+    background-color: #0068FF; /* Xanh Zalo */
+    box-shadow: 0 2px 5px rgba(0, 104, 255, 0.2);
+}
+
+.contact-btn.discord {
+    background-color: #5865F2; /* Tím Discord */
+    box-shadow: 0 2px 5px rgba(88, 101, 242, 0.2);
+}
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 600px) {
+    .footer-flex {
+        justify-content: center; /* Ra giữa trên điện thoại */
+        flex-direction: column;  /* Xếp dọc */
+        text-align: center;
+    }
 }

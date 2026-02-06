@@ -3,46 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Audio Truyện</title>
+    <title>Trang Chủ - Cat Audio</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
+</head>
 <body>
     <nav class="navbar">
         <div class="nav-content">
-            <a href="/" class="logo">🎧 AudioHay</a>
+            <a href="/" class="logo">🎧 Cat Audio</a>
         </div>
     </nav>
 
     <div class="container">
-        
-        <div style="margin-bottom: 30px;">
-            <form action="/" method="GET" class="search-box">
-                <input type="text" name="q" placeholder="Nhập tên truyện bạn muốn tìm..." value="<%= keyword %>">
-                <button type="submit">🔍 Tìm</button>
-            </form>
+        <div class="search-container">
+            <input type="text" id="liveSearch" class="search-input" placeholder="Gõ tên truyện để tìm kiếm ngay..." value="<%= keyword %>" autocomplete="off">
+            <div id="loadingIcon" class="input-loading"></div>
         </div>
-        <h2 style="margin-bottom: 25px;">
-            <% if(keyword) { %>
-                Kết quả tìm kiếm cho: "<%= keyword %>"
-            <% } else { %>
-                Danh Sách Truyện Mới
-            <% } %>
+
+        <h2 id="pageTitle" style="margin-bottom: 25px;">
+            <% if(keyword) { %>Kết quả cho: "<%= keyword %>"<% } else { %>Danh Sách Truyện Mới<% } %>
         </h2>
         
-        <% if(listTruyen.length === 0) { %>
-            <div style="text-align: center; color: #64748b; padding: 40px;">
-                <p style="font-size: 3rem; margin: 0;">😕</p>
-                <p>Không tìm thấy truyện nào khớp với từ khóa này.</p>
-                <a href="/" style="color: #6366f1; font-weight: bold;">Về trang chủ</a>
-            </div>
-        <% } %>
-
-        <div class="story-grid">
+        <div id="storyContainer" class="story-grid">
             <% listTruyen.forEach(function(truyen) { %>
                 <a href="/truyen/<%= truyen._id %>" style="text-decoration: none;">
                     <div class="card">
-                        <div class="story-card-title"><%= truyen.name %></div>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div>
+                            <div class="story-card-title"><%= truyen.name %></div>
+                            <div class="story-card-intro">
+                                <b>Chi tiết:</b> <%= truyen.introduction ? truyen.introduction : "Đang cập nhật..." %>
+                            </div>
+                        </div>
+                        <div class="badges">
                             <span class="badge"><%= truyen.totalChapters %> tập</span>
                             <span class="badge">Audio</span>
                         </div>
@@ -50,7 +42,148 @@
                 </a>
             <% }); %>
         </div>
+
+        <div id="notFound" style="display: none; margin-top: 30px; text-align: center; color: #555;">
+                <p>Không tìm thấy truyện nào.</p>
+        </div>
+
+        <div id="pagination" class="pagination">
+            </div>
     </div>
+
     <%- include('partials/footer') %>
+
+    <script>
+        // Các biến toàn cục
+        let currentPage = Number('<%= (typeof currentPage != "undefined") ? currentPage : 1 %>');
+        let totalPages = Number('<%= (typeof totalPages != "undefined") ? totalPages : 1 %>');
+        let currentKeyword = "<%= keyword %>";
+        let debounceTimer;
+
+        const input = document.getElementById('liveSearch');
+        const container = document.getElementById('storyContainer');
+        const loading = document.getElementById('loadingIcon');
+        const notFound = document.getElementById('notFound');
+        const pageTitle = document.getElementById('pageTitle');
+        const paginationDiv = document.getElementById('pagination');
+
+        // Hàm khởi tạo ban đầu
+        renderPagination(currentPage, totalPages);
+
+        // 1. SỰ KIỆN GÕ PHÍM (LIVE SEARCH)
+        input.addEventListener('input', function() {
+            const keyword = this.value.trim();
+            
+            // Hiển thị loading
+            loading.style.display = 'block';
+
+            // Xóa lệnh cũ nếu người dùng vẫn đang gõ (Debounce)
+            clearTimeout(debounceTimer);
+
+            // Đợi 500ms sau khi ngừng gõ mới gửi yêu cầu
+            debounceTimer = setTimeout(() => {
+                currentKeyword = keyword;
+                currentPage = 1; // Reset về trang 1 khi tìm kiếm mới
+                fetchData(1, currentKeyword);
+            }, 500); 
+        });
+
+        // 2. HÀM GỌI DỮ LIỆU TỪ SERVER
+        async function fetchData(page, keyword) {
+            try {
+                // Đổi URL trên trình duyệt cho đẹp (nhưng không load lại)
+                const urlDisplay = keyword ? `/?q=${keyword}&page=${page}` : `/?page=${page}`;
+                window.history.pushState(null, '', urlDisplay);
+
+                // Gọi API
+                const res = await fetch(`/?q=${keyword}&page=${page}&type=json`);
+                const data = await res.json();
+
+                // Cập nhật dữ liệu
+                renderStories(data.listTruyen);
+                renderPagination(data.currentPage, data.totalPages);
+                
+                // Cập nhật tiêu đề
+                pageTitle.innerText = keyword ? `Kết quả cho: "${keyword}"` : "Danh Sách Truyện Mới";
+                
+                // Tắt loading
+                loading.style.display = 'none';
+
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi tải dữ liệu");
+            }
+        }
+
+        // 3. HÀM VẼ LẠI DANH SÁCH TRUYỆN
+        function renderStories(list) {
+            container.innerHTML = ''; // Xóa cũ
+            
+            if (list.length === 0) {
+                notFound.style.display = 'block';
+                return;
+            }
+            notFound.style.display = 'none';
+
+            list.forEach(truyen => {
+                const intro = truyen.introduction ? truyen.introduction : "Đang cập nhật...";
+                
+                // HTML Card Truyện (Giữ nguyên cấu trúc bạn thích)
+                const html = `
+                    <a href="/truyen/${truyen._id}" style="text-decoration: none;">
+                        <div class="card">
+                            <div>
+                                <div class="story-card-title">${truyen.name}</div>
+                                <div class="story-card-intro">
+                                    <b>Chi tiết:</b> ${intro}
+                                </div>
+                            </div>
+                            <div class="badges">
+                                <span class="badge">${truyen.totalChapters} tập</span>
+                                <span class="badge">Audio</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // 4. HÀM VẼ NÚT PHÂN TRANG
+        function renderPagination(current, total) {
+            paginationDiv.innerHTML = '';
+            
+            if (total <= 1) return; // Nếu chỉ có 1 trang thì khỏi hiện nút
+
+            // Nút Prev (Trang trước)
+            const prevBtn = document.createElement('button');
+            prevBtn.innerText = '« Trước';
+            prevBtn.className = 'page-btn';
+            prevBtn.disabled = current === 1;
+            prevBtn.onclick = () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // Cuộn lên đầu
+                fetchData(current - 1, currentKeyword);
+            };
+            paginationDiv.appendChild(prevBtn);
+
+            // Hiển thị số trang (Ví dụ: Trang 1 / 5)
+            const info = document.createElement('span');
+            info.innerText = ` Trang ${current} / ${total} `;
+            info.style.alignSelf = 'center';
+            info.style.fontWeight = 'bold';
+            paginationDiv.appendChild(info);
+
+            // Nút Next (Trang sau)
+            const nextBtn = document.createElement('button');
+            nextBtn.innerText = 'Sau »';
+            nextBtn.className = 'page-btn';
+            nextBtn.disabled = current === total;
+            nextBtn.onclick = () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                fetchData(current + 1, currentKeyword);
+            };
+            paginationDiv.appendChild(nextBtn);
+        }
+    </script>
 </body>
 </html>
