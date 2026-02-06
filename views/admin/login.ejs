@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>body { align-items: center; }</style>
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+</head>
+<body>
+    <div class="container" style="max-width: 400px;">
+        <div class="card">
+            <h2 style="color: var(--primary-color);">🔐 Đăng nhập hệ thống</h2>
+            <% if (error) { %>
+                <div style="color: red; text-align: center; margin-bottom: 10px;"><%= error %></div>
+            <% } %>
+            <form action="/login" method="POST">
+                <label>Tài khoản</label>
+                <input type="text" name="username" required style="margin-bottom: 15px; width: 100%; box-sizing: border-box; padding: 10px;">
+                
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required style="margin-bottom: 15px; width: 100%; box-sizing: border-box; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px;">
+                
+                <button type="submit" class="btn-primary">Đăng nhập</button>
+            </form>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="/" style="font-size: 0.9rem; color: #666;">Về trang chủ</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

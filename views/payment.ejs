@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="logo">🎧 AudioHay</a>
+            <div class="nav-links">
+                <a href="/" class="nav-btn">🏠 Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 500px;">
+        <a href="javascript:history.back()" class="nav-btn" style="padding-left: 0; margin-bottom: 10px;">
+            ⬅ Quay lại chọn tập
+        </a>
+
+        <div class="card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: var(--primary);">Xác nhận mua</h3>
+                <p style="color: var(--text-sub);">Truyện: <strong><%= truyenName %></strong></p>
+                <div class="badge" style="background: var(--secondary); color: white; display: inline-block;">
+                    Phần <%= partCode %>
+                </div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #10b981; margin-top: 10px;">
+                    10.000đ
+                </div>
+            </div>
+
+            <div id="input-section">
+                <label>Email nhận file:</label>
+                <input type="email" id="gmail" placeholder="vidu@gmail.com" required>
+                <button class="btn-primary" onclick="generateQR()">Tạo mã QR</button>
+            </div>
+
+            <div id="qr-container" style="display: none; text-align: center;">
+                <img id="qr-img" src="" alt="QR Code" style="max-width: 100%; border-radius: 8px; border: 1px solid #eee;">
+                <p style="font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
+                    Quét mã trên bằng App Ngân hàng.<br>Nội dung CK đã được điền tự động.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateQR() {
+            const gmail = document.getElementById('gmail').value;
+            const truyenName = "<%= truyenName %>";
+            const partCode = "<%= partCode %>";
+
+            if (!gmail || !gmail.includes('@')) {
+                alert("Vui lòng nhập Email hợp lệ!");
+                return;
+            }
+
+            const BANK_ID = "MB"; 
+            const ACCOUNT_NO = "017120299999";
+            const TEMPLATE = "compact2";
+            const AMOUNT = "10000";
+            
+            const content = `${gmail} ${truyenName} p${partCode}`;
+            const description = encodeURIComponent(content);
+            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${AMOUNT}&addInfo=${description}`;
+
+            const img = document.getElementById('qr-img');
+            img.src = qrUrl;
+            
+            document.getElementById('input-section').style.display = 'none';
+            document.getElementById('qr-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= truyen.name %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="logo">🎧 AudioHay</a>
+            <div class="nav-links">
+                <a href="/" class="nav-btn">🏠 Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/" class="nav-btn" style="display: inline-flex; padding-left: 0; margin-bottom: 10px;">
+            ⬅ Quay lại danh sách
+        </a>
+
+        <div class="card">
+            <h1 style="margin: 0 0 15px 0; color: var(--primary);"><%= truyen.name %></h1>
+            
+            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Chọn phần nghe (10k/phần)</h3>
+            <div class="part-grid">
+                <% parts.forEach(function(part) { %>
+                    <a href="/payment?truyenId=<%= truyen._id %>&partCode=<%= part.code %>" class="part-item">
+                        <%= part.name %>
+                    </a>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

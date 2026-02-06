@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Audio Truyện</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="logo">🎧 AudioHay</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <div style="margin-bottom: 30px;">
+            <form action="/" method="GET" class="search-box">
+                <input type="text" name="q" placeholder="Nhập tên truyện bạn muốn tìm..." value="<%= keyword %>">
+                <button type="submit">🔍 Tìm</button>
+            </form>
+        </div>
+        <h2 style="margin-bottom: 25px;">
+            <% if(keyword) { %>
+                Kết quả tìm kiếm cho: "<%= keyword %>"
+            <% } else { %>
+                Danh Sách Truyện Mới
+            <% } %>
+        </h2>
+        
+        <% if(listTruyen.length === 0) { %>
+            <div style="text-align: center; color: #64748b; padding: 40px;">
+                <p style="font-size: 3rem; margin: 0;">😕</p>
+                <p>Không tìm thấy truyện nào khớp với từ khóa này.</p>
+                <a href="/" style="color: #6366f1; font-weight: bold;">Về trang chủ</a>
+            </div>
+        <% } %>
+
+        <div class="story-grid">
+            <% listTruyen.forEach(function(truyen) { %>
+                <a href="/truyen/<%= truyen._id %>" style="text-decoration: none;">
+                    <div class="card">
+                        <div class="story-card-title"><%= truyen.name %></div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <span class="badge"><%= truyen.totalChapters %> tập</span>
+                            <span class="badge">Audio</span>
+                        </div>
+                    </div>
+                </a>
+            <% }); %>
+        </div>
+    </div>
+    <%- include('partials/footer') %>
+</body>
+</html>

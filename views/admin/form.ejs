@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= truyen ? 'Sửa Truyện' : 'Thêm Truyện' %></title>
+    <link rel="stylesheet" href="/css/style.css">\
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <h2><%= truyen ? 'Chỉnh Sửa Truyện' : 'Thêm Truyện Mới' %></h2>
+        
+        <form action="<%= truyen ? '/admin/edit/' + truyen._id : '/admin/add' %>" method="POST" class="card">
+            <label>Tên Truyện:</label>
+            <input type="text" name="name" value="<%= truyen ? truyen.name : '' %>" required style="width: 100%; margin-bottom: 15px;">
+            
+            <label>Tổng số tập (Số):</label>
+            <input type="number" name="totalChapters" value="<%= truyen ? truyen.totalChapters : '' %>" required style="width: 100%; margin-bottom: 15px; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px;">
+            <label>Link Truyện (Gốc/Youtube):</label>
+            <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://..." style="width: 100%; margin-bottom: 15px; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px;">
+
+            <label>Giới thiệu:</label>
+            <textarea name="introduction" rows="5" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px; font-family: sans-serif;"><%= truyen ? truyen.introduction : '' %></textarea>
+            
+            <button type="submit" class="btn-primary" style="margin-top: 20px;">Lưu lại</button>
+            <a href="/admin" class="btn-back" style="text-align: center;">Hủy bỏ</a>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<div id="support-menu" class="support-menu">
+    <div class="support-header">
+        👋 Chào bạn, chúng tôi có thể giúp gì?
+    </div>
+    <div class="support-content">
+        <a href="https://zalo.me/0336672088" target="_blank" class="support-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="30" height="30" style="border-radius: 5px;">
+            <div>
+                <strong>Chat qua Zalo</strong>
+                <div style="font-size: 0.8rem; color: #666;">Phản hồi nhanh nhất</div>
+            </div>
+        </a>
+
+        <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="support-item">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="#0084FF"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.56 5.47 3.97 7.08.23.15.38.41.36.68l-.13 2.19c-.04.66.71 1.09 1.25.71l2.36-1.63c.2-.14.45-.18.68-.12.82.21 1.69.32 2.58.32 5.52 0 10-4.03 10-9S18.52 2 12 2z"/></svg>
+            <div>
+                <strong>Discord</strong>
+                <div style="font-size: 0.8rem; color: #666;">Tư vấn trực tiếp</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div id="chat-trigger" class="floating-chat" title="Hỗ trợ">
+    <svg id="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+    <svg id="icon-close" viewBox="0 0 24 24" style="display: none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+</div>
+
+<script>
+    const trigger = document.getElementById('chat-trigger');
+    const menu = document.getElementById('support-menu');
+    const iconChat = document.getElementById('icon-chat');
+    const iconClose = document.getElementById('icon-close');
+
+    trigger.addEventListener('click', function() {
+        // Toggle ẩn hiện menu
+        if (menu.style.display === 'block') {
+            menu.style.display = 'none';
+            iconChat.style.display = 'block';
+            iconClose.style.display = 'none';
+        } else {
+            menu.style.display = 'block';
+            iconChat.style.display = 'none';
+            iconClose.style.display = 'block';
+        }
+    });
+</script>

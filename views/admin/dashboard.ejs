@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+</head>
+<body>
+    <div class="container" style="max-width: 800px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>🛠 Quản Lý Truyện</h1>
+            <a href="/logout" style="color: red; font-weight: bold;">Đăng xuất</a>
+        </div>
+
+        <a href="/admin/add" class="btn-primary" style="display: inline-block; width: auto; margin-bottom: 20px; text-decoration: none;">+ Thêm Truyện Mới</a>
+
+        <% listTruyen.forEach(function(truyen) { %>
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="truyen-title"><%= truyen.name %></div>
+                    <div class="truyen-info"><%= truyen.totalChapters %> tập</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="/admin/edit/<%= truyen._id %>" style="background: #fbbf24; padding: 8px 15px; border-radius: 6px; color: #fff;">Sửa</a>
+                    <a href="/admin/delete/<%= truyen._id %>" onclick="return confirm('Bạn chắc chắn muốn xóa?')" style="background: #ef4444; padding: 8px 15px; border-radius: 6px; color: #fff;">Xóa</a>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</body>
+</html>
