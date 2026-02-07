@@ -144,7 +144,7 @@ app.get('/payment', async (req, res) => {
     const totalAmount = chapterCount * pricePerChapter;
 
     // --- TẠO CHUỖI "X den Y" Ở ĐÂY ---
-    const tapText = `${start} den ${end}`;
+    const tapText = `${start}I${end}`;
 
     res.render('payment', { 
         truyenName: truyen.name, 
