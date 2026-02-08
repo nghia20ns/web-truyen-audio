@@ -1,0 +1,83 @@
+<div id="fixed-header-wrapper">
+    
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="/" class="logo">🎧 Cat Audio</a>
+            <div class="nav-links">
+                <a href="/" class="nav-btn">🏠 Trang chủ</a>
+            </div>
+        </div>
+    </nav>
+
+    <% if (typeof globalAlert !== 'undefined' && globalAlert.isOn) { %>
+        <div class="global-alert alert-<%= globalAlert.type %>">
+            📢 <strong>Thông báo:</strong> <%= globalAlert.content %>
+        </div>
+    <% } %>
+
+</div>
+<style>
+    /* 1. Cố định cả cụm Header lên đầu trang */
+    #fixed-header-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 9999; /* Đảm bảo luôn nằm trên cùng */
+        background-color: transparent; /* Hoặc màu nền của bạn */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Style cho Navbar (giữ nguyên style cũ của bạn, chỉ đảm bảo nó full width) */
+    .navbar {
+        width: 100%;
+        background: #fff; /* Màu nền navbar */
+        border-bottom: 1px solid #eee;
+        /* Xóa position cũ nếu có */
+        position: relative; 
+    }
+
+    /* Style cho Alert */
+    .global-alert {
+        width: 100%;
+        padding: 12px 20px;
+        text-align: center;
+        font-weight: 500;
+        font-size: 0.95rem;
+        /* Animation trượt xuống nhẹ nhàng */
+        animation: slideDown 0.4s ease-out;
+    }
+
+    /* Các màu sắc alert */
+    .alert-warning { background: #fff3cd; color: #856404; border-bottom: 1px solid #ffeeba; }
+    .alert-danger  { background: #f8d7da; color: #721c24; border-bottom: 1px solid #f5c6cb; }
+    .alert-info    { background: #cff4fc; color: #055160; border-bottom: 1px solid #b6effb; }
+    .alert-success { background: #d1e7dd; color: #0f5132; border-bottom: 1px solid #badbcc; }
+
+    @keyframes slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+</style>
+
+<script>
+    // Tự động chỉnh khoảng cách nội dung để không bị Header che mất
+    document.addEventListener("DOMContentLoaded", function() {
+        const header = document.getElementById('fixed-header-wrapper');
+        const body = document.body;
+
+        function adjustPadding() {
+            if (header) {
+                const height = header.offsetHeight;
+                // Thêm padding-top cho body bằng đúng chiều cao của header + thêm 20px cho thoáng
+                body.style.paddingTop = (height + 20) + 'px';
+            }
+        }
+
+        // Chạy ngay khi tải trang
+        adjustPadding();
+
+        // Chạy lại khi thay đổi kích thước màn hình (resize)
+        window.addEventListener('resize', adjustPadding);
+    });
+</script>

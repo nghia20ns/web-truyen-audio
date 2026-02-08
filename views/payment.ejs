@@ -50,15 +50,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-content">
-            <a href="/" class="logo">🎧 AudioHay</a>
-            <div class="nav-links">
-                <a href="/" class="nav-btn">🏠 Trang chủ</a>
-            </div>
-        </div>
-    </nav>
-
+<%- include('partials/header') %>
     <div class="container" style="max-width: 500px;">
         <a href="javascript:history.back()" class="nav-btn" style="padding-left: 0; margin-bottom: 10px;">
             ⬅ Quay lại chọn tập
@@ -78,14 +70,14 @@
 
             <div id="input-section">
                 <label>Email (Vui lòng điền đúng gmail):</label>
-                <input type="text" id="gmail" placeholder="Ví dụ: quocnghia1123" required>
+                <input type="text" id="gmail" placeholder="Ví dụ: quocnghia1123@gmail.com" required>
                 <button class="btn-primary" onclick="generateQR()">Tạo mã QR</button>
             </div>
 
             <div id="qr-container" style="display: none; text-align: center;">
                 
                 <div id="email-alert">
-                    </div>
+                </div>
                 <img id="qr-img" src="" alt="QR Code" style="max-width: 100%; border-radius: 8px; border: 1px solid #eee;">
                 
                 <p style="font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
@@ -116,32 +108,54 @@
 
     <script>
         function generateQR() {
+            // 1. Lấy giá trị và chuẩn hóa (xóa khoảng trắng thừa)
             const rawInput = document.getElementById('gmail').value.trim();
+            
+            // Các biến từ server EJS
             const shortCode = "<%= shortCode %>"; 
             const tapText = "<%= tapText %>"; 
             const amount = "<%= amount %>"; 
 
+            // 2. KHU VỰC KIỂM TRA LỖI (VALIDATION) MỚI
+            // Regex: Chỉ cho phép chữ và số ở phần tên, bắt buộc đuôi @gmail.com
+            const strictGmailRegex = /^[a-zA-Z0-9]+@gmail\.com$/;
+
             if (!rawInput) {
-                alert("Vui lòng nhập tên Gmail!");
+                alert("Vui lòng nhập địa chỉ Gmail!");
                 return;
             }
 
-            // 1. Lấy tên user (bỏ @gmail.com) để làm nội dung CK
+            // Kiểm tra đuôi trước cho người dùng dễ hiểu
+            if (!rawInput.endsWith("@gmail.com")) {
+                alert("Lỗi: Email bắt buộc phải có đuôi @gmail.com");
+                return;
+            }
+
+            // Kiểm tra ký tự đặc biệt và dấu chấm
+            if (!strictGmailRegex.test(rawInput)) {
+                alert("Lỗi: Gmail không được chứa dấu chấm (.), khoảng trắng hoặc ký tự đặc biệt trong phần tên.");
+                return;
+            }
+
+            // --- NẾU QUA ĐƯỢC CÁC BƯỚC TRÊN THÌ MỚI CHẠY TIẾP ---
+
+            // 3. Lấy tên user (bỏ @gmail.com) để làm nội dung CK
+            // Vì đã validate đuôi @gmail.com ở trên, nên split chắc chắn đúng
             let username = rawInput.split('@')[0];
 
-            // 2. Xử lý hiển thị Full Email cho thông báo
-            // Nếu khách nhập "nghia" -> Tự thêm @gmail.com để hiện trong thông báo cho đẹp
+            // 4. Xử lý hiển thị (Dùng chính rawInput vì nó đã chuẩn format email rồi)
             let displayEmail = rawInput;
-            if (!displayEmail.includes('@')) {
-                displayEmail += '@gmail.com';
-            }
 
             // --- CẬP NHẬT THÔNG BÁO NỔI BẬT ---
             const alertBox = document.getElementById('email-alert');
-            // Dùng innerHTML để tô màu đỏ cho email
-            alertBox.innerHTML = `⚠️ Sau khi chuyển khoản trong vòng 3-5h không thấy thông báo từ gmail, Vui lòng kiểm tra trong ứng dụng drive của <span style="color: #d32f2f; font-size: 1.2rem; text-decoration: underline;">${displayEmail}</span> trong mục "được chia sẻ" để nhận truyện`;
+            alertBox.innerHTML = `
+            ⚠️ Sau khi chuyển khoản 3–5h chưa thấy mail?<br>
+            Vui lòng vào <b>Google Drive</b> → mục <b>“Được chia sẻ”</b> của 
+            <span style="color:#d32f2f;">${displayEmail}</span> để nhận truyện.<br>
+            <small>💡 Nên tải audio về máy để nghe mượt hơn.</small>
+            `;
 
-            // 3. Hàm xóa dấu tiếng Việt
+            // 5. Hàm xóa dấu tiếng Việt (để tạo nội dung chuyển khoản sạch)
             function removeAccents(str) {
                 return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                           .replace(/đ/g, "d").replace(/Đ/g, "D");
@@ -150,11 +164,12 @@
             const cleanUser = removeAccents(username);
             const cleanCode = removeAccents(shortCode);
 
-            // 4. Tạo nội dung CK (dùng xxx như bạn yêu cầu)
+            // 6. Tạo nội dung CK
             const content = `St ${cleanUser} ${cleanCode} ${tapText} En`;
             
             document.getElementById('ck-content-display').innerText = content;
 
+            // 7. Tạo link QR
             const BANK_ID = "MB"; 
             const ACCOUNT_NO = "017120299999";
             const TEMPLATE = "compact2";
@@ -165,6 +180,7 @@
             const img = document.getElementById('qr-img');
             img.src = qrUrl;
             
+            // 8. Ẩn form nhập, hiện QR
             document.getElementById('input-section').style.display = 'none';
             document.getElementById('qr-container').style.display = 'block';
         }

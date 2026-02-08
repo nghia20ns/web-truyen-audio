@@ -8,13 +8,9 @@
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-content">
-            <a href="/" class="logo">🎧 Cat Audio</a>
-        </div>
-    </nav>
-
+<%- include('partials/header') %>
     <div class="container">
+            <br>
         <div class="search-container">
             <input type="text" id="liveSearch" class="search-input" placeholder="Gõ tên truyện để tìm kiếm ngay..." value="<%= keyword %>" autocomplete="off">
             <div id="loadingIcon" class="input-loading"></div>
