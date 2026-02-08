@@ -53,17 +53,22 @@ exports.getHomePage = async (req, res) => {
 // Chi tiết truyện
 exports.getTruyenDetail = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.send("Lỗi ID");
+    
     const truyen = await Truyen.findOne({ _id: req.params.id, isDeleted: false });
     if (!truyen) return res.send('Không tìm thấy');
 
     let parts = [];
-    const chunkSize = 10;
+
+    // --- SỬA Ở ĐÂY: Lấy chunk size từ DB ---
+    const chunkSize = (truyen.chunkSize && truyen.chunkSize > 0) ? truyen.chunkSize : 10;
+    
     const totalParts = Math.ceil(truyen.totalChapters / chunkSize);
     const pricePerChapter = truyen.price || 1000;
 
     for (let i = 0; i < totalParts; i++) {
         const start = i * chunkSize + 1;
         const end = Math.min((i + 1) * chunkSize, truyen.totalChapters);
+        
         const chapterCount = end - start + 1;
         const partPrice = chapterCount * pricePerChapter;
 
@@ -76,7 +81,6 @@ exports.getTruyenDetail = async (req, res) => {
     }
     res.render('detail', { truyen, parts });
 };
-
 // Trang thanh toán
 exports.getPayment = async (req, res) => {
     const { truyenId, partCode } = req.query;

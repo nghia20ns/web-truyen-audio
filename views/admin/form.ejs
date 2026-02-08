@@ -27,6 +27,13 @@
             
             <label>Giá tiền 1 tập (VNĐ):</label>
             <input type="number" name="price" value="<%= truyen ? truyen.price : '1000' %>" required placeholder="Ví dụ: 1000 hoặc 1500" style="font-weight: bold; color: #16a34a;">
+
+            <label>Số tập mỗi gói (Chunk Size):</label>
+            <input type="number" name="chunkSize" value="<%= truyen && truyen.chunkSize ? truyen.chunkSize : 10 %>" required min="1" placeholder="Mặc định 10">
+            <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 10px;">
+                * Nhập 10 -> Web chia: 1-10, 11-20... <br>
+                * Nhập 50 -> Web chia: 1-50, 51-100...
+            </small>
             <label>Link Truyện (Gốc/Youtube):</label>
             <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://...">
 
