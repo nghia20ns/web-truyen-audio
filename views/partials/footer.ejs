@@ -20,11 +20,6 @@
     <div class="chat-header">
         <div style="display: flex; align-items: center; gap: 10px;">
             <span>💬 Hỗ trợ trực tuyến</span>
-            <div class="header-icons">
-                <a href="https://zalo.me/0336672088" target="_blank" class="header-icon-link" title="Zalo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="18">
-                </a>
-            </div>
         </div>
         <div class="close-chat-btn" onclick="toggleChat()" title="Đóng chat">✖</div>
     </div>
@@ -140,6 +135,12 @@
         .chat-box { width: 100% !important; height: 100% !important; bottom: 0; left: 0; right: 0; border-radius: 0; }
         .chat-box { animation: none; opacity: 1; transform: none; display: none; }
         .chat-box.active { display: flex; }
+    
+    }
+    .floating-chat-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0); /* Hiệu ứng thu nhỏ biến mất */
     }
 </style>
 
@@ -192,24 +193,30 @@
         localStorage.setItem('chat_session_id', sessionId);
     }
 
-    async function toggleChat() {
+async function toggleChat() {
         const box = document.getElementById('chat-box');
+        const btn = document.getElementById('chat-trigger'); // Lấy nút chat tròn
+
         box.classList.toggle('active');
         
         if (box.classList.contains('active')) {
-            // Xin quyền thông báo (cho trình duyệt)
+            // Khi chat mở -> Ẩn nút tròn
+            btn.classList.add('hidden');
+
+            // Logic cũ giữ nguyên
             if (Notification.permission !== "granted") Notification.requestPermission();
             
-            // Check status
             const res = await fetch('/chat/status');
             const data = await res.json();
             isAdminOnline = data.isOnline;
             checkLoginStatus();
         } else {
+            // Khi chat đóng -> Hiện lại nút tròn
+            btn.classList.remove('hidden');
+
             if (chatInterval) clearInterval(chatInterval);
         }
     }
-
     function checkLoginStatus() {
         if (userName) {
             document.getElementById('chat-login').style.display = 'none';
