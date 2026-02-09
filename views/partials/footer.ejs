@@ -83,6 +83,31 @@
         .chat-input-area input {
             font-size: 16px;             /* Cỡ chữ 16px để iOS không tự zoom khi nhập */
         }
+        @media (max-width: 480px) {
+        .chat-box {
+            width: 100% !important;
+            
+            /* SỬA DÒNG NÀY: Dùng dvh để tự co giãn khi bàn phím hiện */
+            height: 100dvh !important; 
+            max-height: 100dvh !important;
+
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 0;
+            position: fixed;
+            z-index: 99999;
+            display: flex;         /* Đảm bảo dùng Flexbox */
+            flex-direction: column; /* Xếp dọc */
+        }
+
+        /* Thêm cái này để nội dung chat tự co lại */
+        .chat-body {
+            flex: 1; 
+            overflow: hidden; 
+        }
+        
+    }
+    
+    
     }
 </style>
 
@@ -251,4 +276,21 @@
     function stopPolling() {
         if (chatInterval) clearInterval(chatInterval);
     }
+    // --- KHẮC PHỤC LỖI BÀN PHÍM CHE MẤT TRÊN ĐIỆN THOẠI ---
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const chatBox = document.getElementById('chat-box');
+            // Chỉ chỉnh khi đang mở chat trên mobile
+            if (chatBox.style.display !== 'none' && window.innerWidth <= 480) {
+                chatBox.style.height = window.visualViewport.height + 'px';
+                scrollToBottom(); // Cuộn xuống tin nhắn cuối
+            }
+        });
+    }
+
+    // Fix phụ: Khi bấm vào ô nhập liệu, cuộn nó lên
+    const inputField = document.getElementById('msg-input');
+    inputField.addEventListener('focus', () => {
+        setTimeout(scrollToBottom, 300);
+    });
 </script>
