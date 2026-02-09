@@ -83,28 +83,46 @@
         .chat-input-area input {
             font-size: 16px;             /* Cỡ chữ 16px để iOS không tự zoom khi nhập */
         }
-        @media (max-width: 480px) {
+        /* --- CSS CHO MOBILE --- */
+    @media (max-width: 480px) {
         .chat-box {
+            position: fixed;
             width: 100% !important;
             
-            /* SỬA DÒNG NÀY: Dùng dvh để tự co giãn khi bàn phím hiện */
-            height: 100dvh !important; 
-            max-height: 100dvh !important;
-
-            top: 0; left: 0; right: 0; bottom: 0;
+            /* Mặc định full màn hình, JS sẽ ghi đè lại chiều cao này khi bàn phím hiện */
+            height: 100% !important; 
+            
+            bottom: 0; left: 0; right: 0;
             border-radius: 0;
-            position: fixed;
             z-index: 99999;
-            display: flex;         /* Đảm bảo dùng Flexbox */
-            flex-direction: column; /* Xếp dọc */
+            
+            /* Dùng Flexbox để chia bố cục */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Thêm cái này để nội dung chat tự co lại */
         .chat-body {
-            flex: 1; 
-            overflow: hidden; 
+            /* Quan trọng: flex: 1 để tự co giãn phần nội dung */
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Ẩn phần tràn ra ngoài */
+            min-height: 0;    /* Bắt buộc có để scroll hoạt động trên Flexbox */
         }
-        
+
+        .messages-list {
+            flex: 1;          /* Chiếm hết khoảng trống còn lại */
+            overflow-y: auto; /* Cho phép cuộn */
+            padding-bottom: 10px;
+        }
+
+        .chat-header {
+            flex-shrink: 0;   /* Không bao giờ được co nhỏ header */
+        }
+
+        .chat-input-area {
+            flex-shrink: 0;   /* Không bao giờ được co nhỏ ô nhập liệu */
+        }
     }
     
     
@@ -277,15 +295,27 @@
         if (chatInterval) clearInterval(chatInterval);
     }
     // --- KHẮC PHỤC LỖI BÀN PHÍM CHE MẤT TRÊN ĐIỆN THOẠI ---
+    // --- JS FIX LỖI BÀN PHÍM CHE MẤT (UPDATE MỚI) ---
     if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
+        function resizeChatBox() {
             const chatBox = document.getElementById('chat-box');
-            // Chỉ chỉnh khi đang mở chat trên mobile
+            
+            // Chỉ chạy khi đang chat trên điện thoại
             if (chatBox.style.display !== 'none' && window.innerWidth <= 480) {
-                chatBox.style.height = window.visualViewport.height + 'px';
-                scrollToBottom(); // Cuộn xuống tin nhắn cuối
+                // 1. Ép chiều cao khung chat bằng đúng chiều cao nhìn thấy được (đã trừ bàn phím)
+                chatBox.style.height = `${window.visualViewport.height}px`;
+                
+                // 2. Ép vị trí luôn nằm dính đáy visual viewport
+                // (Giúp khắc phục lỗi bị trôi lên trôi xuống trên iOS)
+                chatBox.style.bottom = `${window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop}px`;
+                
+                // 3. Cuộn tin nhắn xuống cuối
+                scrollToBottom();
             }
-        });
+        }
+
+        window.visualViewport.addEventListener('resize', resizeChatBox);
+        window.visualViewport.addEventListener('scroll', resizeChatBox);
     }
 
     // Fix phụ: Khi bấm vào ô nhập liệu, cuộn nó lên
