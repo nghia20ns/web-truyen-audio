@@ -126,8 +126,6 @@ exports.createPaymentLink = async (req, res) => {
         // A. Xử lý Gmail: Lấy phần tên, bỏ đuôi @gmail.com, xóa ký tự lạ
         let userPart = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
         // Giới hạn Gmail 10 ký tự để nhường chỗ cho Mã và Tập
-        if (userPart.length > 10) userPart = userPart.substring(0, 10); 
-
         // B. Xử lý Mã truyện: Viết hoa, xóa ký tự lạ
         const cleanCode = storyCode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
