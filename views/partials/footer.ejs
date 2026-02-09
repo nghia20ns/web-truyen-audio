@@ -1,17 +1,11 @@
 <footer class="simple-footer">
     <div class="container footer-flex">
         <div class="copyright">
-            &copy; <%= new Date().getFullYear() %> Web Truyện Audio. Nâng tầm trải nghiệm nghe.
+            &copy; <%= new Date().getFullYear() %> Web Truyện Audio.
         </div>
-        
         <div class="footer-contact">
-            <span>Kết nối với chúng tôi:</span>
-            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="16"> Zalo
-            </a>
-            <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="contact-btn discord">
-                <img src="https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" width="16"> Discord
-            </a>
+            <span>Liên hệ:</span>
+            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo">Zalo</a>
         </div>
     </div>
 </footer>
@@ -21,24 +15,15 @@
         <div style="display: flex; align-items: center; gap: 10px;">
             <span>💬 Hỗ trợ trực tuyến</span>
         </div>
-        <div class="close-chat-btn" onclick="toggleChat()" title="Đóng chat">✖</div>
+        <div class="close-chat-btn" onclick="toggleChat()">✖</div>
     </div>
     
     <div id="chat-login" class="chat-body chat-login-screen">
-        <div style="text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 10px;">👋</div>
-            <h3 style="margin: 0; color: #6366f1;">Xin chào!</h3>
-            <p style="color: #666; margin-top: 5px;">Vui lòng nhập Gmail để bắt đầu trò chuyện.</p>
-        </div>
-        
-        <div style="width: 100%; margin-top: 20px;">
-            <input type="email" id="chat-email-input" placeholder="Ví dụ: baoboi@gmail.com" class="chat-input-styled">
-            <button onclick="startChat()" class="btn-primary btn-start-chat">
-                Bắt đầu Chat Ngay 🚀
-            </button>
-            <p id="chat-error" class="chat-error-msg"></p>
-        </div>
-         <small style="color: #999; font-size: 0.75rem; margin-top: 15px;">*Chúng tôi chỉ sử dụng tên trước @gmail.com để hiển thị.</small>
+        <h3 style="margin: 0 0 15px 0; color: #6366f1;">Xin chào!</h3>
+        <input type="email" id="chat-email-input" placeholder="Nhập Gmail..." class="chat-input-styled">
+        <button onclick="startChat()" class="btn-primary btn-start-chat">Bắt đầu Chat</button>
+        <p id="chat-error" class="chat-error-msg"></p>
+        <small style="color: #999; font-size: 0.75rem; margin-top: 15px;">*Tên hiển thị lấy theo Gmail.</small>
     </div>
 
     <div id="chat-interface" class="chat-body" style="display: none; padding: 0;">
@@ -46,101 +31,71 @@
         
         <div id="offline-alert" class="offline-screen" style="display: none;">
             <div class="offline-icon">😴</div>
-            <h3>Admin hiện đang Offline</h3>
-            <p>Hiện tại không có tư vấn viên trực tuyến. Bạn vui lòng liên hệ qua các kênh khác để được hỗ trợ nhanh nhất nhé!</p>
-            <div class="offline-buttons">
-                <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo large">Chat Zalo</a>
-                <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="contact-btn discord large">Discord</a>
-            </div>
+            <h3>Admin Offline</h3>
+            <p>Vui lòng liên hệ Zalo để được hỗ trợ.</p>
+            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo large">Chat Zalo</a>
         </div>
 
         <div id="input-area-wrapper" class="chat-input-area">
-            <input type="text" id="msg-input" placeholder="Nhập tin nhắn ở đây..." onkeypress="handleEnter(event)">
-            <button onclick="sendUserMessage()" class="btn-send-msg">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
+            <input type="text" id="msg-input" placeholder="Nhập tin nhắn..." onkeypress="handleEnter(event)">
+            <button onclick="sendUserMessage()" class="btn-send-msg">➤</button>
         </div>
     </div>
 </div>
 
-<div id="chat-trigger" class="floating-chat-btn" onclick="toggleChat()" title="Hỗ trợ khách hàng">
-    <svg id="icon-chat" viewBox="0 0 24 24" width="30" height="30" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+<div id="chat-trigger" class="floating-chat-btn" onclick="toggleChat()">
+    <svg viewBox="0 0 24 24" width="30" height="30" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
 </div>
 
 <style>
     :root { --primary: #6366f1; }
-
-    /* Footer */
     .simple-footer { background-color: white; border-top: 1px solid #f1f5f9; padding: 25px 0; margin-top: 60px; font-size: 0.95rem; color: #64748b; }
     .footer-flex { display: flex; justify-content: space-between; align-items: center; }
-    .footer-contact { display: flex; align-items: center; gap: 15px; font-weight: 500; }
-    .contact-btn { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; color: white !important; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); opacity: 0.95; }
-    .contact-btn img { filter: brightness(0) invert(1); }
-    .contact-btn.zalo { background: linear-gradient(45deg, #0068FF, #00a2ff); }
-    .contact-btn.discord { background: linear-gradient(45deg, #5865F2, #7289da); }
-
-    /* Nút Chat Nổi */
-    .floating-chat-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 10001; }
-    .floating-chat-btn:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.6); }
-
-    /* Khung Chat Box */
-    .chat-box { position: fixed; bottom: 110px; right: 30px; width: 350px; height: 500px; background: white; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); z-index: 10000; display: flex; flex-direction: column; overflow: hidden; border: none; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .chat-box.active { opacity: 1; transform: translateY(0); pointer-events: all; }
-
-    /* Header */
-    .chat-header { background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; padding: 15px 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-    .header-icons { display: flex; gap: 10px; }
-    .header-icon-link { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; backdrop-filter: blur(5px); }
-    .header-icon-link:hover { background: rgba(255,255,255,0.4); }
-    .close-chat-btn { cursor: pointer; font-size: 1.5rem; opacity: 0.8; transition: 0.2s; }
-    .close-chat-btn:hover { opacity: 1; transform: rotate(90deg); }
-
-    /* Body */
-    .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
-    .chat-login-screen { justify-content: center; align-items: center; padding: 30px; text-align: center; }
-    .chat-input-styled { width: 100%; padding: 12px 15px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #e2e8f0; box-sizing: border-box; font-size: 1rem; transition: 0.3s; outline: none; }
-    .chat-input-styled:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-    .btn-start-chat { width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 10px; background: linear-gradient(to right, #6366f1, #8b5cf6); border: none; color: white; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); transition: 0.3s; }
-    .btn-start-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4); }
-    .chat-error-msg { color: #ef4444; font-size: 0.9rem; display: none; margin-top: 10px; text-align: left; }
-
-    /* Messages List */
-    .messages-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
-    .msg { max-width: 85%; padding: 10px 15px; border-radius: 18px; font-size: 0.95rem; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; animation: popIn 0.3s ease; }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-    .msg.me { align-self: flex-end; background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; border-bottom-right-radius: 4px; }
-    .msg.admin { align-self: flex-start; background: white; color: #334155; border: 1px solid #e2e8f0; border-bottom-left-radius: 4px; }
-
-    /* Input Area */
-    .chat-input-area { display: flex; border-top: 1px solid #e2e8f0; padding: 12px; background: white; align-items: center; gap: 10px; }
-    .chat-input-area input { flex: 1; border: none; padding: 10px; outline: none; font-size: 1rem; background: #f1f5f9; border-radius: 20px; transition: 0.3s; }
-    .chat-input-area input:focus { background: white; box-shadow: 0 0 0 2px #e2e8f0; }
-    .btn-send-msg { width: 42px; height: 42px; border: none; background: #6366f1; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 8px rgba(99, 102, 241, 0.3); }
-    .btn-send-msg:hover { transform: scale(1.1); }
+    .contact-btn { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 6px 14px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; color: white !important; }
+    .contact-btn.zalo { background: #0068FF; }
     
-    /* Offline Screen */
-    .offline-screen { flex: 1; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; background: #fff1f2; }
-    .offline-icon { font-size: 4rem; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    .offline-screen h3 { color: #be123c; margin: 0 0 10px 0; }
-    .offline-screen p { color: #4b5563; margin-bottom: 25px; }
-    .offline-buttons { display: flex; gap: 15px; justify-content: center; }
-    .contact-btn.large { padding: 10px 25px; font-size: 1rem; }
-
-    /* Responsive */
-    @media (max-width: 768px) { .footer-flex { flex-direction: column; gap: 20px; text-align: center; } }
-    @media (max-width: 480px) {
-        .floating-chat-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; }
-        .chat-box { width: 100% !important; height: 100% !important; bottom: 0; left: 0; right: 0; border-radius: 0; }
-        .chat-box { animation: none; opacity: 1; transform: none; display: none; }
-        .chat-box.active { display: flex; }
-    
+    /* Nút chat tròn */
+    .floating-chat-btn { 
+        position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+        background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 50%; 
+        display: flex; justify-content: center; align-items: center; cursor: pointer; 
+        z-index: 10001; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); 
+        transition: all 0.3s ease; /* Hiệu ứng mượt */
     }
+    
+    /* Class ẩn nút chat (Thêm cái này theo yêu cầu của bạn) */
     .floating-chat-btn.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0); /* Hiệu ứng thu nhỏ biến mất */
+        opacity: 0;
+        transform: scale(0);
+        pointer-events: none;
+    }
+    
+    .chat-box { position: fixed; bottom: 100px; right: 30px; width: 340px; height: 480px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: 0.3s; transform: translateY(20px); }
+    .chat-box.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+    
+    .chat-header { background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+    .close-chat-btn { cursor: pointer; font-size: 1.2rem; }
+    
+    .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
+    .chat-login-screen { justify-content: center; align-items: center; padding: 20px; text-align: center; }
+    .chat-input-styled { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+    .btn-start-chat { width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    
+    .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { padding: 8px 12px; border-radius: 12px; max-width: 80%; word-wrap: break-word; font-size: 0.9rem; }
+    .msg.me { align-self: flex-end; background: #6366f1; color: white; }
+    .msg.admin { align-self: flex-start; background: white; border: 1px solid #eee; }
+    
+    .chat-input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #eee; }
+    .chat-input-area input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 8px 12px; border-radius: 20px; }
+    .btn-send-msg { border: none; background: #6366f1; color: white; width: 35px; height: 35px; border-radius: 50%; margin-left: 8px; cursor: pointer; }
+    
+    .offline-screen { flex: 1; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; background: #fff1f2; }
+    .offline-icon { font-size: 3rem; margin-bottom: 10px; }
+    
+    @media (max-width: 480px) {
+        .chat-box { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; }
+        .chat-box.active { display: flex; }
     }
 </style>
 
@@ -149,79 +104,39 @@
     let sessionId = localStorage.getItem('chat_session_id');
     let userName = localStorage.getItem('chat_user_name');
     let isAdminOnline = true;
+    let lastMsgCount = 0; // Vẫn cần biến này để check có tin mới không để render
     
-    // BIẾN THÔNG BÁO TAB
-    let lastMsgCount = 0;
-    let originalTitle = document.title;
-    let unreadCount = 0;
-    let blinkInterval = null;
-    let isTabActive = true;
-    const notifyAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-
-    // 1. Logic kiểm tra Active Tab
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            isTabActive = false;
-        } else {
-            isTabActive = true;
-            unreadCount = 0;
-            document.title = originalTitle; // Reset title về gốc
-            stopBlinking();
-        }
-    });
-
-    // 2. Logic Title Nhấp nháy
-    function startBlinking() {
-        if (blinkInterval) return;
-        let showMsg = true;
-        blinkInterval = setInterval(() => {
-            document.title = showMsg ? `(${unreadCount}) 💬 Tin nhắn mới!` : `(${unreadCount}) Xem ngay...`;
-            showMsg = !showMsg;
-        }, 1000);
-    }
-
-    function stopBlinking() {
-        if (blinkInterval) {
-            clearInterval(blinkInterval);
-            blinkInterval = null;
-        }
-    }
-
-    // 3. Logic Chat Cơ bản
     if (!sessionId) {
         sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('chat_session_id', sessionId);
     }
 
-async function toggleChat() {
+    async function toggleChat() {
         const box = document.getElementById('chat-box');
-        const btn = document.getElementById('chat-trigger'); // Lấy nút chat tròn
+        const triggerBtn = document.getElementById('chat-trigger'); // Lấy nút tròn
 
         box.classList.toggle('active');
         
         if (box.classList.contains('active')) {
-            // Khi chat mở -> Ẩn nút tròn
-            btn.classList.add('hidden');
+            // Mở chat -> Ẩn nút tròn
+            triggerBtn.classList.add('hidden');
 
-            // Logic cũ giữ nguyên
-            if (Notification.permission !== "granted") Notification.requestPermission();
-            
             const res = await fetch('/chat/status');
             const data = await res.json();
             isAdminOnline = data.isOnline;
             checkLoginStatus();
         } else {
-            // Khi chat đóng -> Hiện lại nút tròn
-            btn.classList.remove('hidden');
+            // Đóng chat -> Hiện lại nút tròn
+            triggerBtn.classList.remove('hidden');
 
             if (chatInterval) clearInterval(chatInterval);
         }
     }
+
     function checkLoginStatus() {
         if (userName) {
             document.getElementById('chat-login').style.display = 'none';
             document.getElementById('chat-interface').style.display = 'flex';
-            
             if (!isAdminOnline) {
                 document.getElementById('offline-alert').style.display = 'flex';
                 document.getElementById('input-area-wrapper').style.display = 'none';
@@ -231,7 +146,7 @@ async function toggleChat() {
                 document.getElementById('input-area-wrapper').style.display = 'flex';
                 document.getElementById('messages-list').style.display = 'flex';
                 loadMessages();
-                startPolling();
+                chatInterval = setInterval(loadMessages, 3000);
             }
         } else {
             document.getElementById('chat-login').style.display = 'flex';
@@ -241,18 +156,15 @@ async function toggleChat() {
 
     function startChat() {
         const input = document.getElementById('chat-email-input');
-        const errorMsg = document.getElementById('chat-error');
         const email = input.value.trim();
-        errorMsg.style.display = 'none';
-
-        if (!email.toLowerCase().endsWith("@gmail.com")) {
-            errorMsg.innerText = "⚠️ Vui lòng nhập đúng định dạng @gmail.com";
-            errorMsg.style.display = 'block'; return;
+        if(email.includes('@gmail.com')){
+            userName = email.split('@')[0];
+            localStorage.setItem('chat_user_name', userName);
+            checkLoginStatus();
+        } else {
+            document.getElementById('chat-error').innerText = "Vui lòng nhập đúng Gmail!";
+            document.getElementById('chat-error').style.display = 'block';
         }
-        
-        userName = email.split('@')[0];
-        localStorage.setItem('chat_user_name', userName);
-        checkLoginStatus();
     }
 
     async function sendUserMessage() {
@@ -273,37 +185,16 @@ async function toggleChat() {
 
     function handleEnter(e) { if (e.key === 'Enter') sendUserMessage(); }
 
-    // 4. Logic Load Tin Nhắn & Thông báo
     async function loadMessages() {
         try {
             const res = await fetch(`/chat/history?sessionId=${sessionId}`);
             const msgs = await res.json();
             
+            // Chỉ render lại nếu số lượng tin nhắn thay đổi
+            // KHÔNG CÒN LOGIC THÔNG BÁO Ở ĐÂY NỮA
             if (msgs.length > lastMsgCount) {
-                const lastMsg = msgs[msgs.length - 1];
-                
-                // NẾU CÓ TIN NHẮN MỚI TỪ ADMIN
-                if (lastMsg && lastMsg.sender === 'admin' && lastMsgCount > 0) {
-                    
-                    // b) Nếu đang ẩn tab -> Bật thông báo Title nhấp nháy
-                    if (!isTabActive) {
-                        unreadCount++;
-                        startBlinking();
-                    }
-
-                    // c) Bật thông báo hệ thống (Notification API)
-                    if (document.hidden && Notification.permission === "granted") {
-                        new Notification("Admin đã trả lời!", {
-                            body: lastMsg.content,
-                            icon: '/images/logo.png',
-                            tag: 'chat-msg'
-                        });
-                    }
-                }
-                
-                // Render List
                 const list = document.getElementById('messages-list');
-                list.innerHTML = '';
+                list.innerHTML = ''; 
                 msgs.forEach(m => {
                     const type = m.sender === 'client' ? 'me' : 'admin';
                     appendMessage(m.content, type);
@@ -312,14 +203,13 @@ async function toggleChat() {
                 scrollToBottom();
                 lastMsgCount = msgs.length;
             }
-        } catch (e) { console.error(e); }
+        } catch (e) {}
     }
 
     function appendMessage(content, type) {
         const div = document.createElement('div');
         div.className = `msg ${type}`;
-        if (type === 'admin') div.innerHTML = `<strong>Admin:</strong> ${content}`;
-        else div.innerText = content;
+        div.innerHTML = type === 'admin' ? `<strong>Admin:</strong> ${content}` : content;
         document.getElementById('messages-list').appendChild(div);
     }
     
@@ -327,24 +217,14 @@ async function toggleChat() {
         const list = document.getElementById('messages-list');
         list.scrollTop = list.scrollHeight;
     }
-
-    function startPolling() {
-        if (chatInterval) clearInterval(chatInterval);
-        chatInterval = setInterval(loadMessages, 3000);
-    }
-    function stopPolling() { if (chatInterval) clearInterval(chatInterval); }
-
-    // 5. Fix lỗi bàn phím điện thoại
+    
     if (window.visualViewport) {
-        function resizeChatBox() {
-            const chatBox = document.getElementById('chat-box');
-            if (chatBox.classList.contains('active') && window.innerWidth <= 480) {
-                chatBox.style.height = `${window.visualViewport.height}px`;
-                chatBox.style.bottom = `${window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop}px`;
-                scrollToBottom();
-            }
-        }
-        window.visualViewport.addEventListener('resize', resizeChatBox);
-        window.visualViewport.addEventListener('scroll', resizeChatBox);
+        window.visualViewport.addEventListener('resize', () => {
+             const box = document.getElementById('chat-box');
+             if(box.classList.contains('active') && window.innerWidth <= 480) {
+                 box.style.height = window.visualViewport.height + 'px';
+                 scrollToBottom();
+             }
+        });
     }
 </script>
