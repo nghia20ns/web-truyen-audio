@@ -31,7 +31,7 @@ app.use(globalAlertMiddleware);
 // 4. Routes
 app.use('/', require('./routes/index'));      // Routes cho khách (Bao gồm cả thanh toán)
 app.use('/admin', require('./routes/admin')); // Routes cho admin
-
+app.use('/chat', require('./routes/chat'));
 // 5. Khởi động Server
 const PORT = 3000;
 app.listen(PORT, () => {

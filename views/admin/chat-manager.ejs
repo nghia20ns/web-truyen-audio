@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quản lý Chat</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* CSS riêng cho Chat giữ nguyên, nhưng sửa height để khớp layout mới */
+        .chat-container { display: flex; height: 75vh; border: 1px solid #ddd; background: white; border-radius: 12px; overflow: hidden; }
+        .user-list { width: 30%; border-right: 1px solid #ddd; overflow-y: auto; background: #f8fafc; }
+        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .user-item:hover { background: #e0e7ff; }
+        .user-item.active { background: #c7d2fe; }
+        
+        .chat-area { width: 70%; display: flex; flex-direction: column; }
+        .admin-messages { flex: 1; padding: 20px; overflow-y: auto; background: white; display: flex; flex-direction: column; gap: 10px; }
+        .admin-input { padding: 10px; border-top: 1px solid #ddd; display: flex; }
+        
+        .msg { max-width: 70%; padding: 10px; border-radius: 10px; word-wrap: break-word; }
+        .msg.client { align-self: flex-start; background: #f3f4f6; }
+        .msg.admin { align-self: flex-end; background: #6366f1; color: white; }
+        
+        .btn-delete { background-color: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; }
+        .btn-delete:hover { background-color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <%- include('../partials/admin-sidebar') %>
+
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>💬 Quản lý Tin Nhắn</h2>
+            </div>
+            
+            <div class="chat-container">
+                <div class="user-list" id="user-list">
+                    <div style="padding:10px;">Đang tải...</div>
+                </div>
+                
+                <div class="chat-area">
+                    <div id="chat-header-bar" style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #f9fafb;">
+                        <span id="current-chat-name" style="font-weight: bold;">Chọn người để chat</span>
+                        <button id="btn-delete-chat" onclick="deleteCurrentChat()" class="btn-delete" style="display: none;">🗑 Xóa</button>
+                    </div>
+
+                    <div class="admin-messages" id="admin-messages"></div>
+                    
+                    <div class="admin-input">
+                        <input type="text" id="admin-input-text" placeholder="Nhập câu trả lời..." style="flex:1; margin:0; margin-right:10px;" onkeypress="handleEnter(event)">
+                        <button class="btn-primary" onclick="sendAdminMessage()" style="width: auto;">Gửi</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // (Dán lại toàn bộ script ở bài trước vào đây)
+        let currentSessionId = null;
+        async function loadConversations() {
+             // ... Code cũ ...
+             const res = await fetch('/chat/admin/conversations');
+             const users = await res.json();
+             const list = document.getElementById('user-list');
+             const currentScroll = list.scrollTop;
+             list.innerHTML = '';
+             if (users.length === 0) {
+                 list.innerHTML = '<div style="padding:15px; color:#666;">Chưa có ai chat.</div>';
+                 return;
+             }
+             users.forEach(u => {
+                 const div = document.createElement('div');
+                 div.className = 'user-item';
+                 if (u._id === currentSessionId) div.classList.add('active');
+                 div.innerHTML = `<strong>${u.userName}</strong><br><small style="color:#666;">${u.lastMessage.substring(0, 25)}...</small>`;
+                 div.onclick = () => selectUser(u._id, u.userName);
+                 list.appendChild(div);
+             });
+             list.scrollTop = currentScroll;
+        }
+
+        async function selectUser(sessionId, name) {
+            currentSessionId = sessionId;
+            document.getElementById('current-chat-name').innerText = `Đang chat với: ${name}`;
+            document.getElementById('btn-delete-chat').style.display = 'block';
+            loadConversations(); 
+            loadAdminMessages();
+        }
+
+        async function loadAdminMessages() {
+            if (!currentSessionId) return;
+            const res = await fetch(`/chat/history?sessionId=${currentSessionId}`);
+            const msgs = await res.json();
+            const box = document.getElementById('admin-messages');
+            box.innerHTML = '';
+            msgs.forEach(m => {
+                const div = document.createElement('div');
+                div.className = `msg ${m.sender}`;
+                div.innerText = m.content;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendAdminMessage() {
+            const input = document.getElementById('admin-input-text');
+            const text = input.value.trim();
+            if (!text || !currentSessionId) return;
+
+            const box = document.getElementById('admin-messages');
+            const div = document.createElement('div');
+            div.className = 'msg admin';
+            div.innerText = text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+
+            await fetch('/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: currentSessionId, content: text, sender: 'admin', userName: 'Admin' })
+            });
+            input.value = '';
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') sendAdminMessage(); }
+
+        async function deleteCurrentChat() {
+            if (!currentSessionId) return;
+            const confirmDelete = confirm("Bạn có chắc muốn xóa VĨNH VIỄN cuộc trò chuyện này?");
+            if (!confirmDelete) return;
+            try {
+                const res = await fetch(`/chat/delete/${currentSessionId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    currentSessionId = null;
+                    document.getElementById('current-chat-name').innerText = "Chọn người để chat";
+                    document.getElementById('btn-delete-chat').style.display = 'none';
+                    document.getElementById('admin-messages').innerHTML = '';
+                    loadConversations();
+                    alert("Đã xóa thành công!");
+                }
+            } catch (e) { alert("Lỗi: " + e.message); }
+        }
+
+        setInterval(() => {
+            loadConversations(); 
+            if (currentSessionId) loadAdminMessages(); 
+        }, 3000);
+
+        loadConversations();
+    </script>
+</body>
+</html>

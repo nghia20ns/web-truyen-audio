@@ -1,67 +1,254 @@
-<div id="support-menu" class="support-menu">
-    <div class="support-header">
-        👋 Chào bạn, chúng tôi có thể giúp gì?
+<div id="chat-box" class="chat-box" style="display: none;">
+    <div class="chat-header">
+        <span>💬 Hỗ trợ trực tuyến</span>
+        <span onclick="toggleChat()" style="cursor: pointer;">✖</span>
     </div>
-    <div class="support-content">
-        <a href="https://zalo.me/0336672088" target="_blank" class="support-item">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="30" height="30" style="border-radius: 5px;">
-            <div>
-                <strong>Chat qua Zalo</strong>
-                <div style="font-size: 0.8rem; color: #666;">Phản hồi nhanh nhất</div>
-            </div>
-        </a>
+    
+<div id="chat-login" class="chat-body" style="text-align: center; justify-content: center;">
+        <div style="margin-bottom: 15px;">
+            <p style="margin: 0 0 5px 0; font-weight: 500;">Nhập Gmail để chat:</p>
+            <small style="color: #666; font-size: 0.8rem;">(Hệ thống sẽ lấy tên trước @ làm tên hiển thị)</small>
+        </div>
+        
+        <input type="email" id="chat-email-input" 
+               placeholder="Ví dụ: quocnghia91kk@gmail.com" 
+               style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box;">
+        
+        <button onclick="startChat()" class="btn-primary" style="padding: 10px 20px; width: 100%;">
+            Bắt đầu Chat 💬
+        </button>
+        
+        <p id="chat-error" style="color: red; font-size: 0.85rem; display: none; margin-top: 10px;"></p>
+    </div>
 
-        <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="support-item">
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="#0084FF"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.56 5.47 3.97 7.08.23.15.38.41.36.68l-.13 2.19c-.04.66.71 1.09 1.25.71l2.36-1.63c.2-.14.45-.18.68-.12.82.21 1.69.32 2.58.32 5.52 0 10-4.03 10-9S18.52 2 12 2z"/></svg>
-            <div>
-                <strong>Discord</strong>
-                <div style="font-size: 0.8rem; color: #666;">Tư vấn trực tiếp</div>
-            </div>
-        </a>
+    <div id="chat-interface" class="chat-body" style="display: none; padding: 0;">
+        <div id="messages-list" class="messages-list"></div>
+        <div class="chat-input-area">
+            <input type="text" id="msg-input" placeholder="Nhập tin nhắn..." onkeypress="handleEnter(event)">
+            <button onclick="sendUserMessage()">➤</button>
+        </div>
     </div>
 </div>
 
-<div id="chat-trigger" class="floating-chat" title="Hỗ trợ">
+<div id="chat-trigger" class="floating-chat" title="Hỗ trợ" onclick="toggleChat()">
     <svg id="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-    <svg id="icon-close" viewBox="0 0 24 24" style="display: none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
 </div>
+
+<style>
+    .chat-box {
+        position: fixed; bottom: 100px; right: 30px; width: 320px; height: 400px;
+        background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        z-index: 10000; display: flex; flex-direction: column; overflow: hidden;
+        border: 1px solid #eee; animation: slideUp 0.3s ease;
+    }
+    .chat-header { background: var(--primary); color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; }
+    .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 10px; }
+    .messages-list { flex: 1; overflow-y: auto; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px; }
+    .chat-input-area { display: flex; border-top: 1px solid #eee; padding: 5px; }
+    .chat-input-area input { flex: 1; border: none; padding: 10px; outline: none; }
+    .chat-input-area button { border: none; background: white; color: var(--primary); font-weight: bold; cursor: pointer; padding: 0 10px; }
+    
+    /* Bong bóng chat */
+    .msg { max-width: 80%; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; word-wrap: break-word; }
+    .msg.me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+    .msg.admin { align-self: flex-start; background: #e5e7eb; color: #333; border-bottom-left-radius: 2px; }
+    /* --- CSS CHO MOBILE (Thêm vào cuối thẻ style) --- */
+    @media (max-width: 480px) {
+        .chat-box {
+            width: 100% !important;      /* Full chiều ngang */
+            height: 100% !important;     /* Full chiều cao (che hết màn hình) */
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
+            border-radius: 0;            /* Bỏ bo góc */
+            position: fixed;
+            z-index: 99999;              /* Luôn nổi lên trên cùng */
+        }
+
+        .chat-header {
+            padding: 15px;               /* Header to hơn chút để dễ bấm */
+            font-size: 1.1rem;
+        }
+
+        .chat-header span[onclick] {
+            font-size: 1.5rem;           /* Nút X to lên để dễ tắt */
+            padding: 0 10px;
+        }
+
+        .messages-list {
+            padding-bottom: 20px;        /* Tránh bị sát đáy quá */
+        }
+        
+        .chat-input-area input {
+            font-size: 16px;             /* Cỡ chữ 16px để iOS không tự zoom khi nhập */
+        }
+    }
+</style>
 
 <script>
-    const trigger = document.getElementById('chat-trigger');
-    const menu = document.getElementById('support-menu');
-    const iconChat = document.getElementById('icon-chat');
-    const iconClose = document.getElementById('icon-close');
+    let chatInterval = null;
+    let sessionId = localStorage.getItem('chat_session_id');
+    let userName = localStorage.getItem('chat_user_name');
 
-    trigger.addEventListener('click', function() {
-        // Toggle ẩn hiện menu
-        if (menu.style.display === 'block') {
-            menu.style.display = 'none';
-            iconChat.style.display = 'block';
-            iconClose.style.display = 'none';
+    // 1. Khởi tạo Session ID nếu chưa có
+    if (!sessionId) {
+        sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('chat_session_id', sessionId);
+    }
+
+    function toggleChat() {
+        const box = document.getElementById('chat-box');
+        if (box.style.display === 'none') {
+            box.style.display = 'flex';
+            checkLoginStatus();
         } else {
-            menu.style.display = 'block';
-            iconChat.style.display = 'none';
-            iconClose.style.display = 'block';
+            box.style.display = 'none';
+            stopPolling();
         }
-    });
+    }
+
+    function checkLoginStatus() {
+        if (userName) {
+            document.getElementById('chat-login').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'flex';
+            loadMessages();
+            startPolling();
+        } else {
+            document.getElementById('chat-login').style.display = 'flex';
+            document.getElementById('chat-interface').style.display = 'none';
+        }
+    }
+
+    function startChat() {
+        const input = document.getElementById('chat-email-input');
+        const errorMsg = document.getElementById('chat-error');
+        const email = input.value.trim();
+
+        // Reset thông báo lỗi
+        errorMsg.style.display = 'none';
+        errorMsg.innerText = '';
+
+        // 1. Kiểm tra rỗng
+        if (!email) {
+            errorMsg.innerText = "Vui lòng nhập địa chỉ Gmail!";
+            errorMsg.style.display = 'block';
+            input.focus();
+            return;
+        }
+
+        // 2. Kiểm tra đuôi @gmail.com
+        if (!email.toLowerCase().endsWith("@gmail.com")) {
+            errorMsg.innerText = "Email phải có đuôi @gmail.com!";
+            errorMsg.style.display = 'block';
+            input.focus();
+            return;
+        }
+
+        // 3. Lấy phần tên (trước @)
+        const namePart = email.split('@')[0];
+
+        // 4. Kiểm tra ký tự đặc biệt (Chỉ cho phép chữ, số và dấu chấm)
+        // Regex này cấm các ký tự như ! # $ % ^ & * ...
+        const validNameRegex = /^[a-zA-Z0-9.]+$/;
+        
+        if (!validNameRegex.test(namePart)) {
+            errorMsg.innerText = "Tên Gmail chứa ký tự không hợp lệ (chỉ chấp nhận chữ, số, dấu chấm).";
+            errorMsg.style.display = 'block';
+            input.focus();
+            return;
+        }
+
+        // 5. Kiểm tra độ dài (Tùy chọn: tránh tên quá ngắn hoặc quá dài)
+        if (namePart.length < 3 || namePart.length > 30) {
+            errorMsg.innerText = "Tên Gmail phải từ 3 đến 30 ký tự.";
+            errorMsg.style.display = 'block';
+            input.focus();
+            return;
+        }
+
+        // --- HỢP LỆ ---
+        userName = namePart; // Gán tên mới (ví dụ: quocnghia91kk)
+        localStorage.setItem('chat_user_name', userName);
+        
+        // Chuyển sang màn hình chat
+        checkLoginStatus();
+        
+        // Gửi tin nhắn chào mừng tự động (Optional - cho chuyên nghiệp)
+        // appendMessage(`Xin chào ${userName}, mình có thể giúp gì cho bạn?`, 'admin');
+    }
+
+    // 2. Gửi tin nhắn
+    async function sendUserMessage() {
+        const input = document.getElementById('msg-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Hiện ngay lên màn hình cho mượt
+        appendMessage(text, 'me');
+        input.value = '';
+
+        try {
+            await fetch('/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, userName, sender: 'client', content: text })
+            });
+            scrollToBottom();
+        } catch (e) { console.error(e); }
+    }
+
+    function handleEnter(e) { if (e.key === 'Enter') sendUserMessage(); }
+
+    // 3. Tải tin nhắn (Polling)
+    async function loadMessages() {
+        try {
+            const res = await fetch(`/chat/history?sessionId=${sessionId}`);
+            const msgs = await res.json();
+            const list = document.getElementById('messages-list');
+            list.innerHTML = ''; // Xóa cũ render mới (hoặc tối ưu sau)
+            
+            msgs.forEach(m => {
+                const type = m.sender === 'client' ? 'me' : 'admin';
+                appendMessage(m.content, type);
+            });
+            scrollToBottom();
+        } catch (e) { console.error(e); }
+    }
+
+    function appendMessage(content, type) {
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+
+        if (type === 'admin') {
+            // Nếu là Admin: Tạo chữ "Admin:" in đậm
+            const strong = document.createElement('strong');
+            strong.innerText = "Admin: ";
+            strong.style.marginRight = "5px"; // Cách ra một chút cho đẹp
+            
+            div.appendChild(strong);
+            
+            // Sau đó mới thêm nội dung tin nhắn
+            div.appendChild(document.createTextNode(content));
+        } else {
+            // Nếu là Khách (me): Chỉ hiện nội dung bình thường
+            div.innerText = content;
+        }
+
+        document.getElementById('messages-list').appendChild(div);
+    }
+
+    function scrollToBottom() {
+        const list = document.getElementById('messages-list');
+        list.scrollTop = list.scrollHeight;
+    }
+
+    // Tự động tải tin nhắn mỗi 3 giây
+    function startPolling() {
+        if (chatInterval) clearInterval(chatInterval);
+        chatInterval = setInterval(loadMessages, 3000);
+    }
+    function stopPolling() {
+        if (chatInterval) clearInterval(chatInterval);
+    }
 </script>
-
-<footer class="simple-footer">
-    <div class="container footer-flex">
-        <div class="copyright">
-            &copy; 2026 <strong>Cat Audio</strong>. All rights reserved.
-        </div>
-
-        <div class="footer-contact">
-            <span style="margin-right: 10px; color: #64748b;">Liên hệ:</span>
-            
-            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo">
-                Zalo
-            </a>
-            
-            <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="contact-btn discord">
-                Discord
-            </a>
-        </div>
-    </div>
-</footer>

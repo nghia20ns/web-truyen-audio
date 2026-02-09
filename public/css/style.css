@@ -616,3 +616,198 @@ input:focus, textarea:focus {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* =========================================
+   ADMIN DASHBOARD (VERTICAL LAYOUT)
+   ========================================= */
+
+/* Layout bao ngoài: Chia 2 cột (Sidebar - Content) */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f1f5f9; /* Màu nền tổng thể xám nhạt */
+}
+
+/* --- 1. SIDEBAR --- */
+.admin-sidebar {
+    width: 260px;
+    background-color: #1e293b; /* Màu tối sang trọng */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed; /* Cố định sidebar */
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 25px 20px;
+    color: #fff;
+    border-bottom: 1px solid #334155;
+    background: #0f172a;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 20px 10px;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.menu-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin: 15px 10px 5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    color: #cbd5e1;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.sidebar-menu li a:hover {
+    background-color: #334155;
+    color: #fff;
+    transform: translateX(3px);
+}
+
+.sidebar-menu li a.active {
+    background-color: var(--primary); /* Màu tím chủ đạo */
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.logout-link:hover {
+    background-color: #ef4444 !important; /* Màu đỏ khi hover nút đăng xuất */
+    color: white !important;
+}
+
+/* --- 2. MAIN CONTENT --- */
+.admin-content {
+    flex: 1;
+    margin-left: 260px; /* Đẩy nội dung sang phải bằng chiều rộng sidebar */
+    padding: 30px;
+    width: calc(100% - 260px); /* Đảm bảo không bị tràn */
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.content-header h2 { margin: 0; color: #1e293b; font-size: 1.5rem; }
+.stat-badge {
+    background: #e0e7ff;
+    color: var(--primary);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* --- ADMIN STORY CARD (Style riêng cho admin) --- */
+.admin-story-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s;
+}
+
+.admin-story-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.story-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.story-meta {
+    font-size: 0.9rem;
+    color: #64748b;
+    display: flex;
+    gap: 15px;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid #fde68a;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background: #fbbf24;
+    color: #78350f;
+}
+
+/* --- RESPONSIVE MOBILE CHO ADMIN --- */
+@media (max-width: 768px) {
+    .admin-wrapper { flex-direction: column; }
+    
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        flex-direction: row;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 10px;
+    }
+    
+    .sidebar-menu { display: flex; padding: 10px; gap: 5px; }
+    .sidebar-brand, .menu-label, .logout-link { display: none; } /* Ẩn bớt cho gọn trên mobile */
+    
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .content-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .admin-story-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+}

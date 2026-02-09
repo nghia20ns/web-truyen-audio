@@ -1,47 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="container" style="max-width: 800px; margin-top: 20px;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-            <h1 style="margin: 0; color: #333;">🛠 Quản Trị Hệ Thống</h1>
-            <a href="/logout" style="color: #dc2626; font-weight: bold; text-decoration: none; padding: 5px 10px; border: 1px solid #dc2626; border-radius: 4px;">Đăng xuất</a>
-        </div>
-
-        <div style="display: flex; gap: 15px; margin-bottom: 25px;">
-            <a href="/admin/add" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-                ➕ Thêm Truyện Mới
-            </a>
-
-            <a href="/admin/alert" class="btn-primary" style="background-color: #0ea5e9; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-                📢 Cài Đặt Thông Báo
-            </a>
-        </div>
-
-        <h3 style="margin-bottom: 15px; color: #555;">Danh sách truyện hiện có:</h3>
-        
-        <% if (listTruyen.length === 0) { %>
-            <div style="text-align: center; color: #888; padding: 20px;">Chưa có truyện nào.</div>
-        <% } %>
-
-        <% listTruyen.forEach(function(truyen) { %>
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 15px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div>
-                    <div class="truyen-title" style="font-weight: bold; font-size: 1.1rem; color: #111;"><%= truyen.name %></div>
-                    <div class="truyen-info" style="color: #666; font-size: 0.9rem;">
-                        ⚡ Số tập: <strong><%= truyen.totalChapters %></strong>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <a href="/admin/edit/<%= truyen._id %>" style="background: #fbbf24; padding: 8px 15px; border-radius: 6px; color: #fff; text-decoration: none; font-size: 0.9rem;">Sửa</a>
-                </div>
+    
+    <div class="admin-wrapper">
+        <nav class="admin-sidebar">
+            <div class="sidebar-brand">
+                🎧 Admin Panel
             </div>
-        <% }); %>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-label">Chức năng chính</li>
+                <li>
+                    <a href="/admin" class="active">
+                        🏠 Tổng quan
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/add">
+                        ➕ Thêm Truyện Mới
+                    </a>
+                </li>
+                <li>
+                    <a href="/chat/manager">
+                        💬 Quản Lý Chat
+                    </a>
+                </li>
+                
+                <li class="menu-label">Hệ thống</li>
+                <li>
+                    <a href="/admin/alert">
+                        📢 Cấu Hình Thông Báo
+                    </a>
+                </li>
+                <li>
+                    <a href="/" target="_blank">
+                        🌏 Xem Trang Web
+                    </a>
+                </li>
+                
+                <li style="margin-top: 20px; border-top: 1px solid #334155;"></li>
+                <li>
+                    <a href="/logout" class="logout-link">
+                        🚪 Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>Danh sách truyện hiện có</h2>
+                <div class="stat-badge">Tổng: <%= listTruyen.length %> truyện</div>
+            </div>
+
+            <div class="story-list-container">
+                <% if (listTruyen.length === 0) { %>
+                    <div class="empty-state">
+                        <p>Chưa có truyện nào trong hệ thống.</p>
+                        <a href="/admin/add" class="btn-primary" style="display:inline-block; width:auto;">Thêm ngay</a>
+                    </div>
+                <% } %>
+
+                <% listTruyen.forEach(function(truyen) { %>
+                    <div class="admin-story-card">
+                        <div class="story-info">
+                            <div class="story-name"><%= truyen.name %></div>
+                            <div class="story-meta">
+                                <span>⚡ <%= truyen.totalChapters %> tập</span>
+                                <span>💰 <%= (truyen.price || 1000).toLocaleString('vi-VN') %>đ</span>
+                            </div>
+                        </div>
+                        <div class="story-actions">
+                            <a href="/admin/edit/<%= truyen._id %>" class="btn-edit">✏️ Sửa</a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </main>
     </div>
+
 </body>
 </html>

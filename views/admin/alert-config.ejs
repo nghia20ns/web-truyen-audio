@@ -4,38 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cấu hình Thông Báo</title>
-    <style>
-        body { font-family: sans-serif; padding: 50px; background: #f4f4f4; }
-        .box { background: white; padding: 30px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;}
-        button { background: #6366f1; color: white; padding: 12px; border: none; width: 100%; border-radius: 5px; cursor: pointer; font-size: 1rem; }
-        button:hover { background: #4f46e5; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="box">
-        <h2 style="text-align: center; color: #333;">📢 Cài đặt Thông Báo Web</h2>
-        
-        <form action="/admin/alert" method="POST">
-            <label><strong>Nội dung thông báo:</strong></label>
-            <textarea name="content" rows="4" placeholder="Ví dụ: Admin bận đi chơi, web tạm nghỉ..."><%= globalAlert.content %></textarea>
-            
-            <label><strong>Loại màu sắc:</strong></label>
-            <select name="type">
-                <option value="warning" <%= globalAlert.type == 'warning' ? 'selected' : '' %>>Màu Vàng (Cảnh báo/Chú ý)</option>
-                <option value="danger" <%= globalAlert.type == 'danger' ? 'selected' : '' %>>Màu Đỏ (Quan trọng/Lỗi)</option>
-                <option value="info" <%= globalAlert.type == 'info' ? 'selected' : '' %>>Màu Xanh (Thông tin)</option>
-                <option value="success" <%= globalAlert.type == 'success' ? 'selected' : '' %>>Màu Xanh lá (Thành công)</option>
-            </select>
+    <div class="admin-wrapper">
+        <%- include('../partials/admin-sidebar') %>
 
-            <div style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="status" name="status" value="on" style="width: auto;" <%= globalAlert.isOn ? 'checked' : '' %>>
-                <label for="status"><strong>BẬT hiển thị trên web</strong></label>
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>📢 Cài đặt Thông Báo Web</h2>
             </div>
 
-            <button type="submit">Lưu Cài Đặt</button>
-        </form>
-        <p style="text-align: center; margin-top: 20px;"><a href="/">Về trang chủ xem thử</a></p>
+            <div class="card" style="max-width: 600px;">
+                <form action="/admin/alert" method="POST">
+                    <label><strong>Nội dung thông báo:</strong></label>
+                    <textarea name="content" rows="4" placeholder="Ví dụ: Admin bận đi chơi..."><%= globalAlert.content %></textarea>
+                    
+                    <label><strong>Loại màu sắc:</strong></label>
+                    <select name="type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px;">
+                        <option value="warning" <%= globalAlert.type == 'warning' ? 'selected' : '' %>>Màu Vàng (Cảnh báo)</option>
+                        <option value="danger" <%= globalAlert.type == 'danger' ? 'selected' : '' %>>Màu Đỏ (Quan trọng)</option>
+                        <option value="info" <%= globalAlert.type == 'info' ? 'selected' : '' %>>Màu Xanh (Thông tin)</option>
+                        <option value="success" <%= globalAlert.type == 'success' ? 'selected' : '' %>>Màu Xanh lá (Thành công)</option>
+                    </select>
+
+                    <div style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="status" name="status" value="on" style="width: auto;" <%= globalAlert.isOn ? 'checked' : '' %>>
+                        <label for="status"><strong>BẬT hiển thị trên web</strong></label>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Lưu Cài Đặt</button>
+                </form>
+            </div>
+        </main>
     </div>
 </body>
 </html>
