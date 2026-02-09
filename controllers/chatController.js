@@ -25,28 +25,71 @@ exports.getMessages = async (req, res) => {
 };
 
 // 3. (ADMIN) Lấy danh sách các người đang chat
+// controllers/chatController.js
+
+// ... (các hàm khác giữ nguyên)
+
+// 3. (ADMIN) Lấy danh sách các người đang chat - ĐÃ FIX LỖI CHE TÊN
 exports.getConversations = async (req, res) => {
     try {
-        // Gom nhóm theo sessionId để lấy tin nhắn cuối cùng
         const conversations = await Message.aggregate([
-            { $sort: { createdAt: -1 } },
+            // 1. Sắp xếp tin mới nhất lên đầu
+            { $sort: { createdAt: -1 } }, 
+            
+            // 2. Gom nhóm theo Session
             {
                 $group: {
                     _id: "$sessionId",
-                    lastMessage: { $first: "$content" },
-                    userName: { $first: "$userName" },
-                    lastTime: { $first: "$createdAt" }
+                    lastMessage: { $first: "$content" }, // Lấy nội dung tin mới nhất (của bất kỳ ai)
+                    lastTime: { $first: "$createdAt" },  // Lấy thời gian mới nhất
+                    
+                    // --- ĐÂY LÀ PHẦN QUAN TRỌNG MỚI ---
+                    // Tạo một danh sách chứa tất cả người gửi trong hội thoại này
+                    sendersInfo: { 
+                        $push: { 
+                            sender: "$sender", 
+                            name: "$userName" 
+                        } 
+                    }
                 }
             },
+            
+            // 3. Lọc ra tên của Khách hàng (Bỏ qua tên Admin)
+            {
+                $addFields: {
+                    clientInfo: { 
+                        $first: { 
+                            $filter: { 
+                                input: "$sendersInfo", // Duyệt danh sách người gửi
+                                as: "info",
+                                // Chỉ lấy người nào là 'client'
+                                cond: { $eq: ["$$info.sender", "client"] } 
+                            } 
+                        } 
+                    }
+                }
+            },
+            
+            // 4. Định dạng lại kết quả cuối cùng
+            {
+                $project: {
+                    _id: 1,
+                    lastMessage: 1,
+                    lastTime: 1,
+                    // Nếu tìm thấy tên khách thì dùng, nếu không (trường hợp hiếm) thì để là 'Khách'
+                    userName: { $ifNull: ["$clientInfo.name", "Khách"] } 
+                }
+            },
+            
+            // 5. Sắp xếp hội thoại nào mới nhắn thì lên đầu
             { $sort: { lastTime: -1 } }
         ]);
+        
         res.json(conversations);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
-// controllers/chatController.js
-
 // ... (các hàm cũ giữ nguyên)
 
 // 4. Xóa vĩnh viễn cuộc trò chuyện
