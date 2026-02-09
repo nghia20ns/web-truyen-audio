@@ -34,5 +34,9 @@ router.get('/chat/manager', requireLogin, (req, res) => {
     res.render('admin/chat-manager'); // Render file views/admin/chat-manager.ejs
 });
 router.delete('/chat/delete/:sessionId', requireLogin, chatController.deleteConversation);
+// API Bật/Tắt (Dành cho Admin)
+router.post('/chat/toggle-status', requireLogin, chatController.toggleStatus);
 
+// API Kiểm tra trạng thái (Dành cho Khách)
+router.get('/chat/status', chatController.getStatus);
 module.exports = router;

@@ -1,23 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const requireLogin = require('../middleware/auth');
+const requireLogin = require('../middleware/auth'); // Đảm bảo file này ok
 
-// Auth Routes
+// --- AUTH ROUTES ---
 router.get('/login', adminController.getLogin);
 router.post('/login', adminController.postLogin);
 router.get('/logout', adminController.logout);
 
-// Admin Routes (Bảo vệ bằng middleware)
+// --- ADMIN ROUTES (Cần đăng nhập) ---
 router.get('/', requireLogin, adminController.getDashboard);
 
-router.get('/add', requireLogin, adminController.getAddTruyen);
-router.post('/add', requireLogin, adminController.postAddTruyen);
+// Thêm truyện
+router.get('/add', requireLogin, adminController.getAddPage);
+router.post('/add', requireLogin, adminController.postAdd);
 
-router.get('/edit/:id', requireLogin, adminController.getEditTruyen);
-router.post('/edit/:id', requireLogin, adminController.postEditTruyen);
+// Sửa truyện
+router.get('/edit/:id', requireLogin, adminController.getEditPage);
+router.post('/edit/:id', requireLogin, adminController.postEdit);
 
-router.get('/alert', requireLogin, adminController.getAlertConfig);
-router.post('/alert', requireLogin, adminController.postAlertConfig);
+// Xóa truyện (Thêm route này nếu chưa có)
+router.get('/delete/:id', requireLogin, adminController.deleteTruyen);
+
+// Cấu hình thông báo
+router.get('/alert', requireLogin, adminController.getAlertPage);
+router.post('/alert', requireLogin, adminController.postAlert);
 
 module.exports = router;

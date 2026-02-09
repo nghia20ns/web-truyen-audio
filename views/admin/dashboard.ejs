@@ -9,51 +9,9 @@
 <body>
     
     <div class="admin-wrapper">
-        <nav class="admin-sidebar">
-            <div class="sidebar-brand">
-                🎧 Admin Panel
-            </div>
-            
-            <ul class="sidebar-menu">
-                <li class="menu-label">Chức năng chính</li>
-                <li>
-                    <a href="/admin" class="active">
-                        🏠 Tổng quan
-                    </a>
-                </li>
-                <li>
-                    <a href="/admin/add">
-                        ➕ Thêm Truyện Mới
-                    </a>
-                </li>
-                <li>
-                    <a href="/chat/manager">
-                        💬 Quản Lý Chat
-                    </a>
-                </li>
-                
-                <li class="menu-label">Hệ thống</li>
-                <li>
-                    <a href="/admin/alert">
-                        📢 Cấu Hình Thông Báo
-                    </a>
-                </li>
-                <li>
-                    <a href="/" target="_blank">
-                        🌏 Xem Trang Web
-                    </a>
-                </li>
-                
-                <li style="margin-top: 20px; border-top: 1px solid #334155;"></li>
-                <li>
-                    <a href="/logout" class="logout-link">
-                        🚪 Đăng xuất
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<%- include('../partials/admin-sidebar') %>
 
-        <main class="admin-content">
+<main class="admin-content">
             <div class="content-header">
                 <h2>Danh sách truyện hiện có</h2>
                 <div class="stat-badge">Tổng: <%= listTruyen.length %> truyện</div>

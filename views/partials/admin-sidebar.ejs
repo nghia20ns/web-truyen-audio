@@ -1,43 +1,167 @@
 <nav class="admin-sidebar">
-    <div class="sidebar-brand">
-        🎧 Admin Panel
-    </div>
+    <div class="sidebar-brand">🎧 Admin Panel</div>
     
     <ul class="sidebar-menu">
         <li class="menu-label">Chức năng chính</li>
+        <li><a href="/admin">🏠 Tổng quan</a></li>
+        <li><a href="/admin/add">➕ Thêm Truyện Mới</a></li>
+        
         <li>
-            <a href="/admin">
-                🏠 Tổng quan
-            </a>
-        </li>
-        <li>
-            <a href="/admin/add">
-                ➕ Thêm Truyện Mới
-            </a>
-        </li>
-        <li>
-            <a href="/chat/manager">
-                💬 Quản Lý Chat
+            <a href="/chat/manager" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>💬 Quản Lý Chat</span>
+                <span id="chat-badge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; display: none; font-weight: bold;">0</span>
             </a>
         </li>
         
         <li class="menu-label">Hệ thống</li>
-        <li>
-            <a href="/admin/alert">
-                📢 Cấu Hình Thông Báo
-            </a>
-        </li>
-        <li>
-            <a href="/" target="_blank">
-                🌏 Xem Trang Web
-            </a>
-        </li>
+        <li><a href="/admin/alert">📢 Cấu Hình Thông Báo</a></li>
+        <li><a href="/" target="_blank">🌏 Xem Trang Web</a></li>
         
-        <li style="margin-top: 20px; border-top: 1px solid #334155;"></li>
         <li>
-            <a href="/logout" class="logout-link">
-                🚪 Đăng xuất
+            <a href="#" onclick="toggleOnlineStatus(event)" id="status-link">
+                🟢 Trạng thái: Đang Check...
             </a>
         </li>
+
+        <li style="margin-top: 20px; border-top: 1px solid #334155;"></li>
+        <li><a href="/admin/logout" class="logout-link">🚪 Đăng xuất</a></li>
     </ul>
 </nav>
+
+<script>
+    // --- 1. SETUP BIẾN ---
+    let lastTopMessageTime = 0; // Lưu thời gian tin nhắn cuối cùng
+    const adminAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    
+    // Biến cho Title & Tab
+    let originalTitle = document.title;
+    let unreadCount = 0;
+    let blinkInterval = null;
+    let isTabActive = true;
+
+    // Xin quyền thông báo ngay lập tức
+    if (Notification.permission !== "granted") Notification.requestPermission();
+
+    // --- 2. LOGIC KIỂM TRA TAB ACTIVE (Giống hệt bên Client) ---
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            isTabActive = false;
+        } else {
+            // Người dùng đã quay lại -> Reset thông báo
+            isTabActive = true;
+            resetNotification();
+        }
+    });
+
+    // Nếu đang ở trang chat manager thì reset luôn cho chắc
+    if (window.location.pathname.includes('/chat/manager')) {
+        resetNotification();
+    }
+
+    function resetNotification() {
+        stopBlinking();
+        unreadCount = 0;
+        document.title = originalTitle;
+        const badge = document.getElementById('chat-badge');
+        if(badge) badge.style.display = 'none';
+    }
+
+    function startBlinking() {
+        if (blinkInterval) return;
+        let show = true;
+        blinkInterval = setInterval(() => {
+            document.title = show ? `(${unreadCount}) 💬 Khách nhắn tin!` : `(${unreadCount}) Xem ngay...`;
+            show = !show;
+        }, 1000);
+    }
+
+    function stopBlinking() {
+        if (blinkInterval) {
+            clearInterval(blinkInterval);
+            blinkInterval = null;
+        }
+    }
+
+    // --- 3. LOGIC CHECK TIN NHẮN MỚI (CORE) ---
+    async function checkNewMessagesGlobal() {
+        try {
+            const res = await fetch('/chat/admin/conversations');
+            const conversations = await res.json();
+            
+            // Nếu không có hội thoại nào thì bỏ qua
+            if (conversations.length === 0) return;
+
+            // Lấy hội thoại mới nhất
+            const topConvo = conversations[0];
+            const topTime = new Date(topConvo.lastTime).getTime();
+
+            // Lần đầu chạy: Lưu mốc thời gian hiện tại rồi thoát (để không báo tin cũ)
+            if (lastTopMessageTime === 0) {
+                lastTopMessageTime = topTime;
+                return;
+            }
+
+            // NẾU CÓ TIN NHẮN MỚI (Thời gian thay đổi)
+            if (topTime > lastTopMessageTime) {
+                lastTopMessageTime = topTime;
+
+                // a) Luôn phát âm thanh trước
+                adminAudio.play().catch(() => {});
+
+                // b) Cập nhật Badge đỏ trên menu
+                const badge = document.getElementById('chat-badge');
+                if (badge) {
+                    unreadCount++; // Tăng số đếm
+                    badge.innerText = unreadCount;
+                    badge.style.display = 'inline-block';
+                }
+
+                // c) Nếu đang ẩn tab -> Bật thông báo Title & Browser Notification
+                if (!isTabActive) {
+                    startBlinking();
+
+                    if (Notification.permission === "granted") {
+                        const notif = new Notification(`💬 ${topConvo.userName} nhắn tin!`, {
+                            body: topConvo.lastMessage,
+                            icon: '/images/logo.png',
+                            tag: 'admin-msg'
+                        });
+                        notif.onclick = () => {
+                            window.focus();
+                            window.location.href = '/chat/manager';
+                        };
+                    }
+                }
+
+                // d) Nếu đang ở trang Chat Manager -> Reload lại danh sách ngay lập tức
+                if (typeof loadConversations === 'function') {
+                    loadConversations();
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // --- 4. CÁC HÀM KHÁC (Status) ---
+    async function checkStatus() {
+        try {
+            const res = await fetch('/chat/status');
+            const data = await res.json();
+            updateStatusUI(data.isOnline);
+        } catch (e) {}
+    }
+    function updateStatusUI(isOnline) {
+        const link = document.getElementById('status-link');
+        link.innerHTML = isOnline ? '🟢 Admin: <strong>ONLINE</strong>' : '🔴 Admin: <strong>OFFLINE</strong>';
+        link.style.color = isOnline ? '#4ade80' : '#f87171';
+    }
+    async function toggleOnlineStatus(e) {
+        e.preventDefault();
+        const res = await fetch('/chat/toggle-status', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) updateStatusUI(data.isOnline);
+    }
+
+    // CHẠY NGAY LẬP TỨC
+    checkStatus();
+    setInterval(checkNewMessagesGlobal, 3000); // Check 3 giây 1 lần
+</script>

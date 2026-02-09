@@ -2,17 +2,22 @@
 const express = require('express');
 const router = express.Router();
 const chatController = require('../controllers/chatController');
-const requireLogin = require('../middleware/auth'); // Dùng middleware admin có sẵn
 
-// API cho Khách
+// Middleware kiểm tra Admin (Nếu file auth.js của bạn nằm ở folder middleware)
+const requireLogin = require('../middleware/auth'); 
+
+// --- ROUTE CHO KHÁCH ---
 router.post('/send', chatController.sendMessage);
 router.get('/history', chatController.getMessages);
+router.get('/status', chatController.getStatus);
 
-// API cho Admin (Cần login)
+// --- ROUTE CHO ADMIN (Cần login) ---
 router.get('/admin/conversations', requireLogin, chatController.getConversations);
+router.delete('/delete/:sessionId', requireLogin, chatController.deleteConversation);
+router.post('/toggle-status', requireLogin, chatController.toggleStatus);
 
-// Route render trang chat cho Admin (Tạo thêm view sau)
-router.get('/manager', requireLogin, async (req, res) => {
+// Trang quản lý Chat
+router.get('/manager', requireLogin, (req, res) => {
     res.render('admin/chat-manager'); 
 });
 

@@ -1,8 +1,7 @@
-const requireLogin = (req, res, next) => {
-    if (req.session.isAdmin) {
-        next();
-    } else {
-        res.redirect('/admin/login');
+module.exports = (req, res, next) => {
+    // Nếu cookie không có adminId -> Đá về login
+    if (!req.session || !req.session.adminId) {
+        return res.redirect('/admin/login');
     }
+    next();
 };
-module.exports = requireLogin;

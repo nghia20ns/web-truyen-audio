@@ -1,10 +1,13 @@
 require('dotenv').config();
 const express = require('express');
-const app = express();
 const path = require('path');
-const session = require('express-session');
+const cookieSession = require('cookie-session'); // <--- THƯ VIỆN MỚI
+const bcrypt = require('bcryptjs');
 const connectDB = require('./config/db');
 const globalAlertMiddleware = require('./middleware/global');
+const Admin = require('./models/Admin');
+
+const app = express();
 
 // 1. Kết nối Database
 connectDB();
@@ -13,27 +16,53 @@ connectDB();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// --- BẮT BUỘC: Middleware đọc dữ liệu ---
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'secret_key',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 1000 }
+// 3. Cấu hình Session (Lưu thẳng vào Cookie trình duyệt)
+app.use(cookieSession({
+    name: 'session',
+    // Khóa bí mật để mã hóa cookie (bắt buộc phải có)
+    keys: [process.env.SESSION_SECRET || 'khoa_bi_mat_so_1', 'khoa_bi_mat_so_2'],
+    
+    // Thời gian sống: 30 ngày (Tính bằng mili giây)
+    maxAge: 30 * 24 * 60 * 60 * 1000 
 }));
 
-// 3. Middleware
-app.use(globalAlertMiddleware); 
+// 4. Global Middleware
+app.use(globalAlertMiddleware);
 
-// 4. Routes
-app.use('/', require('./routes/index'));      // Routes cho khách (Bao gồm cả thanh toán)
-app.use('/admin', require('./routes/admin')); // Routes cho admin
-app.use('/chat', require('./routes/chat'));
-// 5. Khởi động Server
-const PORT = 3000;
+// --- HÀM TỰ ĐỘNG TẠO ADMIN ---
+const createDefaultAdmin = async () => {
+    try {
+        setTimeout(async () => {
+            const count = await Admin.countDocuments();
+            if (count === 0) {
+                console.log('⚠️ Chưa có Admin -> Đang tạo tài khoản mặc định...');
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash('Nghia12345!', salt); // Pass: Nghia12345!
+                
+                await Admin.create({
+                    username: 'nghia20ns',
+                    password: hashedPassword
+                });
+                console.log('✅ Đã tạo Admin: nghia20ns');
+            }
+        }, 2000);
+    } catch (err) {
+        console.error('❌ Lỗi tạo Admin:', err);
+    }
+};
+createDefaultAdmin();
+
+// 5. Routes
+app.use('/', require('./routes/index'));
+app.use('/admin', require('./routes/admin'));
+app.use('/chat', require('./routes/chat')); 
+
+// 6. Khởi động Server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Web chạy tại: http://localhost:${PORT}`);
 });

@@ -1,131 +1,145 @@
-<div id="chat-box" class="chat-box" style="display: none;">
-    <div class="chat-header">
-        <span>💬 Hỗ trợ trực tuyến</span>
-        <span onclick="toggleChat()" style="cursor: pointer;">✖</span>
-    </div>
-    
-<div id="chat-login" class="chat-body" style="text-align: center; justify-content: center;">
-        <div style="margin-bottom: 15px;">
-            <p style="margin: 0 0 5px 0; font-weight: 500;">Nhập Gmail để chat:</p>
-            <small style="color: #666; font-size: 0.8rem;">(Hệ thống sẽ lấy tên trước @ làm tên hiển thị)</small>
+<footer class="simple-footer">
+    <div class="container footer-flex">
+        <div class="copyright">
+            &copy; <%= new Date().getFullYear() %> Web Truyện Audio. Nâng tầm trải nghiệm nghe.
         </div>
         
-        <input type="email" id="chat-email-input" 
-               placeholder="Ví dụ: quocnghia91kk@gmail.com" 
-               style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box;">
+        <div class="footer-contact">
+            <span>Kết nối với chúng tôi:</span>
+            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="16"> Zalo
+            </a>
+            <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="contact-btn discord">
+                <img src="https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" width="16"> Discord
+            </a>
+        </div>
+    </div>
+</footer>
+
+<div id="chat-box" class="chat-box">
+    <div class="chat-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span>💬 Hỗ trợ trực tuyến</span>
+            <div class="header-icons">
+                <a href="https://zalo.me/0336672088" target="_blank" class="header-icon-link" title="Zalo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="18">
+                </a>
+            </div>
+        </div>
+        <div class="close-chat-btn" onclick="toggleChat()" title="Đóng chat">✖</div>
+    </div>
+    
+    <div id="chat-login" class="chat-body chat-login-screen">
+        <div style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">👋</div>
+            <h3 style="margin: 0; color: #6366f1;">Xin chào!</h3>
+            <p style="color: #666; margin-top: 5px;">Vui lòng nhập Gmail để bắt đầu trò chuyện.</p>
+        </div>
         
-        <button onclick="startChat()" class="btn-primary" style="padding: 10px 20px; width: 100%;">
-            Bắt đầu Chat 💬
-        </button>
-        
-        <p id="chat-error" style="color: red; font-size: 0.85rem; display: none; margin-top: 10px;"></p>
+        <div style="width: 100%; margin-top: 20px;">
+            <input type="email" id="chat-email-input" placeholder="Ví dụ: baoboi@gmail.com" class="chat-input-styled">
+            <button onclick="startChat()" class="btn-primary btn-start-chat">
+                Bắt đầu Chat Ngay 🚀
+            </button>
+            <p id="chat-error" class="chat-error-msg"></p>
+        </div>
+         <small style="color: #999; font-size: 0.75rem; margin-top: 15px;">*Chúng tôi chỉ sử dụng tên trước @gmail.com để hiển thị.</small>
     </div>
 
     <div id="chat-interface" class="chat-body" style="display: none; padding: 0;">
         <div id="messages-list" class="messages-list"></div>
-        <div class="chat-input-area">
-            <input type="text" id="msg-input" placeholder="Nhập tin nhắn..." onkeypress="handleEnter(event)">
-            <button onclick="sendUserMessage()">➤</button>
+        
+        <div id="offline-alert" class="offline-screen" style="display: none;">
+            <div class="offline-icon">😴</div>
+            <h3>Admin hiện đang Offline</h3>
+            <p>Hiện tại không có tư vấn viên trực tuyến. Bạn vui lòng liên hệ qua các kênh khác để được hỗ trợ nhanh nhất nhé!</p>
+            <div class="offline-buttons">
+                <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo large">Chat Zalo</a>
+                <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="contact-btn discord large">Discord</a>
+            </div>
+        </div>
+
+        <div id="input-area-wrapper" class="chat-input-area">
+            <input type="text" id="msg-input" placeholder="Nhập tin nhắn ở đây..." onkeypress="handleEnter(event)">
+            <button onclick="sendUserMessage()" class="btn-send-msg">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
         </div>
     </div>
 </div>
 
-<div id="chat-trigger" class="floating-chat" title="Hỗ trợ" onclick="toggleChat()">
-    <svg id="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+<div id="chat-trigger" class="floating-chat-btn" onclick="toggleChat()" title="Hỗ trợ khách hàng">
+    <svg id="icon-chat" viewBox="0 0 24 24" width="30" height="30" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
 </div>
 
 <style>
-    .chat-box {
-        position: fixed; bottom: 100px; right: 30px; width: 320px; height: 400px;
-        background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        z-index: 10000; display: flex; flex-direction: column; overflow: hidden;
-        border: 1px solid #eee; animation: slideUp 0.3s ease;
-    }
-    .chat-header { background: var(--primary); color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; }
-    .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 10px; }
-    .messages-list { flex: 1; overflow-y: auto; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; gap: 8px; }
-    .chat-input-area { display: flex; border-top: 1px solid #eee; padding: 5px; }
-    .chat-input-area input { flex: 1; border: none; padding: 10px; outline: none; }
-    .chat-input-area button { border: none; background: white; color: var(--primary); font-weight: bold; cursor: pointer; padding: 0 10px; }
+    :root { --primary: #6366f1; }
+
+    /* Footer */
+    .simple-footer { background-color: white; border-top: 1px solid #f1f5f9; padding: 25px 0; margin-top: 60px; font-size: 0.95rem; color: #64748b; }
+    .footer-flex { display: flex; justify-content: space-between; align-items: center; }
+    .footer-contact { display: flex; align-items: center; gap: 15px; font-weight: 500; }
+    .contact-btn { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; color: white !important; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); opacity: 0.95; }
+    .contact-btn img { filter: brightness(0) invert(1); }
+    .contact-btn.zalo { background: linear-gradient(45deg, #0068FF, #00a2ff); }
+    .contact-btn.discord { background: linear-gradient(45deg, #5865F2, #7289da); }
+
+    /* Nút Chat Nổi */
+    .floating-chat-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 10001; }
+    .floating-chat-btn:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.6); }
+
+    /* Khung Chat Box */
+    .chat-box { position: fixed; bottom: 110px; right: 30px; width: 350px; height: 500px; background: white; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); z-index: 10000; display: flex; flex-direction: column; overflow: hidden; border: none; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .chat-box.active { opacity: 1; transform: translateY(0); pointer-events: all; }
+
+    /* Header */
+    .chat-header { background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; padding: 15px 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .header-icons { display: flex; gap: 10px; }
+    .header-icon-link { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; backdrop-filter: blur(5px); }
+    .header-icon-link:hover { background: rgba(255,255,255,0.4); }
+    .close-chat-btn { cursor: pointer; font-size: 1.5rem; opacity: 0.8; transition: 0.2s; }
+    .close-chat-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+    /* Body */
+    .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
+    .chat-login-screen { justify-content: center; align-items: center; padding: 30px; text-align: center; }
+    .chat-input-styled { width: 100%; padding: 12px 15px; margin-bottom: 15px; border-radius: 10px; border: 2px solid #e2e8f0; box-sizing: border-box; font-size: 1rem; transition: 0.3s; outline: none; }
+    .chat-input-styled:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+    .btn-start-chat { width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 10px; background: linear-gradient(to right, #6366f1, #8b5cf6); border: none; color: white; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); transition: 0.3s; }
+    .btn-start-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4); }
+    .chat-error-msg { color: #ef4444; font-size: 0.9rem; display: none; margin-top: 10px; text-align: left; }
+
+    /* Messages List */
+    .messages-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+    .msg { max-width: 85%; padding: 10px 15px; border-radius: 18px; font-size: 0.95rem; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; animation: popIn 0.3s ease; }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .msg.me { align-self: flex-end; background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; border-bottom-right-radius: 4px; }
+    .msg.admin { align-self: flex-start; background: white; color: #334155; border: 1px solid #e2e8f0; border-bottom-left-radius: 4px; }
+
+    /* Input Area */
+    .chat-input-area { display: flex; border-top: 1px solid #e2e8f0; padding: 12px; background: white; align-items: center; gap: 10px; }
+    .chat-input-area input { flex: 1; border: none; padding: 10px; outline: none; font-size: 1rem; background: #f1f5f9; border-radius: 20px; transition: 0.3s; }
+    .chat-input-area input:focus { background: white; box-shadow: 0 0 0 2px #e2e8f0; }
+    .btn-send-msg { width: 42px; height: 42px; border: none; background: #6366f1; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 8px rgba(99, 102, 241, 0.3); }
+    .btn-send-msg:hover { transform: scale(1.1); }
     
-    /* Bong bóng chat */
-    .msg { max-width: 80%; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; word-wrap: break-word; }
-    .msg.me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
-    .msg.admin { align-self: flex-start; background: #e5e7eb; color: #333; border-bottom-left-radius: 2px; }
-    /* --- CSS CHO MOBILE (Thêm vào cuối thẻ style) --- */
+    /* Offline Screen */
+    .offline-screen { flex: 1; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; background: #fff1f2; }
+    .offline-icon { font-size: 4rem; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .offline-screen h3 { color: #be123c; margin: 0 0 10px 0; }
+    .offline-screen p { color: #4b5563; margin-bottom: 25px; }
+    .offline-buttons { display: flex; gap: 15px; justify-content: center; }
+    .contact-btn.large { padding: 10px 25px; font-size: 1rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) { .footer-flex { flex-direction: column; gap: 20px; text-align: center; } }
     @media (max-width: 480px) {
-        .chat-box {
-            width: 100% !important;      /* Full chiều ngang */
-            height: 100% !important;     /* Full chiều cao (che hết màn hình) */
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0;
-            border-radius: 0;            /* Bỏ bo góc */
-            position: fixed;
-            z-index: 99999;              /* Luôn nổi lên trên cùng */
-        }
-
-        .chat-header {
-            padding: 15px;               /* Header to hơn chút để dễ bấm */
-            font-size: 1.1rem;
-        }
-
-        .chat-header span[onclick] {
-            font-size: 1.5rem;           /* Nút X to lên để dễ tắt */
-            padding: 0 10px;
-        }
-
-        .messages-list {
-            padding-bottom: 20px;        /* Tránh bị sát đáy quá */
-        }
-        
-        .chat-input-area input {
-            font-size: 16px;             /* Cỡ chữ 16px để iOS không tự zoom khi nhập */
-        }
-        /* --- CSS CHO MOBILE --- */
-    @media (max-width: 480px) {
-        .chat-box {
-            position: fixed;
-            width: 100% !important;
-            
-            /* Mặc định full màn hình, JS sẽ ghi đè lại chiều cao này khi bàn phím hiện */
-            height: 100% !important; 
-            
-            bottom: 0; left: 0; right: 0;
-            border-radius: 0;
-            z-index: 99999;
-            
-            /* Dùng Flexbox để chia bố cục */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-body {
-            /* Quan trọng: flex: 1 để tự co giãn phần nội dung */
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Ẩn phần tràn ra ngoài */
-            min-height: 0;    /* Bắt buộc có để scroll hoạt động trên Flexbox */
-        }
-
-        .messages-list {
-            flex: 1;          /* Chiếm hết khoảng trống còn lại */
-            overflow-y: auto; /* Cho phép cuộn */
-            padding-bottom: 10px;
-        }
-
-        .chat-header {
-            flex-shrink: 0;   /* Không bao giờ được co nhỏ header */
-        }
-
-        .chat-input-area {
-            flex-shrink: 0;   /* Không bao giờ được co nhỏ ô nhập liệu */
-        }
-    }
-    
-    
+        .floating-chat-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; }
+        .chat-box { width: 100% !important; height: 100% !important; bottom: 0; left: 0; right: 0; border-radius: 0; }
+        .chat-box { animation: none; opacity: 1; transform: none; display: none; }
+        .chat-box.active { display: flex; }
     }
 </style>
 
@@ -133,21 +147,66 @@
     let chatInterval = null;
     let sessionId = localStorage.getItem('chat_session_id');
     let userName = localStorage.getItem('chat_user_name');
+    let isAdminOnline = true;
+    
+    // BIẾN THÔNG BÁO TAB
+    let lastMsgCount = 0;
+    let originalTitle = document.title;
+    let unreadCount = 0;
+    let blinkInterval = null;
+    let isTabActive = true;
+    const notifyAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
-    // 1. Khởi tạo Session ID nếu chưa có
+    // 1. Logic kiểm tra Active Tab
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            isTabActive = false;
+        } else {
+            isTabActive = true;
+            unreadCount = 0;
+            document.title = originalTitle; // Reset title về gốc
+            stopBlinking();
+        }
+    });
+
+    // 2. Logic Title Nhấp nháy
+    function startBlinking() {
+        if (blinkInterval) return;
+        let showMsg = true;
+        blinkInterval = setInterval(() => {
+            document.title = showMsg ? `(${unreadCount}) 💬 Tin nhắn mới!` : `(${unreadCount}) Xem ngay...`;
+            showMsg = !showMsg;
+        }, 1000);
+    }
+
+    function stopBlinking() {
+        if (blinkInterval) {
+            clearInterval(blinkInterval);
+            blinkInterval = null;
+        }
+    }
+
+    // 3. Logic Chat Cơ bản
     if (!sessionId) {
         sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('chat_session_id', sessionId);
     }
 
-    function toggleChat() {
+    async function toggleChat() {
         const box = document.getElementById('chat-box');
-        if (box.style.display === 'none') {
-            box.style.display = 'flex';
+        box.classList.toggle('active');
+        
+        if (box.classList.contains('active')) {
+            // Xin quyền thông báo (cho trình duyệt)
+            if (Notification.permission !== "granted") Notification.requestPermission();
+            
+            // Check status
+            const res = await fetch('/chat/status');
+            const data = await res.json();
+            isAdminOnline = data.isOnline;
             checkLoginStatus();
         } else {
-            box.style.display = 'none';
-            stopPolling();
+            if (chatInterval) clearInterval(chatInterval);
         }
     }
 
@@ -155,8 +214,18 @@
         if (userName) {
             document.getElementById('chat-login').style.display = 'none';
             document.getElementById('chat-interface').style.display = 'flex';
-            loadMessages();
-            startPolling();
+            
+            if (!isAdminOnline) {
+                document.getElementById('offline-alert').style.display = 'flex';
+                document.getElementById('input-area-wrapper').style.display = 'none';
+                document.getElementById('messages-list').style.display = 'none';
+            } else {
+                document.getElementById('offline-alert').style.display = 'none';
+                document.getElementById('input-area-wrapper').style.display = 'flex';
+                document.getElementById('messages-list').style.display = 'flex';
+                loadMessages();
+                startPolling();
+            }
         } else {
             document.getElementById('chat-login').style.display = 'flex';
             document.getElementById('chat-interface').style.display = 'none';
@@ -167,160 +236,108 @@
         const input = document.getElementById('chat-email-input');
         const errorMsg = document.getElementById('chat-error');
         const email = input.value.trim();
-
-        // Reset thông báo lỗi
         errorMsg.style.display = 'none';
-        errorMsg.innerText = '';
 
-        // 1. Kiểm tra rỗng
-        if (!email) {
-            errorMsg.innerText = "Vui lòng nhập địa chỉ Gmail!";
-            errorMsg.style.display = 'block';
-            input.focus();
-            return;
-        }
-
-        // 2. Kiểm tra đuôi @gmail.com
         if (!email.toLowerCase().endsWith("@gmail.com")) {
-            errorMsg.innerText = "Email phải có đuôi @gmail.com!";
-            errorMsg.style.display = 'block';
-            input.focus();
-            return;
+            errorMsg.innerText = "⚠️ Vui lòng nhập đúng định dạng @gmail.com";
+            errorMsg.style.display = 'block'; return;
         }
-
-        // 3. Lấy phần tên (trước @)
-        const namePart = email.split('@')[0];
-
-        // 4. Kiểm tra ký tự đặc biệt (Chỉ cho phép chữ, số và dấu chấm)
-        // Regex này cấm các ký tự như ! # $ % ^ & * ...
-        const validNameRegex = /^[a-zA-Z0-9.]+$/;
         
-        if (!validNameRegex.test(namePart)) {
-            errorMsg.innerText = "Tên Gmail chứa ký tự không hợp lệ (chỉ chấp nhận chữ, số, dấu chấm).";
-            errorMsg.style.display = 'block';
-            input.focus();
-            return;
-        }
-
-        // 5. Kiểm tra độ dài (Tùy chọn: tránh tên quá ngắn hoặc quá dài)
-        if (namePart.length < 3 || namePart.length > 30) {
-            errorMsg.innerText = "Tên Gmail phải từ 3 đến 30 ký tự.";
-            errorMsg.style.display = 'block';
-            input.focus();
-            return;
-        }
-
-        // --- HỢP LỆ ---
-        userName = namePart; // Gán tên mới (ví dụ: quocnghia91kk)
+        userName = email.split('@')[0];
         localStorage.setItem('chat_user_name', userName);
-        
-        // Chuyển sang màn hình chat
         checkLoginStatus();
-        
-        // Gửi tin nhắn chào mừng tự động (Optional - cho chuyên nghiệp)
-        // appendMessage(`Xin chào ${userName}, mình có thể giúp gì cho bạn?`, 'admin');
     }
 
-    // 2. Gửi tin nhắn
     async function sendUserMessage() {
         const input = document.getElementById('msg-input');
         const text = input.value.trim();
         if (!text) return;
-
-        // Hiện ngay lên màn hình cho mượt
+        
         appendMessage(text, 'me');
         input.value = '';
-
-        try {
-            await fetch('/chat/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId, userName, sender: 'client', content: text })
-            });
-            scrollToBottom();
-        } catch (e) { console.error(e); }
+        scrollToBottom();
+        
+        await fetch('/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, userName, sender: 'client', content: text })
+        });
     }
 
     function handleEnter(e) { if (e.key === 'Enter') sendUserMessage(); }
 
-    // 3. Tải tin nhắn (Polling)
+    // 4. Logic Load Tin Nhắn & Thông báo
     async function loadMessages() {
         try {
             const res = await fetch(`/chat/history?sessionId=${sessionId}`);
             const msgs = await res.json();
-            const list = document.getElementById('messages-list');
-            list.innerHTML = ''; // Xóa cũ render mới (hoặc tối ưu sau)
             
-            msgs.forEach(m => {
-                const type = m.sender === 'client' ? 'me' : 'admin';
-                appendMessage(m.content, type);
-            });
-            scrollToBottom();
+            if (msgs.length > lastMsgCount) {
+                const lastMsg = msgs[msgs.length - 1];
+                
+                // NẾU CÓ TIN NHẮN MỚI TỪ ADMIN
+                if (lastMsg && lastMsg.sender === 'admin' && lastMsgCount > 0) {
+                    
+                    // b) Nếu đang ẩn tab -> Bật thông báo Title nhấp nháy
+                    if (!isTabActive) {
+                        unreadCount++;
+                        startBlinking();
+                    }
+
+                    // c) Bật thông báo hệ thống (Notification API)
+                    if (document.hidden && Notification.permission === "granted") {
+                        new Notification("Admin đã trả lời!", {
+                            body: lastMsg.content,
+                            icon: '/images/logo.png',
+                            tag: 'chat-msg'
+                        });
+                    }
+                }
+                
+                // Render List
+                const list = document.getElementById('messages-list');
+                list.innerHTML = '';
+                msgs.forEach(m => {
+                    const type = m.sender === 'client' ? 'me' : 'admin';
+                    appendMessage(m.content, type);
+                });
+                
+                scrollToBottom();
+                lastMsgCount = msgs.length;
+            }
         } catch (e) { console.error(e); }
     }
 
     function appendMessage(content, type) {
         const div = document.createElement('div');
         div.className = `msg ${type}`;
-
-        if (type === 'admin') {
-            // Nếu là Admin: Tạo chữ "Admin:" in đậm
-            const strong = document.createElement('strong');
-            strong.innerText = "Admin: ";
-            strong.style.marginRight = "5px"; // Cách ra một chút cho đẹp
-            
-            div.appendChild(strong);
-            
-            // Sau đó mới thêm nội dung tin nhắn
-            div.appendChild(document.createTextNode(content));
-        } else {
-            // Nếu là Khách (me): Chỉ hiện nội dung bình thường
-            div.innerText = content;
-        }
-
+        if (type === 'admin') div.innerHTML = `<strong>Admin:</strong> ${content}`;
+        else div.innerText = content;
         document.getElementById('messages-list').appendChild(div);
     }
-
+    
     function scrollToBottom() {
         const list = document.getElementById('messages-list');
         list.scrollTop = list.scrollHeight;
     }
 
-    // Tự động tải tin nhắn mỗi 3 giây
     function startPolling() {
         if (chatInterval) clearInterval(chatInterval);
         chatInterval = setInterval(loadMessages, 3000);
     }
-    function stopPolling() {
-        if (chatInterval) clearInterval(chatInterval);
-    }
-    // --- KHẮC PHỤC LỖI BÀN PHÍM CHE MẤT TRÊN ĐIỆN THOẠI ---
-    // --- JS FIX LỖI BÀN PHÍM CHE MẤT (UPDATE MỚI) ---
+    function stopPolling() { if (chatInterval) clearInterval(chatInterval); }
+
+    // 5. Fix lỗi bàn phím điện thoại
     if (window.visualViewport) {
         function resizeChatBox() {
             const chatBox = document.getElementById('chat-box');
-            
-            // Chỉ chạy khi đang chat trên điện thoại
-            if (chatBox.style.display !== 'none' && window.innerWidth <= 480) {
-                // 1. Ép chiều cao khung chat bằng đúng chiều cao nhìn thấy được (đã trừ bàn phím)
+            if (chatBox.classList.contains('active') && window.innerWidth <= 480) {
                 chatBox.style.height = `${window.visualViewport.height}px`;
-                
-                // 2. Ép vị trí luôn nằm dính đáy visual viewport
-                // (Giúp khắc phục lỗi bị trôi lên trôi xuống trên iOS)
                 chatBox.style.bottom = `${window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop}px`;
-                
-                // 3. Cuộn tin nhắn xuống cuối
                 scrollToBottom();
             }
         }
-
         window.visualViewport.addEventListener('resize', resizeChatBox);
         window.visualViewport.addEventListener('scroll', resizeChatBox);
     }
-
-    // Fix phụ: Khi bấm vào ô nhập liệu, cuộn nó lên
-    const inputField = document.getElementById('msg-input');
-    inputField.addEventListener('focus', () => {
-        setTimeout(scrollToBottom, 300);
-    });
 </script>
