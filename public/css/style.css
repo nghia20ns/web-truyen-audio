@@ -441,3 +441,178 @@ input:focus, textarea:focus {
         text-align: center;
     }
 }
+
+/* --- PAYMENT PAGE STYLES (Mobile Optimized) --- */
+
+/* Card giao diện chính */
+.payment-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-top: 10px;
+    overflow: hidden;
+    position: relative;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Header thông tin */
+.story-info {
+    text-align: center;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.story-title {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0 0 5px 0;
+    font-weight: 700;
+}
+
+.price-tag {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #059669; /* Xanh lá đậm */
+    margin: 10px 0;
+}
+
+.badge-tap {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+/* Form nhập liệu */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box; /* Quan trọng để không bị vỡ khung */
+}
+
+.form-input:focus {
+    border-color: #4f46e5;
+    outline: none;
+}
+
+/* Nút bấm to cho mobile */
+.btn-pay {
+    width: 100%;
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+    transition: transform 0.1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-pay:active {
+    transform: scale(0.98);
+}
+
+.btn-pay:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Khu vực QR Code */
+#qr-container {
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.qr-frame {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px;
+    background: white;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.qr-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.alert-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.copy-box {
+    background: #f3f4f6;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: monospace;
+    color: #ef4444;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: 1px dashed #d1d5db;
+    word-break: break-all;
+}
+
+/* Spinner Loading */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+/* Nút quay lại */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

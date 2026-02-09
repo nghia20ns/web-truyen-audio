@@ -2,202 +2,261 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh Toán - PayOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thanh Toán - Cat Audio</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
+    
     <style>
-        /* Giữ nguyên CSS cũ */
-        .info-box {
-            background-color: #f8f9fa;
-            border: 1px dashed #ced4da;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 15px;
-            font-family: monospace;
-            color: #333;
-            word-break: break-all;
+        /* --- CSS CHO MOBILE --- */
+        body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
+        
+        .container {
+            padding: 15px;
+            max-width: 480px; 
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        .payment-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        /* Header */
+        .story-header { text-align: center; border-bottom: 1px dashed #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; }
+        .story-name { font-size: 1.1rem; font-weight: 700; color: #111827; margin: 0 0 5px 0; }
+        .tap-badge { background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
+        .price-display { font-size: 1.75rem; font-weight: 800; color: #059669; margin: 12px 0; letter-spacing: -0.5px; }
+
+        /* Form */
+        .form-label { display: block; font-weight: 500; color: #374151; margin-bottom: 8px; font-size: 0.95rem; }
+        .form-input {
+            width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 12px;
+            font-size: 16px; box-sizing: border-box; outline: none; transition: all 0.2s;
+        }
+        .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+        .btn-main {
+            width: 100%; background: #4f46e5; color: white; padding: 15px; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 15px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .btn-main:disabled { background: #9ca3af; }
+
+        /* KHUNG QR (Mặc định ẩn) */
+        #qr-section { display: none; text-align: center; animation: slideUp 0.3s ease-out; }
+
+        .qr-wrapper {
+            background: white; padding: 10px; border: 2px solid #e5e7eb; border-radius: 12px;
+            display: inline-block; margin-bottom: 10px;
+        }
+        .qr-image { width: 100%; max-width: 250px; height: auto; display: block; }
+
+        /* HỘP HƯỚNG DẪN ĐẦY ĐỦ (Style cũ của bạn) */
         .guide-box {
             margin-top: 20px;
             padding: 15px;
-            background-color: #e3f2fd;
+            background-color: #e3f2fd; /* Màu xanh nhạt */
             border-radius: 8px;
             text-align: left;
             font-size: 0.9rem;
             color: #0d47a1;
             border-left: 4px solid #2196f3;
+            line-height: 1.6;
         }
         .guide-box ul { padding-left: 20px; margin: 5px 0 0 0; }
         .guide-box li { margin-bottom: 6px; }
 
-        #email-alert {
-            background-color: #fff3cd; 
-            color: #856404;           
-            border: 2px solid #ffeeba; 
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-size: 1.1rem;        
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            animation: popIn 0.5s ease; 
+        /* Copy content box */
+        .copy-content { 
+            font-family: monospace; background: #f3f4f6; padding: 10px; 
+            border-radius: 6px; font-weight: bold; color: #dc2626; 
+            word-break: break-all; border: 1px dashed #d1d5db; 
         }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        /* Loading Spinner cho nút bấm */
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #3498db;
-            width: 16px;
-            height: 16px;
-            -webkit-animation: spin 2s linear infinite; /* Safari */
-            animation: spin 2s linear infinite;
-            display: inline-block;
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+
+        .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .back-btn { color: #6b7280; text-decoration: none; display: inline-flex; align-items: center; margin-bottom: 15px; font-weight: 500; }
     </style>
 </head>
 <body>
-<%- include('partials/header') %>
-    <div class="container" style="max-width: 500px;">
-        <a href="javascript:history.back()" class="nav-btn" style="padding-left: 0; margin-bottom: 10px;">
-            ⬅ Quay lại chọn tập
+
+    <%- include('partials/header') %>
+
+    <div class="container">
+        <a href="javascript:history.back()" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Quay lại chọn tập
         </a>
 
-        <div class="card">
-
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h3 style="margin: 0; color: var(--primary);">Xác nhận mua</h3>
-                <h5 style="margin: 0; color: var(--danger);">💳 <strong>Nhắn nhỏ:</strong> Nếu anh em muốn mua bằng thẻ cào thì nhắn em Cat qua Zalo hoặc Discord nhé!!!</h5>
-
-                <p style="color: var(--text-sub);">Truyện: <strong><%= truyenName %></strong></p>
-                <div class="badge" style="background: var(--secondary); color: white; display: inline-block;">
-                    Tập <%= partCode %>
-                </div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: #10b981; margin-top: 10px;">
-                    <%= amountText %>đ
-                </div>
-            </div>
-
-            <div id="input-section">
-                <label>Email (Vui lòng điền đúng gmail):</label>
-                <input type="text" id="gmail" placeholder="Ví dụ: quocnghia1123@gmail.com" required>
-                
-                <div style="margin: 15px 0; font-size: 0.9em; color: #555;">
-                    <p>💡 Sau khi bấm nút, bạn sẽ được chuyển đến trang thanh toán của PayOS (MB Bank, VietQR).</p>
-                </div>
-
-                <button id="pay-btn" class="btn-primary" onclick="createPayment()">
-                    Thanh toán ngay
-                </button>
-            </div>
+        <div class="payment-card">
             
-            <div class="guide-box" style="margin-top: 30px;">
-                <strong>🔔 Lưu ý quan trọng:</strong>
-                <ul>
-                    <li>Hệ thống sẽ tự động gửi quyền truy cập sau khi thanh toán thành công.</li>
-                    <li>Vui lòng kiểm tra kỹ trong <strong>thư rác, spam</strong>.</li>
-                    <li>Trong vòng 3-5h nếu không thấy thì hãy nhắn tin qua zalo hoặc discord.</li>
-                    <li>Đăng nhập Drive bằng <strong>đúng Gmail</strong> bạn đã điền ở trên để nghe.</li>
-                </ul>
+            <div class="story-header">
+                <h2 class="story-name"><%= truyenName %></h2>
+                <span class="tap-badge">Tập <%= partCode %></span>
+                <div class="price-display"><%= amountText %>đ</div>
+                <div style="font-size: 0.85rem; color: #6b7280;">
+                    Thẻ cào? Nhắn Zalo/Discord Admin nhé!
+                </div>
             </div>
+
+            <div id="form-section">
+                <div class="form-group">
+                    <label class="form-label">Nhập Gmail nhận truyện:</label>
+                    <input type="email" id="gmail-input" class="form-input" placeholder="vidu: quocnghia@gmail.com" inputmode="email">
+                    <small style="color: #6b7280; margin-top: 6px; display: block; font-size: 0.8rem;">* Điền đúng để nhận link Google Drive.</small>
+                </div>
+
+                <button id="btn-pay" class="btn-main" onclick="startPaymentProcess()">
+                    Thanh toán ngay (PayOS)
+                </button>
+                <hr style="margin: 20px 0;">
+                <div class="guide-steps">
+                    <div class="guide-title">💡 Hướng dẫn nhận truyện:</div>
+                    <ul>
+                        <li>⏳ Sau khi thanh toán <strong>3-5h</strong> mà chưa thấy Email?</li>
+                        <li>📂 Hãy vào <strong>Google Drive</strong> ➝ mục <strong>"Được chia sẻ với tôi"</strong>.</li>
+                        <li>📧 Bắt buộc đăng nhập <strong>đúng Gmail</strong> bạn vừa điền ở trên.</li>
+                        <li>🎧 <strong>Mẹo:</strong> Nên tải file MP3 về máy để nghe mượt hơn.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="qr-section">
+                <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; border: 1px solid #ffeeba;">
+                    ⚠️ Hệ thống tự động đang bận. Vui lòng quét mã thủ công bên dưới.
+                </div>
+
+                <div class="qr-wrapper">
+                    <img id="qr-img" class="qr-image" src="" alt="QR Code">
+                </div>
+
+                <p style="font-weight: 600; color: #374151; margin: 10px 0;">
+                    Quét bằng App Ngân hàng (MB, VCB...)
+                </p>
+
+                <div style="text-align: left;">
+                    <label class="form-label" style="font-size: 0.85rem;">Nội dung chuyển khoản (Bắt buộc):</label>
+                    <div class="copy-content" id="ck-content"></div>
+                </div>
+
+                <div class="guide-box">
+                    <strong>🔔 Lưu ý quan trọng:</strong>
+                    <ul>
+                        <li>Hệ thống sẽ tự động gửi quyền truy cập sau khi thanh toán thành công.</li>
+                        <li>Vui lòng kiểm tra kỹ trong <strong>thư rác, spam</strong>.</li>
+                        <li>Trong vòng 3-5h nếu không thấy thì hãy nhắn tin qua Zalo hoặc Discord.</li>
+                        <li>Đăng nhập Drive bằng <strong>đúng Gmail</strong> bạn đã điền ở trên để nghe.</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <%- include('partials/footer') %>
 
     <script>
-        async function createPayment() {
-            // 1. Lấy giá trị và chuẩn hóa
-            const rawInput = document.getElementById('gmail').value.trim();
-            const btn = document.getElementById('pay-btn');
-            
-            // Các biến từ server EJS
-            const shortCode = "<%= shortCode %>"; 
-            const tapText = "<%= tapText %>"; 
-            const amount = "<%= amount %>"; 
+        const PAYMENT_DATA = {
+            shortCode: "<%= shortCode %>",
+            tapText: "<%= tapText %>",
+            amount: "<%= amount %>"
+        };
 
-            // 2. VALIDATION (Giữ nguyên logic của bạn)
-            const strictGmailRegex = /^[a-zA-Z0-9]+@gmail\.com$/;
+        async function startPaymentProcess() {
+            const input = document.getElementById('gmail-input');
+            const email = input.value.trim();
+            const btn = document.getElementById('btn-pay');
 
-            if (!rawInput) {
-                alert("Vui lòng nhập địa chỉ Gmail!");
-                return;
+            // Validation
+            if (!email || !email.endsWith("@gmail.com")) { 
+                alert("Vui lòng nhập đúng Gmail (đuôi @gmail.com)!"); input.focus(); return; 
+            }
+            const namePart = email.split('@')[0];
+            if (/[^a-zA-Z0-9.]/.test(namePart)) {
+                alert("Tên Gmail không được chứa ký tự đặc biệt."); input.focus(); return;
             }
 
-            if (!rawInput.endsWith("@gmail.com")) {
-                alert("Lỗi: Email bắt buộc phải có đuôi @gmail.com");
-                return;
-            }
-
-            if (!strictGmailRegex.test(rawInput)) {
-                alert("Lỗi: Gmail không được chứa dấu chấm (.), khoảng trắng hoặc ký tự đặc biệt trong phần tên.");
-                return;
-            }
-
-            // --- BẮT ĐẦU GỌI API PAYOS ---
-            
-            // Khóa nút để tránh bấm nhiều lần
-            const originalText = btn.innerText;
-            btn.innerHTML = '<span class="spinner"></span> Đang tạo đơn...';
+            // Loading
+            btn.innerHTML = '<div class="spinner"></div> Đang xử lý...';
             btn.disabled = true;
 
             try {
-                // Gọi về Backend (Node.js)
+                // Gọi API PayOS
                 const response = await fetch('/create-payment-link', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        email: rawInput,
-                        amount: amount,   // Gửi số tiền (dạng số hoặc chuỗi đều được, backend sẽ parse)
-                        storyCode: shortCode,
-                        tapText: tapText,
-                        returnUrl: window.location.href // <--- THÊM DÒNG NÀY (Gửi link trang hiện tại)
+                        email: email,
+                        amount: PAYMENT_DATA.amount,
+                        storyCode: PAYMENT_DATA.shortCode,
+                        tapText: PAYMENT_DATA.tapText,
+                        returnUrl: window.location.href
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.checkoutUrl) {
-                    // Nếu thành công, chuyển hướng sang trang thanh toán
+                    // Thành công -> Sang PayOS
                     window.location.href = data.checkoutUrl;
                 } else {
-                    // Nếu backend trả về lỗi
-                    alert("Có lỗi xảy ra: " + (data.error || "Không xác định"));
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    // Thất bại -> Hiện QR thủ công
+                    console.warn("PayOS Error, fallback to manual.");
+                    forceShowManualQR(email);
                 }
 
             } catch (error) {
-                console.error('Error:', error);
-                alert("Lỗi kết nối đến server. Vui lòng thử lại sau.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                // Lỗi mạng -> Hiện QR thủ công
+                console.error("Network Error:", error);
+                forceShowManualQR(email);
             }
-            window.onload = function() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const status = urlParams.get('status');
-                const orderCode = urlParams.get('orderCode');
+        }
 
-                if (status === 'PAID') {
-                    alert("✅ Thanh toán thành công! Mã đơn: " + orderCode + "\nHệ thống đang xử lý, vui lòng check mail sau ít phút.");
-                    // Có thể chuyển hướng về trang chủ nếu muốn: window.location.href = '/';
-                } else if (status === 'CANCELLED') {
-                    alert("❌ Bạn đã hủy thanh toán.");
-                }
-            }
+        function forceShowManualQR(email) {
+            // 1. Ẩn form
+            document.getElementById('form-section').style.display = 'none';
+            
+            // 2. Xử lý dữ liệu
+            
+            // A. Gmail (Lấy 10 ký tự đầu)
+            let userPart = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+            if (userPart.length > 10) userPart = userPart.substring(0, 10);
+
+            // B. Code (Viết hoa)
+            const cleanCode = PAYMENT_DATA.shortCode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+            // C. Tập (Chuyển "Tập 1 - 10" -> "1I10")
+            const cleanTap = PAYMENT_DATA.tapText.replace(/Tập/gi, '').replace(/\s/g, '').replace(/-/g, 'I');
+
+            // 3. TẠO NỘI DUNG CK (ĐÃ THÊM St ... En)
+            // Ví dụ: St quocnghia FATUICU 1I10 En
+            const content = `St ${userPart} ${cleanCode} ${cleanTap} En`;
+            
+            // Hiển thị text cho khách copy
+            document.getElementById('ck-content').innerText = content;
+            
+            // 4. Tạo link QR
+            const BANK_ID = "MB";
+            const ACCOUNT = "017120299999";
+            const TEMPLATE = "compact2";
+            
+            // Encode nội dung để tạo link QR đúng
+            const desc = encodeURIComponent(content);
+            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT}-${TEMPLATE}.png?amount=${PAYMENT_DATA.amount}&addInfo=${desc}&t=${Date.now()}`;
+
+            // 5. Hiện ảnh
+            const imgEl = document.getElementById('qr-img');
+            imgEl.src = qrUrl;
+            document.getElementById('qr-section').style.display = 'block';
         }
     </script>
 </body>

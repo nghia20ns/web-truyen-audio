@@ -113,59 +113,68 @@ const crypto = require('crypto');
 // ... giữ nguyên các hàm getHomePage, getTruyenDetail ...
 
 // --- HÀM TẠO LINK THANH TOÁN (THỦ CÔNG, KHÔNG CẦN LIB PAYOS) ---
+// controllers/clientController.js
+
 exports.createPaymentLink = async (req, res) => {
     try {
         const { email, amount, storyCode, tapText, returnUrl } = req.body;
         
         if (!email || !amount) return res.status(400).json({ error: "Thiếu thông tin" });
 
-        // 1. TẠO NỘI DUNG CHUYỂN KHOẢN (Description)
-        // Logic: Lấy tên user, ghép với mã truyện và tập -> Xóa ký tự đặc biệt -> Cắt ngắn < 25 ký tự
+        // --- 1. XỬ LÝ DỮ LIỆU ---
+        
+        // A. Xử lý Gmail: Lấy phần tên, bỏ đuôi @gmail.com, xóa ký tự lạ
         let userPart = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-        let cleanCode = storyCode.replace(/[^a-zA-Z0-9]/g, '');
-        let cleanTap = tapText.replace(/[^a-zA-Z0-9]/g, '');
+        // Giới hạn Gmail 10 ký tự để nhường chỗ cho Mã và Tập
+        if (userPart.length > 10) userPart = userPart.substring(0, 10); 
 
-        // Kết quả: "nghiavo GIFATUI 1I10"
+        // B. Xử lý Mã truyện: Viết hoa, xóa ký tự lạ
+        const cleanCode = storyCode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+        // C. Xử lý Tập: Chuyển "Tập 1 - 10" thành "1I10" (Số I Số)
+        // Logic: Xóa chữ "Tập", xóa khoảng trắng, thay dấu "-" thành chữ "I"
+        const cleanTap = tapText.replace(/Tập/gi, '').replace(/\s/g, '').replace(/-/g, 'I');
+
+        // --- 2. TẠO NỘI DUNG ---
+
+        // Nội dung CK: "quocnghia FATUICU 1I10" (Tối đa 25 ký tự)
         let description = `${userPart} ${cleanCode} ${cleanTap}`;
-        description = description.substring(0, 25); // Cắt ngắn để không lỗi PayOS
+        description = description.substring(0, 25); // Cắt chốt chặn cuối cùng
 
-        // 2. CHUẨN BỊ DỮ LIỆU
+        // Tên sản phẩm trong đơn hàng: "FATUICU 1I10"
+        const itemName = `${cleanCode} ${cleanTap}`;
+
+        // --- 3. CHUẨN BỊ GỬI PAYOS ---
         const orderCode = Number(String(Date.now()).slice(-6));
         const finalAmount = Number(amount);
         const finalReturnUrl = returnUrl || `http://localhost:3000/`;
         const finalCancelUrl = returnUrl || `http://localhost:3000/`;
 
-        // 3. TẠO CHỮ KÝ (SIGNATURE)
-        // Quy tắc PayOS: Sắp xếp a-z các trường: amount, cancelUrl, description, orderCode, returnUrl
+        // Tạo chữ ký (Signature)
         const signatureString = `amount=${finalAmount}&cancelUrl=${finalCancelUrl}&description=${description}&orderCode=${orderCode}&returnUrl=${finalReturnUrl}`;
-
         const checksumKey = process.env.PAYOS_CHECKSUM_KEY;
-        if (!checksumKey) throw new Error("Chưa cấu hình PAYOS_CHECKSUM_KEY trong .env");
+        const signature = crypto.createHmac('sha256', checksumKey).update(signatureString).digest('hex');
 
-        const signature = crypto.createHmac('sha256', checksumKey)
-            .update(signatureString)
-            .digest('hex');
-
-        // 4. TẠO BODY ĐẦY ĐỦ
+        // Body gửi đi
         const bodyData = {
             orderCode: orderCode,
             amount: finalAmount,
-            description: description,
+            description: description, // <--- Đã chuẩn theo ý bạn (Gmail trước)
             buyerName: userPart,
             buyerEmail: email,
             cancelUrl: finalCancelUrl,
             returnUrl: finalReturnUrl,
-            signature: signature, // Đã có chữ ký xịn
+            signature: signature,
             items: [
                 {
-                    name: `Truyen ${cleanCode} - ${cleanTap}`,
+                    name: itemName, // <--- Đã chuẩn theo ý bạn (Code + 1I10)
                     quantity: 1,
                     price: finalAmount,
                 },
             ],
         };
 
-        // 5. GỌI API PAYOS
+        // Gọi API
         const response = await fetch('https://api-merchant.payos.vn/v2/payment-requests', {
             method: 'POST',
             headers: {
@@ -178,16 +187,14 @@ exports.createPaymentLink = async (req, res) => {
 
         const result = await response.json();
 
-        // 6. TRẢ VỀ KẾT QUẢ
         if (!response.ok || result.code !== "00") {
-            console.error("Lỗi PayOS:", result);
-            return res.status(500).json({ error: result.desc || "Lỗi tạo link thanh toán" });
+            return res.json({ error: result.desc || "Lỗi PayOS", useManualQR: true });
         }
 
         res.json({ checkoutUrl: result.data.checkoutUrl });
 
     } catch (error) {
-        console.error("Lỗi hệ thống:", error);
-        res.status(500).json({ error: error.message });
+        console.error("Lỗi:", error);
+        res.json({ error: error.message, useManualQR: true });
     }
 };
