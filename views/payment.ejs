@@ -229,7 +229,6 @@
             
             // A. Gmail (Lấy 10 ký tự đầu)
             let userPart = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-            if (userPart.length > 10) userPart = userPart.substring(0, 10);
 
             // B. Code (Viết hoa)
             const cleanCode = PAYMENT_DATA.shortCode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
