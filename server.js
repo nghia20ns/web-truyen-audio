@@ -12,6 +12,9 @@ connectDB();
 // 2. Cấu hình App
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// --- BẮT BUỘC: Middleware đọc dữ liệu ---
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
@@ -23,10 +26,10 @@ app.use(session({
 }));
 
 // 3. Middleware
-app.use(globalAlertMiddleware); // Kích hoạt thông báo toàn web
+app.use(globalAlertMiddleware); 
 
 // 4. Routes
-app.use('/', require('./routes/index'));      // Routes cho khách
+app.use('/', require('./routes/index'));      // Routes cho khách (Bao gồm cả thanh toán)
 app.use('/admin', require('./routes/admin')); // Routes cho admin
 
 // 5. Khởi động Server

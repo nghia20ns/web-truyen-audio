@@ -48,14 +48,25 @@
     .nav-btn { text-decoration: none; color: #555; font-weight: 500; }
 
     /* Style cho Alert Chính */
+/* Style cho Alert Chính - ĐÃ SỬA */
     .global-alert {
         width: 100%;
         padding: 12px 20px;
+        
+        /* QUAN TRỌNG: Dòng này giúp padding không làm vỡ khung */
+        box-sizing: border-box; 
+        
+        /* Căn giữa tuyệt đối bằng Flexbox */
+        display: flex;
+        justify-content: center;
+        align-items: center;
         text-align: center;
+        
         font-weight: 500;
         font-size: 0.95rem;
         animation: slideDown 0.4s ease-out;
     }
+    
     .alert-warning { background: #fff3cd; color: #856404; border-bottom: 1px solid #ffeeba; }
     .alert-danger  { background: #f8d7da; color: #721c24; border-bottom: 1px solid #f5c6cb; }
     .alert-info    { background: #cff4fc; color: #055160; border-bottom: 1px solid #b6effb; }

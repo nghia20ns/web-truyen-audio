@@ -105,3 +105,89 @@ exports.getPayment = async (req, res) => {
         amountText: totalAmount.toLocaleString('vi-VN') 
     });
 };
+
+// Thêm dòng này lên đầu file clientController.js
+const crypto = require('crypto'); 
+// ... giữ nguyên các đoạn import Truyen, mongoose cũ ...
+
+// ... giữ nguyên các hàm getHomePage, getTruyenDetail ...
+
+// --- HÀM TẠO LINK THANH TOÁN (THỦ CÔNG, KHÔNG CẦN LIB PAYOS) ---
+exports.createPaymentLink = async (req, res) => {
+    try {
+        const { email, amount, storyCode, tapText, returnUrl } = req.body;
+        
+        if (!email || !amount) return res.status(400).json({ error: "Thiếu thông tin" });
+
+        // 1. TẠO NỘI DUNG CHUYỂN KHOẢN (Description)
+        // Logic: Lấy tên user, ghép với mã truyện và tập -> Xóa ký tự đặc biệt -> Cắt ngắn < 25 ký tự
+        let userPart = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+        let cleanCode = storyCode.replace(/[^a-zA-Z0-9]/g, '');
+        let cleanTap = tapText.replace(/[^a-zA-Z0-9]/g, '');
+
+        // Kết quả: "nghiavo GIFATUI 1I10"
+        let description = `${userPart} ${cleanCode} ${cleanTap}`;
+        description = description.substring(0, 25); // Cắt ngắn để không lỗi PayOS
+
+        // 2. CHUẨN BỊ DỮ LIỆU
+        const orderCode = Number(String(Date.now()).slice(-6));
+        const finalAmount = Number(amount);
+        const finalReturnUrl = returnUrl || `http://localhost:3000/`;
+        const finalCancelUrl = returnUrl || `http://localhost:3000/`;
+
+        // 3. TẠO CHỮ KÝ (SIGNATURE)
+        // Quy tắc PayOS: Sắp xếp a-z các trường: amount, cancelUrl, description, orderCode, returnUrl
+        const signatureString = `amount=${finalAmount}&cancelUrl=${finalCancelUrl}&description=${description}&orderCode=${orderCode}&returnUrl=${finalReturnUrl}`;
+
+        const checksumKey = process.env.PAYOS_CHECKSUM_KEY;
+        if (!checksumKey) throw new Error("Chưa cấu hình PAYOS_CHECKSUM_KEY trong .env");
+
+        const signature = crypto.createHmac('sha256', checksumKey)
+            .update(signatureString)
+            .digest('hex');
+
+        // 4. TẠO BODY ĐẦY ĐỦ
+        const bodyData = {
+            orderCode: orderCode,
+            amount: finalAmount,
+            description: description,
+            buyerName: userPart,
+            buyerEmail: email,
+            cancelUrl: finalCancelUrl,
+            returnUrl: finalReturnUrl,
+            signature: signature, // Đã có chữ ký xịn
+            items: [
+                {
+                    name: `Truyen ${cleanCode} - ${cleanTap}`,
+                    quantity: 1,
+                    price: finalAmount,
+                },
+            ],
+        };
+
+        // 5. GỌI API PAYOS
+        const response = await fetch('https://api-merchant.payos.vn/v2/payment-requests', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-client-id': process.env.PAYOS_CLIENT_ID,
+                'x-api-key': process.env.PAYOS_API_KEY
+            },
+            body: JSON.stringify(bodyData)
+        });
+
+        const result = await response.json();
+
+        // 6. TRẢ VỀ KẾT QUẢ
+        if (!response.ok || result.code !== "00") {
+            console.error("Lỗi PayOS:", result);
+            return res.status(500).json({ error: result.desc || "Lỗi tạo link thanh toán" });
+        }
+
+        res.json({ checkoutUrl: result.data.checkoutUrl });
+
+    } catch (error) {
+        console.error("Lỗi hệ thống:", error);
+        res.status(500).json({ error: error.message });
+    }
+};

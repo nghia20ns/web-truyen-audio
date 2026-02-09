@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh Toán</title>
+    <title>Thanh Toán - PayOS</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
     <style>
+        /* Giữ nguyên CSS cũ */
         .info-box {
             background-color: #f8f9fa;
             border: 1px dashed #ced4da;
@@ -30,22 +31,39 @@
         .guide-box ul { padding-left: 20px; margin: 5px 0 0 0; }
         .guide-box li { margin-bottom: 6px; }
 
-        /* --- STYLE MỚI CHO THÔNG BÁO NỔI BẬT --- */
         #email-alert {
-            background-color: #fff3cd; /* Nền vàng nhạt */
-            color: #856404;           /* Chữ nâu đậm */
-            border: 2px solid #ffeeba; /* Viền vàng đậm */
+            background-color: #fff3cd; 
+            color: #856404;           
+            border: 2px solid #ffeeba; 
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 8px;
-            font-size: 1.1rem;        /* Chữ to hơn bình thường */
+            font-size: 1.1rem;        
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Đổ bóng cho nổi */
-            animation: popIn 0.5s ease; /* Hiệu ứng hiện ra */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            animation: popIn 0.5s ease; 
         }
         @keyframes popIn {
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Loading Spinner cho nút bấm */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 16px;
+            height: 16px;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -60,7 +78,7 @@
 
             <div style="text-align: center; margin-bottom: 20px;">
                 <h3 style="margin: 0; color: var(--primary);">Xác nhận mua</h3>
-              <h5 style="margin: 0; color: var(--danger);">💳 <strong>Nhắn nhỏ:</strong> Nếu anh em muốn mua bằng thẻ cào thì nhắn em Cat qua Zalo hoặc Discord nhé!!!</h5>
+                <h5 style="margin: 0; color: var(--danger);">💳 <strong>Nhắn nhỏ:</strong> Nếu anh em muốn mua bằng thẻ cào thì nhắn em Cat qua Zalo hoặc Discord nhé!!!</h5>
 
                 <p style="color: var(--text-sub);">Truyện: <strong><%= truyenName %></strong></p>
                 <div class="badge" style="background: var(--secondary); color: white; display: inline-block;">
@@ -74,35 +92,24 @@
             <div id="input-section">
                 <label>Email (Vui lòng điền đúng gmail):</label>
                 <input type="text" id="gmail" placeholder="Ví dụ: quocnghia1123@gmail.com" required>
-                <button class="btn-primary" onclick="generateQR()">Tạo mã QR</button>
+                
+                <div style="margin: 15px 0; font-size: 0.9em; color: #555;">
+                    <p>💡 Sau khi bấm nút, bạn sẽ được chuyển đến trang thanh toán của PayOS (MB Bank, VietQR).</p>
+                </div>
+
+                <button id="pay-btn" class="btn-primary" onclick="createPayment()">
+                    Thanh toán ngay
+                </button>
             </div>
-
-            <div id="qr-container" style="display: none; text-align: center;">
-                
-                <div id="email-alert">
-                </div>
-                <img id="qr-img" src="" alt="QR Code" style="max-width: 100%; border-radius: 8px; border: 1px solid #eee;">
-                
-                <p style="font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
-                    Quét mã trên bằng App Ngân hàng.
-                </p>
-
-                <div class="info-box">
-                    <strong>Nội dung CK:</strong><br>
-                    <span id="ck-content-display" style="font-weight: bold; color: #d32f2f;"></span>
-                </div>
-
-                <div class="guide-box">
-                    <strong>🔔 Hướng dẫn:</strong>
-                    <ul>
-                        <li>Vui lòng kiểm tra kỹ trong <strong>thư rác, spam</strong>. Trong vòng 3-5h nếu không thấy thì hãy nhắn tin qua zalo hoặc discord đễ được hỗ trợ sớm nhất</li>
-                        <li><strong>Lưu ý:</strong> Việc thêm vào nhóm Drive thực hiện thủ công, Admin không online thường xuyên nên có thể sẽ có độ trễ. Mong bạn thông cảm chờ đợi.</li>
-                        <li>Đăng nhập Drive bằng <strong>đúng Gmail</strong> bạn đã điền ở trên để nghe.</li>
-                        <li>Nếu file nghe không có tốc độ <strong>x1.5, x2</strong>, hãy <strong>cập nhật ứng dụng Google Drive</strong> lên phiên bản mới nhất.</li>
-                        <li>Còn nếu vẫn không nghe được <strong>x1.5, x2</strong>, nữa thì hãy <strong>Tải mp3 </strong>về nghe nhé anh em.</li>
-                        <li>Mọi sai sót hoặc thắc mắc vui lòng liên hệ Admin qua <strong>Zalo</strong> hoặc <strong>Discord</strong>.</li>
-                    </ul>
-                </div>
+            
+            <div class="guide-box" style="margin-top: 30px;">
+                <strong>🔔 Lưu ý quan trọng:</strong>
+                <ul>
+                    <li>Hệ thống sẽ tự động gửi quyền truy cập sau khi thanh toán thành công.</li>
+                    <li>Vui lòng kiểm tra kỹ trong <strong>thư rác, spam</strong>.</li>
+                    <li>Trong vòng 3-5h nếu không thấy thì hãy nhắn tin qua zalo hoặc discord.</li>
+                    <li>Đăng nhập Drive bằng <strong>đúng Gmail</strong> bạn đã điền ở trên để nghe.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -110,17 +117,17 @@
     <%- include('partials/footer') %>
 
     <script>
-        function generateQR() {
-            // 1. Lấy giá trị và chuẩn hóa (xóa khoảng trắng thừa)
+        async function createPayment() {
+            // 1. Lấy giá trị và chuẩn hóa
             const rawInput = document.getElementById('gmail').value.trim();
+            const btn = document.getElementById('pay-btn');
             
             // Các biến từ server EJS
             const shortCode = "<%= shortCode %>"; 
             const tapText = "<%= tapText %>"; 
             const amount = "<%= amount %>"; 
 
-            // 2. KHU VỰC KIỂM TRA LỖI (VALIDATION) MỚI
-            // Regex: Chỉ cho phép chữ và số ở phần tên, bắt buộc đuôi @gmail.com
+            // 2. VALIDATION (Giữ nguyên logic của bạn)
             const strictGmailRegex = /^[a-zA-Z0-9]+@gmail\.com$/;
 
             if (!rawInput) {
@@ -128,64 +135,69 @@
                 return;
             }
 
-            // Kiểm tra đuôi trước cho người dùng dễ hiểu
             if (!rawInput.endsWith("@gmail.com")) {
                 alert("Lỗi: Email bắt buộc phải có đuôi @gmail.com");
                 return;
             }
 
-            // Kiểm tra ký tự đặc biệt và dấu chấm
             if (!strictGmailRegex.test(rawInput)) {
                 alert("Lỗi: Gmail không được chứa dấu chấm (.), khoảng trắng hoặc ký tự đặc biệt trong phần tên.");
                 return;
             }
 
-            // --- NẾU QUA ĐƯỢC CÁC BƯỚC TRÊN THÌ MỚI CHẠY TIẾP ---
+            // --- BẮT ĐẦU GỌI API PAYOS ---
+            
+            // Khóa nút để tránh bấm nhiều lần
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="spinner"></span> Đang tạo đơn...';
+            btn.disabled = true;
 
-            // 3. Lấy tên user (bỏ @gmail.com) để làm nội dung CK
-            // Vì đã validate đuôi @gmail.com ở trên, nên split chắc chắn đúng
-            let username = rawInput.split('@')[0];
+            try {
+                // Gọi về Backend (Node.js)
+                const response = await fetch('/create-payment-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: rawInput,
+                        amount: amount,   // Gửi số tiền (dạng số hoặc chuỗi đều được, backend sẽ parse)
+                        storyCode: shortCode,
+                        tapText: tapText,
+                        returnUrl: window.location.href // <--- THÊM DÒNG NÀY (Gửi link trang hiện tại)
+                    })
+                });
 
-            // 4. Xử lý hiển thị (Dùng chính rawInput vì nó đã chuẩn format email rồi)
-            let displayEmail = rawInput;
+                const data = await response.json();
 
-            // --- CẬP NHẬT THÔNG BÁO NỔI BẬT ---
-            const alertBox = document.getElementById('email-alert');
-            alertBox.innerHTML = `
-            ⚠️ Sau khi chuyển khoản 3–5h chưa thấy mail?<br>
-            Vui lòng vào <b>Google Drive</b> → mục <b>“Được chia sẻ”</b> của 
-            <span style="color:#d32f2f;">${displayEmail}</span> để nhận truyện.<br>
-            <small>💡 Nên tải audio về máy để nghe mượt hơn.</small>
-            `;
+                if (data.checkoutUrl) {
+                    // Nếu thành công, chuyển hướng sang trang thanh toán
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    // Nếu backend trả về lỗi
+                    alert("Có lỗi xảy ra: " + (data.error || "Không xác định"));
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
 
-            // 5. Hàm xóa dấu tiếng Việt (để tạo nội dung chuyển khoản sạch)
-            function removeAccents(str) {
-                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                          .replace(/đ/g, "d").replace(/Đ/g, "D");
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Lỗi kết nối đến server. Vui lòng thử lại sau.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
+            window.onload = function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const status = urlParams.get('status');
+                const orderCode = urlParams.get('orderCode');
 
-            const cleanUser = removeAccents(username);
-            const cleanCode = removeAccents(shortCode);
-
-            // 6. Tạo nội dung CK
-            const content = `St ${cleanUser} ${cleanCode} ${tapText} En`;
-            
-            document.getElementById('ck-content-display').innerText = content;
-
-            // 7. Tạo link QR
-            const BANK_ID = "MB"; 
-            const ACCOUNT_NO = "017120299999";
-            const TEMPLATE = "compact2";
-            
-            const description = encodeURIComponent(content);
-            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-${TEMPLATE}.png?amount=${amount}&addInfo=${description}`;
-
-            const img = document.getElementById('qr-img');
-            img.src = qrUrl;
-            
-            // 8. Ẩn form nhập, hiện QR
-            document.getElementById('input-section').style.display = 'none';
-            document.getElementById('qr-container').style.display = 'block';
+                if (status === 'PAID') {
+                    alert("✅ Thanh toán thành công! Mã đơn: " + orderCode + "\nHệ thống đang xử lý, vui lòng check mail sau ít phút.");
+                    // Có thể chuyển hướng về trang chủ nếu muốn: window.location.href = '/';
+                } else if (status === 'CANCELLED') {
+                    alert("❌ Bạn đã hủy thanh toán.");
+                }
+            }
         }
     </script>
 </body>
