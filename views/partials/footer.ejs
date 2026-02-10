@@ -70,7 +70,19 @@
         pointer-events: none;
     }
     
-    .chat-box { position: fixed; bottom: 100px; right: 30px; width: 340px; height: 480px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: 0.3s; transform: translateY(20px); }
+    .chat-box { 
+        position: fixed; bottom: 100px; right: 30px;
+        width: 340px; height: 480px; background: white; border-radius: 12px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10000; 
+        display: flex; flex-direction: column;
+        opacity: 0; pointer-events: none; 
+        
+        /* --- SỬA Ở ĐÂY: Chỉ transition opacity và transform --- */
+        transition: opacity 0.3s, transform 0.3s; 
+        /* ----------------------------------------------------- */
+        
+        transform: translateY(20px); 
+    }
     .chat-box.active { opacity: 1; pointer-events: all; transform: translateY(0); }
     
     .chat-header { background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
@@ -219,12 +231,24 @@
     }
     
     if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
+        // Hàm xử lý resize tối ưu
+        const handleResize = () => {
              const box = document.getElementById('chat-box');
+             // Chỉ chạy logic khi đang ở Mobile (<= 480px) và Chat đang mở
              if(box.classList.contains('active') && window.innerWidth <= 480) {
-                 box.style.height = window.visualViewport.height + 'px';
-                 scrollToBottom();
+                 // Dùng requestAnimationFrame để mượt hơn, tránh giật cục
+                 requestAnimationFrame(() => {
+                     // Cập nhật chiều cao bằng đúng phần nhìn thấy được (trừ bàn phím)
+                     box.style.height = window.visualViewport.height + 'px';
+                     // Đảm bảo chat luôn dính đáy (quan trọng cho iOS)
+                     box.style.bottom = '0px'; 
+                     scrollToBottom();
+                 });
              }
-        });
+        };
+
+        window.visualViewport.addEventListener('resize', handleResize);
+        window.visualViewport.addEventListener('scroll', handleResize); // Thêm sự kiện scroll để chắc chắn
     }
+
 </script>
