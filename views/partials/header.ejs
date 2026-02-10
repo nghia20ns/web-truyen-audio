@@ -7,7 +7,7 @@
     </nav>
     <% if (typeof globalAlert !== 'undefined' && globalAlert.isOn) { %>
         <div class="global-alert alert-<%= globalAlert.type %>">
-            📢 <strong>Thông báo:</strong> <%= globalAlert.content %>
+            <%= globalAlert.content %>
         </div>
     <% } %>
 

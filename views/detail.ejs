@@ -3,31 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= truyen.name %></title>
+    <title><%= truyen.name %> | Web Truyện Audio</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
-</head>
+    </head>
 <body>
 <%- include('partials/header') %>
-    <div class="container">
-        <a href="/" class="nav-btn" style="display: inline-flex; padding-left: 0; margin-bottom: 10px;">
-            ⬅ Quay lại danh sách
-        </a>
 
-        <div class="card">
-            <h1 style="margin: 0 0 15px 0; color: var(--primary);"><%= truyen.name %></h1>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Quay lại trang chủ
+            </a>
+        </div>
+
+        <div class="card detail-card">
+            <div class="detail-hero">
+                <div class="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+                <div class="hero-content">
+                    <h1 class="detail-title"><%= truyen.name %></h1>
+                    <div class="hero-badges">
+                        <span class="badge badge-blue">
+                            📖 <%= truyen.totalChapters %> Tập
+                        </span>
+                        <span class="badge badge-pink">
+                            🎧 Audio Chất lượng cao
+                        </span>
+                    </div>
+                </div>
+            </div>
             
-        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Chọn tập nghe</h3>
-            <div class="part-grid">
-                <% parts.forEach(function(part) { %>
-                    <a href="/payment?truyenId=<%= truyen._id %>&partCode=<%= part.code %>" class="part-item">
-                        <div style="font-size: 1rem;"><%= part.name %></div>
-                        <div style="font-size: 0.8rem; color: #ef4444;"><%= part.priceText %>đ</div>
-                    </a>
-                <% }); %>
+            <hr class="divider">
+
+            <div class="detail-section">
+                <h3 class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Giới thiệu nội dung
+                </h3>
+                <div class="story-description">
+                    <%= truyen.introduction ? truyen.introduction : "Nội dung đang được cập nhật..." %>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    Danh sách tập
+                </h3>
+                
+                <div class="chapter-grid">
+                    <% parts.forEach(function(part) { %>
+                        <a href="/payment?truyenId=<%= truyen._id %>&partCode=<%= part.code %>" class="chapter-card">
+                            <div class="chapter-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                            <div class="chapter-info">
+                                <div class="chapter-name"><%= part.name %></div>
+                                <div class="chapter-price"><%= part.priceText %>đ</div>
+                            </div>
+                        </a>
+                    <% }); %>
+                </div>
             </div>
         </div>
     </div>
-        <%- include('partials/footer') %>
+    
+    <%- include('partials/footer') %>
 </body>
 </html>

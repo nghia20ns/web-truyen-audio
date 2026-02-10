@@ -35,7 +35,7 @@ body {
     max-width: 800px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between; /* Đẩy Logo sang trái, Menu sang phải */
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -84,40 +84,119 @@ body {
     padding: 0 20px;
 }
 
+/* --- DANH SÁCH TRUYỆN (GRID) --- */
+/* Đã chỉnh sửa để thẻ card đều nhau */
+.story-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    align-items: stretch;
+}
+
+.story-grid a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    height: 100%;
+}
+
 /* --- CARDS & ITEMS --- */
+/* Đã chỉnh sửa Flexbox */
 .card {
     background: var(--surface);
     border-radius: var(--radius);
-    padding: 25px;
+    padding: 20px;
     box-shadow: var(--shadow);
-    margin-bottom: 20px;
     border: 1px solid var(--border);
-    transition: transform 0.2s;
+    transition: transform 0.2s, border-color 0.2s;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px; /* Giữ margin-bottom cho các trang không dùng grid */
+}
+
+/* Ghi đè margin-bottom trong grid để tránh khoảng trắng thừa */
+.story-grid .card {
+    margin-bottom: 0;
 }
 
 .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
 }
 
-/* --- DANH SÁCH TRUYỆN (GRID) --- */
-.story-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+/* Class mới để bọc Title + Intro */
+.card-body-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .story-card-title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-main);
     margin-bottom: 8px;
     line-height: 1.4;
     
-    /* Tự động cắt nếu tên dài quá 2 dòng */
     display: -webkit-box;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.story-card-intro {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    margin-bottom: 15px;
+    line-height: 1.5;
+    
+    /* Giới hạn 2 dòng như yêu cầu */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- TRANG CHI TIẾT (DETAIL PAGE) --- */
+/* Style mới cho phần giới thiệu full */
+.detail-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.detail-title {
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin: 0 0 10px 0;
+}
+
+.story-detail-intro {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    color: #334155;
+    font-size: 1rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    text-align: justify;
+}
+
+.story-detail-intro h4 {
+    margin-top: 0;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* --- NÚT BẤM (BUTTONS) --- */
@@ -257,7 +336,7 @@ input:focus, textarea:focus {
     display: flex;
     justify-content: center;
     gap: 15px;
-    flex-wrap: wrap; /* Tự xuống dòng trên đt nhỏ */
+    flex-wrap: wrap;
 }
 
 .footer-btn {
@@ -270,7 +349,7 @@ input:focus, textarea:focus {
     font-weight: 700;
     font-size: 0.95rem;
     transition: transform 0.2s, box-shadow 0.2s;
-    color: white !important; /* Bắt buộc chữ trắng */
+    color: white !important;
 }
 
 .btn-discord { background: #5865F2; }
@@ -288,15 +367,16 @@ input:focus, textarea:focus {
     right: 30px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #00B2FF 0%, #006AFF 100%); /* Màu Messenger */
+    background: var(--primary);
     border-radius: 50%;
-    box-shadow: 0 4px 15px rgba(0, 106, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     z-index: 9999;
     transition: transform 0.3s;
+    color: white;
 }
 
 .floating-chat:hover { transform: scale(1.1) rotate(10deg); }
@@ -307,11 +387,11 @@ input:focus, textarea:focus {
     fill: white;
 }
 
-/* --- SUPPORT MENU (MỚI) --- */
+/* --- SUPPORT MENU --- */
 .support-menu {
-    display: none; /* Mặc định ẩn */
+    display: none;
     position: fixed;
-    bottom: 100px; /* Cách nút tròn một đoạn */
+    bottom: 100px;
     right: 30px;
     width: 300px;
     background: white;
@@ -358,28 +438,6 @@ input:focus, textarea:focus {
     background: #f8fafc;
 }
 
-/* Chỉnh lại nút tròn một chút cho khớp */
-.floating-chat {
-    background: var(--primary); /* Dùng màu chủ đạo của web cho đồng bộ */
-    color: white;
-    /* Các thuộc tính cũ giữ nguyên */
-}
-
-.story-card-intro {
-    font-size: 0.9rem;
-    color: var(--text-sub);
-    margin-bottom: 15px;
-    line-height: 1.5;
-    
-    /* Giới hạn 3 dòng */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    
-    /* Đẩy phần này dãn ra để phần Badge trôi xuống đáy */
-    flex-grow: 1; 
-}
-
 /* --- SIMPLE FOOTER STYLE --- */
 .simple-footer {
     background-color: white;
@@ -391,9 +449,9 @@ input:focus, textarea:focus {
 
 .footer-flex {
     display: flex;
-    justify-content: space-between; /* Đẩy 2 bên ra xa nhau */
+    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; /* Tự xuống dòng nếu màn hình quá nhỏ */
+    flex-wrap: wrap;
     gap: 15px;
 }
 
@@ -422,29 +480,25 @@ input:focus, textarea:focus {
     opacity: 0.9;
 }
 
-/* Màu thương hiệu */
 .contact-btn.zalo {
-    background-color: #0068FF; /* Xanh Zalo */
+    background-color: #0068FF;
     box-shadow: 0 2px 5px rgba(0, 104, 255, 0.2);
 }
 
 .contact-btn.discord {
-    background-color: #5865F2; /* Tím Discord */
+    background-color: #5865F2;
     box-shadow: 0 2px 5px rgba(88, 101, 242, 0.2);
 }
 
-/* --- RESPONSIVE MOBILE --- */
 @media (max-width: 600px) {
     .footer-flex {
-        justify-content: center; /* Ra giữa trên điện thoại */
-        flex-direction: column;  /* Xếp dọc */
+        justify-content: center;
+        flex-direction: column;
         text-align: center;
     }
 }
 
-/* --- PAYMENT PAGE STYLES (Mobile Optimized) --- */
-
-/* Card giao diện chính */
+/* --- PAYMENT PAGE STYLES --- */
 .payment-card {
     background: white;
     border-radius: 16px;
@@ -458,7 +512,6 @@ input:focus, textarea:focus {
     margin-right: auto;
 }
 
-/* Header thông tin */
 .story-info {
     text-align: center;
     border-bottom: 1px dashed #eee;
@@ -476,7 +529,7 @@ input:focus, textarea:focus {
 .price-tag {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #059669; /* Xanh lá đậm */
+    color: #059669;
     margin: 10px 0;
 }
 
@@ -490,7 +543,6 @@ input:focus, textarea:focus {
     display: inline-block;
 }
 
-/* Form nhập liệu */
 .form-group {
     margin-bottom: 15px;
 }
@@ -510,7 +562,7 @@ input:focus, textarea:focus {
     border-radius: 12px;
     font-size: 1rem;
     transition: border-color 0.2s;
-    box-sizing: border-box; /* Quan trọng để không bị vỡ khung */
+    box-sizing: border-box;
 }
 
 .form-input:focus {
@@ -518,7 +570,6 @@ input:focus, textarea:focus {
     outline: none;
 }
 
-/* Nút bấm to cho mobile */
 .btn-pay {
     width: 100%;
     background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
@@ -536,17 +587,9 @@ input:focus, textarea:focus {
     align-items: center;
 }
 
-.btn-pay:active {
-    transform: scale(0.98);
-}
+.btn-pay:active { transform: scale(0.98); }
+.btn-pay:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
 
-.btn-pay:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-/* Khu vực QR Code */
 #qr-container {
     display: none;
     text-align: center;
@@ -592,7 +635,6 @@ input:focus, textarea:focus {
     word-break: break-all;
 }
 
-/* Spinner Loading */
 .spinner {
     width: 20px;
     height: 20px;
@@ -603,7 +645,6 @@ input:focus, textarea:focus {
     margin-right: 8px;
 }
 
-/* Nút quay lại */
 .back-link {
     display: inline-flex;
     align-items: center;
@@ -616,25 +657,25 @@ input:focus, textarea:focus {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
 /* =========================================
    ADMIN DASHBOARD (VERTICAL LAYOUT)
    ========================================= */
 
-/* Layout bao ngoài: Chia 2 cột (Sidebar - Content) */
 .admin-wrapper {
     display: flex;
     min-height: 100vh;
-    background-color: #f1f5f9; /* Màu nền tổng thể xám nhạt */
+    background-color: #f1f5f9;
 }
 
 /* --- 1. SIDEBAR --- */
 .admin-sidebar {
     width: 260px;
-    background-color: #1e293b; /* Màu tối sang trọng */
+    background-color: #1e293b;
     color: white;
     display: flex;
     flex-direction: column;
-    position: fixed; /* Cố định sidebar */
+    position: fixed;
     height: 100vh;
     left: 0;
     top: 0;
@@ -688,22 +729,22 @@ input:focus, textarea:focus {
 }
 
 .sidebar-menu li a.active {
-    background-color: var(--primary); /* Màu tím chủ đạo */
+    background-color: var(--primary);
     color: #fff;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .logout-link:hover {
-    background-color: #ef4444 !important; /* Màu đỏ khi hover nút đăng xuất */
+    background-color: #ef4444 !important;
     color: white !important;
 }
 
 /* --- 2. MAIN CONTENT --- */
 .admin-content {
     flex: 1;
-    margin-left: 260px; /* Đẩy nội dung sang phải bằng chiều rộng sidebar */
+    margin-left: 260px;
     padding: 30px;
-    width: calc(100% - 260px); /* Đảm bảo không bị tràn */
+    width: calc(100% - 260px);
 }
 
 .content-header {
@@ -726,7 +767,7 @@ input:focus, textarea:focus {
     font-weight: 600;
 }
 
-/* --- ADMIN STORY CARD (Style riêng cho admin) --- */
+/* --- ADMIN STORY CARD --- */
 .admin-story-card {
     background: white;
     padding: 20px;
@@ -791,7 +832,7 @@ input:focus, textarea:focus {
     }
     
     .sidebar-menu { display: flex; padding: 10px; gap: 5px; }
-    .sidebar-brand, .menu-label, .logout-link { display: none; } /* Ẩn bớt cho gọn trên mobile */
+    .sidebar-brand, .menu-label, .logout-link { display: none; }
     
     .admin-content {
         margin-left: 0;
@@ -809,5 +850,225 @@ input:focus, textarea:focus {
         flex-direction: column;
         text-align: center;
         gap: 15px;
+    }
+}
+
+/* =========================================
+   NEW DETAIL PAGE STYLES (TỐI ƯU GIAO DIỆN)
+   ========================================= */
+
+/* Nút quay lại gọn gàng */
+.breadcrumb {
+    margin-bottom: 20px;
+}
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-sub);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.back-link:hover {
+    color: var(--primary);
+}
+
+/* Card chính của trang chi tiết */
+.detail-card {
+    padding: 0; /* Xóa padding mặc định để layout đẹp hơn */
+    overflow: hidden;
+}
+
+/* --- HERO SECTION (Phần đầu trang) --- */
+.detail-hero {
+    padding: 30px;
+    background: linear-gradient(to bottom, #f8fafc, #ffffff);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Icon sách đại diện (Placeholder cho ảnh bìa) */
+.hero-icon {
+    width: 80px;
+    height: 80px;
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.hero-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.hero-content {
+    flex-grow: 1;
+}
+
+.detail-title {
+    font-size: 1.8rem;
+    color: var(--text-main);
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+}
+
+.hero-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.badge-blue { background: #e0e7ff; color: #4338ca; }
+.badge-pink { background: #fce7f3; color: #be185d; }
+
+.divider {
+    border: 0;
+    border-top: 1px solid #f1f5f9;
+    margin: 0;
+}
+
+/* --- SECTION CHUNG --- */
+.detail-section {
+    padding: 30px;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    color: var(--text-main);
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.section-title svg { color: var(--primary); }
+
+/* --- PHẦN GIỚI THIỆU --- */
+/* --- PHẦN GIỚI THIỆU (CẬP NHẬT) --- */
+.story-description {
+    color: #475569;
+    line-height: 1.8;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    text-align: justify;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+    
+    /* --- PHẦN MỚI THÊM VÀO --- */
+    max-height: 300px; /* Chiều cao tối đa (bạn có thể chỉnh số này) */
+    overflow-y: auto;  /* Tự động hiện thanh trượt dọc nếu dài hơn chiều cao trên */
+    
+    /* Giúp thanh trượt mượt mà hơn trên iOS/Mac */
+    -webkit-overflow-scrolling: touch; 
+}
+
+/* --- TÙY CHỈNH THANH TRƯỢT (SCROLLBAR) CHO ĐẸP --- */
+/* Chỉ áp dụng cho khung giới thiệu này */
+.story-description::-webkit-scrollbar {
+    width: 6px; /* Độ rộng thanh trượt nhỏ gọn */
+}
+
+.story-description::-webkit-scrollbar-track {
+    background: #f1f5f9; /* Màu nền rãnh trượt (trùng màu nền khung) */
+    border-radius: 4px;
+}
+
+.story-description::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* Màu của thanh trượt */
+    border-radius: 4px;
+}
+
+.story-description::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* Đậm lên khi rê chuột vào */
+}
+
+/* --- DANH SÁCH TẬP (GRID MỚI) --- */
+.chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Card nhỏ gọn hơn */
+    gap: 15px;
+}
+
+.chapter-card {
+    display: flex;
+    flex-direction: column; /* Xếp dọc icon và tên */
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.chapter-card:hover {
+    border-color: var(--primary);
+    background: #eff6ff;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.chapter-icon {
+    width: 40px;
+    height: 40px;
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 50%; /* Hình tròn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    transition: transform 0.2s;
+}
+
+.chapter-card:hover .chapter-icon {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+.chapter-name {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    
+    /* Cắt tên nếu quá dài */
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.chapter-price {
+    font-size: 0.85rem;
+    color: #ef4444; /* Màu đỏ cho giá tiền */
+    font-weight: 700;
+    background: #fef2f2;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Responsive mobile: Header dọc */
+@media (max-width: 600px) {
+    .detail-hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    .hero-badges {
+        justify-content: center;
+    }
+    .chapter-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 cột trên mobile */
     }
 }
