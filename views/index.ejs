@@ -2,55 +2,217 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">    <title>Trang Chủ - Cat Audio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trang Chủ - Cat Audio</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 
+    <style>
+        /* CSS Riêng cho trang chủ */
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .story-grid {
+            display: grid;
+            /* THAY ĐỔI 1: Tăng kích thước cột tối thiểu từ 160px lên 280px để thẻ bè ra */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px;
+            padding-bottom: 40px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-img-wrapper {
+            width: 100%;
+            /* THAY ĐỔI 2: Giảm tỷ lệ từ 140% (dọc) xuống 56.25% (ngang - chuẩn 16:9) */
+            padding-top: 56.25%; 
+            position: relative;
+            background-color: #e5e7eb;
+        }
+
+        .card-img-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 15px; /* Tăng padding một chút cho thoáng */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .story-card-title {
+            font-size: 1.1rem; /* Tăng cỡ chữ tiêu đề lên chút */
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: block; 
+            overflow: visible;
+            white-space: normal; 
+        }
+
+        .story-card-intro {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .badges {
+            display: flex;
+            gap: 5px;
+            margin-top: auto;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .badge-audio {
+            background-color: #fce7f3;
+            color: #9d174d;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            .story-grid {
+                /* THAY ĐỔI 3: Mobile nên để 1 cột nếu dùng ảnh ngang cho to rõ */
+                grid-template-columns: 1fr; 
+                gap: 15px;
+            }
+            .story-card-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
 <%- include('partials/header') %>
     <div class="container">
             <br>
-        <div class="search-container">
-            <input type="text" id="liveSearch" class="search-input" placeholder="Gõ tên truyện để tìm kiếm ngay..." value="<%= keyword %>" autocomplete="off">
-            <div id="loadingIcon" class="input-loading"></div>
+        <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 30px auto;">
+            <input type="text" id="liveSearch" class="search-input" 
+                   placeholder="Nhập tên truyện cần tìm..." 
+                   value="<%= keyword %>" autocomplete="off"
+                   style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #d1d5db; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div id="loadingIcon" class="input-loading" style="position: absolute; right: 15px; top: 12px; display: none;">⏳</div>
         </div>
 
-        <h2 id="pageTitle" style="margin-bottom: 25px;">
+        <h2 id="pageTitle" style="margin-bottom: 25px; font-size: 1.5rem; color: #1f2937; border-left: 5px solid #6366f1; padding-left: 15px;">
             <% if(keyword) { %>Kết quả cho: "<%= keyword %>"<% } else { %>Danh Sách Truyện Mới<% } %>
         </h2>
         
         <div id="storyContainer" class="story-grid">
             <% listTruyen.forEach(function(truyen) { %>
-                <a href="/truyen/<%= truyen._id %>" style="text-decoration: none;">
+                <a href="/truyen/<%= truyen._id %>" style="text-decoration: none; color: inherit;">
                     <div class="card">
-                        <div>
-                            <div class="story-card-title"><%= truyen.name %></div>
-                            <div class="story-card-intro">
-                                <b>Chi tiết:</b> <%= truyen.introduction ? truyen.introduction : "Đang cập nhật..." %>
-                            </div>
+                        <div class="card-img-wrapper">
+                            <% 
+                                let imgUrl = truyen.image || '/images/default-cover.png'; 
+                                // THAY ĐỔI 4: Tăng kích thước ảnh lấy về từ Cloudinary lên 500px
+                                if(imgUrl.includes('cloudinary')) {
+                                    const uploadIndex = imgUrl.indexOf('/upload/');
+                                    if(uploadIndex !== -1) {
+                                        // w_500: rộng 500px, h_280: cao 280px (tỉ lệ ~16:9), c_fill: cắt vừa khung
+                                        imgUrl = imgUrl.slice(0, uploadIndex + 8) + 'w_500,h_280,c_fill,q_auto,f_auto/' + imgUrl.slice(uploadIndex + 8);
+                                    }
+                                }
+                            %>
+                            <img src="<%= imgUrl %>" class="card-img-top" alt="<%= truyen.name %>" loading="lazy">
                         </div>
-                        <div class="badges">
-                            <span class="badge"><%= truyen.totalChapters %> tập</span>
-                            <span class="badge">Audio</span>
+
+                        <div class="card-body">
+                            <div>
+                                <div class="story-card-title"><%= truyen.name %></div>
+                                <div class="story-card-intro">
+                                    <%= truyen.introduction ? truyen.introduction : "Đang cập nhật nội dung..." %>
+                                </div>
+                            </div>
+                            <div class="badges">
+                                <span class="badge"><%= truyen.totalChapters %> tập</span>
+                                <span class="badge badge-audio">Audio</span>
+                            </div>
                         </div>
                     </div>
                 </a>
             <% }); %>
         </div>
 
-        <div id="notFound" style="display: none; margin-top: 30px; text-align: center; color: #555;">
-                <p>Không tìm thấy truyện nào.</p>
+        <div id="notFound" style="display: none; margin-top: 50px; text-align: center; color: #6b7280;">
+             <img src="/images/empty.svg" alt="Empty" style="width: 100px; opacity: 0.5; margin-bottom: 10px;">
+             <p>Không tìm thấy truyện nào phù hợp.</p>
         </div>
 
         <div id="pagination" class="pagination">
-            </div>
+        </div>
     </div>
 
     <%- include('partials/footer') %>
 
     <script>
-        // Các biến toàn cục
+        // --- LOGIC JAVASCRIPT ---
         let currentPage = Number('<%= (typeof currentPage != "undefined") ? currentPage : 1 %>');
         let totalPages = Number('<%= (typeof totalPages != "undefined") ? totalPages : 1 %>');
         let currentKeyword = "<%= keyword %>";
@@ -63,122 +225,117 @@
         const pageTitle = document.getElementById('pageTitle');
         const paginationDiv = document.getElementById('pagination');
 
-        // Hàm khởi tạo ban đầu
         renderPagination(currentPage, totalPages);
 
-        // 1. SỰ KIỆN GÕ PHÍM (LIVE SEARCH)
+        // 1. SỰ KIỆN GÕ TÌM KIẾM
         input.addEventListener('input', function() {
             const keyword = this.value.trim();
-            
-            // Hiển thị loading
             loading.style.display = 'block';
-
-            // Xóa lệnh cũ nếu người dùng vẫn đang gõ (Debounce)
             clearTimeout(debounceTimer);
 
-            // Đợi 500ms sau khi ngừng gõ mới gửi yêu cầu
             debounceTimer = setTimeout(() => {
                 currentKeyword = keyword;
-                currentPage = 1; // Reset về trang 1 khi tìm kiếm mới
+                currentPage = 1; 
                 fetchData(1, currentKeyword);
             }, 500); 
         });
 
-        // 2. HÀM GỌI DỮ LIỆU TỪ SERVER
+        // 2. HÀM LẤY DỮ LIỆU
         async function fetchData(page, keyword) {
             try {
-                // Đổi URL trên trình duyệt cho đẹp (nhưng không load lại)
                 const urlDisplay = keyword ? `/?q=${keyword}&page=${page}` : `/?page=${page}`;
                 window.history.pushState(null, '', urlDisplay);
 
-                // Gọi API
                 const res = await fetch(`/?q=${keyword}&page=${page}&type=json`);
                 const data = await res.json();
 
-                // Cập nhật dữ liệu
                 renderStories(data.listTruyen);
                 renderPagination(data.currentPage, data.totalPages);
                 
-                // Cập nhật tiêu đề
                 pageTitle.innerText = keyword ? `Kết quả cho: "${keyword}"` : "Danh Sách Truyện Mới";
-                
-                // Tắt loading
                 loading.style.display = 'none';
 
             } catch (err) {
                 console.error(err);
-                alert("Lỗi tải dữ liệu");
+                loading.style.display = 'none';
             }
         }
 
-        // 3. HÀM VẼ LẠI DANH SÁCH TRUYỆN
+        // 3. HÀM VẼ DANH SÁCH TRUYỆN
         function renderStories(list) {
-            container.innerHTML = ''; // Xóa cũ
+            container.innerHTML = ''; 
             
-            if (list.length === 0) {
+            if (!list || list.length === 0) {
                 notFound.style.display = 'block';
                 return;
             }
             notFound.style.display = 'none';
 
             list.forEach(truyen => {
-                const intro = truyen.introduction ? truyen.introduction : "Đang cập nhật...";
+                const intro = truyen.introduction ? truyen.introduction : "Đang cập nhật nội dung...";
                 
-                // HTML Card Truyện (Giữ nguyên cấu trúc bạn thích)
+                // THAY ĐỔI 5: Cập nhật JS logic cho ảnh to hơn
+                let imgUrl = truyen.image || '/images/default-cover.png';
+                if(imgUrl.includes('cloudinary')) {
+                     const uploadIndex = imgUrl.indexOf('/upload/');
+                     if(uploadIndex !== -1) {
+                        // w_500, h_280
+                        imgUrl = imgUrl.slice(0, uploadIndex + 8) + 'w_500,h_280,c_fill,q_auto,f_auto/' + imgUrl.slice(uploadIndex + 8);
+                     }
+                }
+
                 const html = `
-                    <a href="/truyen/${truyen._id}" style="text-decoration: none;">
+                    <a href="/truyen/${truyen._id}" style="text-decoration: none; color: inherit;">
                         <div class="card">
-                            <div>
-                                <div class="story-card-title">${truyen.name}</div>
-                                <div class="story-card-intro">
-                                    <b>Chi tiết:</b> ${intro}
-                                </div>
+                            <div class="card-img-wrapper">
+                                <img src="${imgUrl}" class="card-img-top" alt="${truyen.name}" loading="lazy">
                             </div>
-                            <div class="badges">
-                                <span class="badge">${truyen.totalChapters} tập</span>
-                                <span class="badge">Audio</span>
+                            <div class="card-body">
+                                <div>
+                                    <div class="story-card-title">${truyen.name}</div>
+                                    <div class="story-card-intro">${intro}</div>
+                                </div>
+                                <div class="badges">
+                                    <span class="badge">${truyen.totalChapters} tập</span>
+                                    <span class="badge badge-audio">Audio</span>
+                                </div>
                             </div>
                         </div>
                     </a>
                 `;
-                container.innerHTML += html;
+                container.insertAdjacentHTML('beforeend', html);
             });
         }
 
-        // 4. HÀM VẼ NÚT PHÂN TRANG
         function renderPagination(current, total) {
             paginationDiv.innerHTML = '';
-            
-            if (total <= 1) return; // Nếu chỉ có 1 trang thì khỏi hiện nút
+            if (total <= 1) return;
 
-            // Nút Prev (Trang trước)
             const prevBtn = document.createElement('button');
-            prevBtn.innerText = '« Trước';
+            prevBtn.innerHTML = '&laquo; Trước';
             prevBtn.className = 'page-btn';
             prevBtn.disabled = current === 1;
-            prevBtn.onclick = () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' }); // Cuộn lên đầu
-                fetchData(current - 1, currentKeyword);
-            };
+            prevBtn.onclick = () => changePage(current - 1);
             paginationDiv.appendChild(prevBtn);
 
-            // Hiển thị số trang (Ví dụ: Trang 1 / 5)
             const info = document.createElement('span');
-            info.innerText = ` Trang ${current} / ${total} `;
+            info.innerText = ` ${current} / ${total} `;
             info.style.alignSelf = 'center';
             info.style.fontWeight = 'bold';
+            info.style.color = '#4b5563';
             paginationDiv.appendChild(info);
 
-            // Nút Next (Trang sau)
             const nextBtn = document.createElement('button');
-            nextBtn.innerText = 'Sau »';
+            nextBtn.innerHTML = 'Sau &raquo;';
             nextBtn.className = 'page-btn';
             nextBtn.disabled = current === total;
-            nextBtn.onclick = () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                fetchData(current + 1, currentKeyword);
-            };
+            nextBtn.onclick = () => changePage(current + 1);
             paginationDiv.appendChild(nextBtn);
+        }
+
+        function changePage(newPage) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            fetchData(newPage, currentKeyword);
         }
     </script>
 </body>

@@ -1,29 +1,51 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const requireLogin = require('../middleware/auth'); // Đảm bảo file này ok
+const path = require('path');
+const multer = require('multer');
+
+// --- 1. KHẮC PHỤC LỖI IMPORT AUTH ---
+// Vì file middleware/auth.js export trực tiếp hàm, nên không dùng { }
+const requireAuth = require('../middleware/auth'); 
+
+// --- 2. CẤU HÌNH MULTER (Xử lý upload ảnh) ---
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Lưu tạm vào thư mục uploads ở root
+    },
+    filename: function (req, file, cb) {
+        // Đặt tên file tránh trùng lặp
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// ================= ROUTES =================
 
 // --- AUTH ROUTES ---
 router.get('/login', adminController.getLogin);
 router.post('/login', adminController.postLogin);
 router.get('/logout', adminController.logout);
 
-// --- ADMIN ROUTES (Cần đăng nhập) ---
-router.get('/', requireLogin, adminController.getDashboard);
+// --- ADMIN ROUTES (Yêu cầu đăng nhập) ---
+router.get('/', requireAuth, adminController.getDashboard);
 
-// Thêm truyện
-router.get('/add', requireLogin, adminController.getAddPage);
-router.post('/add', requireLogin, adminController.postAdd);
+// 1. Thêm truyện
+router.get('/add', requireAuth, adminController.getAddPage);
+// Thêm middleware upload.single('image') để xử lý file từ form
+router.post('/add', requireAuth, upload.single('image'), adminController.postAdd);
 
-// Sửa truyện
-router.get('/edit/:id', requireLogin, adminController.getEditPage);
-router.post('/edit/:id', requireLogin, adminController.postEdit);
+// 2. Sửa truyện
+router.get('/edit/:id', requireAuth, adminController.getEditPage);
+// Thêm middleware upload.single('image')
+router.post('/edit/:id', requireAuth, upload.single('image'), adminController.postEdit);
 
-// Xóa truyện (Thêm route này nếu chưa có)
-router.get('/delete/:id', requireLogin, adminController.deleteTruyen);
+// 3. Xóa truyện
+router.get('/delete/:id', requireAuth, adminController.deleteTruyen);
 
-// Cấu hình thông báo
-router.get('/alert', requireLogin, adminController.getAlertPage);
-router.post('/alert', requireLogin, adminController.postAlert);
+// 4. Cấu hình thông báo
+router.get('/alert', requireAuth, adminController.getAlertPage);
+router.post('/alert', requireAuth, adminController.postAlert);
 
 module.exports = router;

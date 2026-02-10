@@ -20,25 +20,37 @@
                 </div>
             <% } %>
 
-            <form action="<%= truyen && truyen._id ? '/admin/edit/' + truyen._id : '/admin/add' %>" method="POST" class="card" style="max-width: 800px;">
+            <form action="<%= truyen && truyen._id ? '/admin/edit/' + truyen._id : '/admin/add' %>" 
+                  method="POST" 
+                  enctype="multipart/form-data" 
+                  class="card" 
+                  style="max-width: 800px;">
                 
                 <label>Tên Truyện:</label>
                 <input type="text" name="name" value="<%= truyen ? truyen.name : '' %>" required>
+
+                <label>Ảnh bìa (Nếu muốn thay đổi):</label>
+                <input type="file" name="image" accept="image/*" style="padding: 10px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
                 
-                <label>Từ viết tắt (Duy nhất, ví dụ: dptk):</label>
-                <input type="text" name="shortCode" value="<%= truyen ? truyen.shortCode : '' %>" required placeholder="Không được trùng..." style="border: 2px solid #6366f1;">
+                <% if (truyen && truyen.image) { %>
+                    <div style="margin-bottom: 20px;">
+                        <p style="font-size: 0.9em; color: #64748b; margin-bottom: 5px;">Ảnh hiện tại:</p>
+                        <img src="<%= truyen.image %>" height="150" style="border-radius: 8px; border: 1px solid #e2e8f0;">
+                    </div>
+                <% } %>
+
+                <label>Từ viết tắt (Duy nhất):</label>
+                <input type="text" name="shortCode" value="<%= truyen ? truyen.shortCode : '' %>" required placeholder="ví dụ: dptk" style="border: 2px solid #6366f1;">
                 
-                <label>Tổng số tập (Số):</label>
+                <label>Tổng số tập:</label>
                 <input type="number" name="totalChapters" value="<%= truyen ? truyen.totalChapters : '' %>" required>
                 
                 <label>Giá tiền 1 tập (VNĐ):</label>
-                <input type="number" name="price" value="<%= truyen ? truyen.price : '1000' %>" required placeholder="Ví dụ: 1000" style="font-weight: bold; color: #16a34a;">
+                <input type="number" name="price" value="<%= truyen ? truyen.price : '1000' %>" required style="font-weight: bold; color: #16a34a;">
 
                 <label>Số tập mỗi gói (Chunk Size):</label>
                 <input type="number" name="chunkSize" value="<%= truyen && truyen.chunkSize ? truyen.chunkSize : 10 %>" required min="1">
-                <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 10px;">
-                    * Nhập 10 -> Web chia: 1-10, 11-20...
-                </small>
+                <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 10px;">* Nhập 10 -> Web chia: 1-10, 11-20...</small>
 
                 <label>Link Truyện (Gốc/Youtube):</label>
                 <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://...">
