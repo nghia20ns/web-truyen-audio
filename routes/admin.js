@@ -3,7 +3,7 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const path = require('path');
 const multer = require('multer');
-
+const fs = require('fs'); // <--- BẮT BUỘC PHẢI CÓ DÒNG NÀY
 // --- 1. KHẮC PHỤC LỖI IMPORT AUTH ---
 // Vì file middleware/auth.js export trực tiếp hàm, nên không dùng { }
 const requireAuth = require('../middleware/auth'); 
@@ -11,14 +11,18 @@ const requireAuth = require('../middleware/auth');
 // --- 2. CẤU HÌNH MULTER (Xử lý upload ảnh) ---
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Lưu tạm vào thư mục uploads ở root
+        const dir = 'uploads/';
+        // <--- 2. Thêm đoạn kiểm tra này
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
+        // -----------------------------
+        cb(null, dir); 
     },
     filename: function (req, file, cb) {
-        // Đặt tên file tránh trùng lặp
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
-
 const upload = multer({ storage: storage });
 
 // ================= ROUTES =================
