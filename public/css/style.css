@@ -1072,3 +1072,144 @@ input:focus, textarea:focus {
         grid-template-columns: repeat(2, 1fr); /* 2 cột trên mobile */
     }
 }
+
+/* --- BANNER HƯỚNG DẪN / APP (GIAO DIỆN MỚI) --- */
+.guide-banner {
+    background: linear-gradient(120deg, #fdfbf7 0%, #fff 100%); /* Nền trắng kem nhẹ nhàng */
+    border: 2px solid #6366f1; /* Viền tím làm điểm nhấn */
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Phần ảnh bên trái */
+.guide-img-box {
+    flex-shrink: 0;
+    width: 100px; /* Kích thước ảnh */
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* --- BANNER APP (CẬP NHẬT) --- */
+/* --- BANNER APP (CẬP NHẬT ẢNH TO RÕ HƠN) --- */
+.guide-banner {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border: 2px dashed #818cf8; /* Màu viền sáng hơn chút */
+    border-radius: 16px;
+    padding: 25px; /* Tăng padding để thoáng hơn */
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center; /* Căn giữa theo chiều dọc */
+    gap: 30px; /* Tăng khoảng cách giữa ảnh và chữ */
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15);
+}
+
+.guide-img-box {
+    flex-shrink: 0;
+    /* THAY ĐỔI QUAN TRỌNG Ở ĐÂY: */
+    width: 180px; /* Tăng chiều rộng lên đáng kể (cũ là 110px) */
+    height: auto; /* Để chiều cao tự nhiên theo ảnh, không ép vuông */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guide-img-box img {
+    width: 100%;
+    height: auto; /* Chiều cao tự động điều chỉnh theo tỉ lệ ảnh */
+    display: block;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15)); /* Bóng đổ sâu hơn giúp ảnh nổi lên */
+    border-radius: 8px; /* Bo góc nhẹ cho ảnh */
+}
+
+.guide-content {
+    flex-grow: 1;
+}
+
+.guide-title {
+    font-size: 1.2rem; /* Tăng cỡ chữ tiêu đề */
+    font-weight: 800;
+    color: #4338ca;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.guide-desc {
+    font-size: 1rem; /* Tăng cỡ chữ mô tả */
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* ... các phần khác giữ nguyên ... */
+
+/* Mobile responsive */
+@media (max-width: 768px) { /* Đổi breakpoint lên tablet */
+    .guide-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        gap: 20px;
+    }
+    .guide-img-box {
+        width: 100%; /* Trên mobile cho ảnh rộng tối đa */
+        max-width: 250px; /* Nhưng không quá 250px để tránh vỡ nét */
+    }
+}
+
+/* --- NÚT TẢI APP (MỚI) --- */
+.guide-action {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #00875f; /* Màu xanh chuẩn Google Play */
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 135, 95, 0.2);
+}
+
+.btn-download:hover {
+    background-color: #016e4d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 135, 95, 0.3);
+    color: #fff;
+}
+
+/* Biểu tượng mũi tên tải xuống */
+.btn-download i {
+    font-size: 1.1rem;
+}
+
+/* Mobile: Nút full chiều rộng cho dễ bấm */
+@media (max-width: 600px) {
+    .btn-download {
+        width: 100%;
+        justify-content: center;
+    }
+}
