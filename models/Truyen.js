@@ -10,7 +10,8 @@ const truyenSchema = new mongoose.Schema({
     isDeleted: { type: Boolean, default: false },   
     chunkSize: { type: Number, default: 10 },
     // --- THÊM DÒNG NÀY ---
-    image: { type: String, default: '' } 
+    image: { type: String, default: '' },
+    categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }]
     // ---------------------
 }, { timestamps: true });
 

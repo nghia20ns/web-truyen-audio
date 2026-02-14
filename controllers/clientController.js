@@ -1,21 +1,40 @@
 const Truyen = require('../models/Truyen');
+const Category = require('../models/Category'); // Model Danh mục mới thêm
 const mongoose = require('mongoose');
+const crypto = require('crypto'); // Dùng cho thanh toán
 
-// Trang chủ + Tìm kiếm
+// 1. Trang chủ + Tìm kiếm + Lọc theo Danh mục
 exports.getHomePage = async (req, res) => {
     try {
-        // 1. MẶC ĐỊNH: Chỉ lấy những truyện CHƯA bị xóa mềm
-        let filter = { isDeleted: false }; 
+        const page = parseInt(req.query.page) || 1;
+        const limit = 12;
+        const skip = (page - 1) * limit;
         
         const keyword = req.query.q || ''; 
-        
-        // 2. NẾU CÓ TÌM KIẾM:
+        const catSlug = req.query.cat || ''; // Lấy slug danh mục từ URL
+
+        // Lấy danh sách Categories để hiển thị menu
+        const allCategories = await Category.find(); 
+
+        // Xây dựng bộ lọc
+        let filter = { isDeleted: false }; // Mặc định: Chỉ lấy truyện CHƯA xóa
+
+        // Nếu có chọn danh mục
+        let currentCat = null;
+        if (catSlug) {
+            currentCat = await Category.findOne({ slug: catSlug });
+            if (currentCat) {
+                filter.categories = currentCat._id; // Lọc truyện theo ID danh mục
+            }
+        }
+
+        // Nếu có tìm kiếm
         if (keyword) {
             filter = {
                 $and: [
-                    { isDeleted: false }, // Điều kiện bắt buộc: Phải chưa xóa
+                    filter, // Giữ điều kiện cũ (xóa mềm + danh mục)
                     { 
-                        $or: [ // Và thỏa mãn 1 trong 2 điều kiện tìm kiếm
+                        $or: [ 
                             { name: { $regex: keyword, $options: 'i' } },
                             { introduction: { $regex: keyword, $options: 'i' } },
                         ]
@@ -24,16 +43,12 @@ exports.getHomePage = async (req, res) => {
             };
         }
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = 12;
-        const skip = (page - 1) * limit;
-
-        // Đếm số lượng (chỉ đếm truyện chưa xóa)
+        // Đếm và lấy danh sách
         const totalStories = await Truyen.countDocuments(filter);
         const totalPages = Math.ceil(totalStories / limit);
 
-        // Lấy danh sách (chỉ lấy truyện chưa xóa)
         const listTruyen = await Truyen.find(filter)
+            .populate('categories', 'name slug') // Lấy tên danh mục để hiển thị (nếu cần)
             .select('-link -price -shortCode')
             .skip(skip)
             .limit(limit)
@@ -43,14 +58,22 @@ exports.getHomePage = async (req, res) => {
             return res.json({ listTruyen, currentPage: page, totalPages, totalStories });
         }
 
-        res.render('index', { listTruyen, keyword, currentPage: page, totalPages }); 
+        res.render('index', { 
+            listTruyen, 
+            keyword, 
+            currentPage: page, 
+            totalPages,
+            allCategories,      // Truyền menu danh mục ra view
+            currentCatSlug: catSlug // Để highlight menu active
+        }); 
 
     } catch (e) {
         console.error(e);
         res.status(500).send("Lỗi Server: " + e.message);
     }
 };
-// Chi tiết truyện
+
+// 2. Chi tiết truyện
 exports.getTruyenDetail = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.send("Lỗi ID");
     
@@ -58,8 +81,6 @@ exports.getTruyenDetail = async (req, res) => {
     if (!truyen) return res.send('Không tìm thấy');
 
     let parts = [];
-
-    // --- SỬA Ở ĐÂY: Lấy chunk size từ DB ---
     const chunkSize = (truyen.chunkSize && truyen.chunkSize > 0) ? truyen.chunkSize : 10;
     
     const totalParts = Math.ceil(truyen.totalChapters / chunkSize);
@@ -81,7 +102,8 @@ exports.getTruyenDetail = async (req, res) => {
     }
     res.render('detail', { truyen, parts });
 };
-// Trang thanh toán
+
+// 3. Trang thanh toán (Hiển thị form/QR)
 exports.getPayment = async (req, res) => {
     const { truyenId, partCode } = req.query;
     if (!mongoose.Types.ObjectId.isValid(truyenId)) return res.redirect('/');
@@ -93,8 +115,7 @@ exports.getPayment = async (req, res) => {
     const pricePerChapter = truyen.price || 1000;
     const totalAmount = chapterCount * pricePerChapter;
     
-    // Logic riêng của bạn: đổi dấu gạch ngang thành chữ I hoặc theo ý muốn
-    const tapText = `${start}I${end}`;
+    const tapText = `${start}I${end}`; // Định dạng tập cho nội dung CK
 
     res.render('payment', { 
         truyenName: truyen.name, 
@@ -106,49 +127,31 @@ exports.getPayment = async (req, res) => {
     });
 };
 
-// Thêm dòng này lên đầu file clientController.js
-const crypto = require('crypto'); 
-// ... giữ nguyên các đoạn import Truyen, mongoose cũ ...
-
-// ... giữ nguyên các hàm getHomePage, getTruyenDetail ...
-
-// --- HÀM TẠO LINK THANH TOÁN (THỦ CÔNG, KHÔNG CẦN LIB PAYOS) ---
-// controllers/clientController.js
-
+// 4. API Tạo Link Thanh Toán (PayOS)
 exports.createPaymentLink = async (req, res) => {
     try {
         const { email, amount, storyCode, tapText, returnUrl } = req.body;
         
         if (!email || !amount) return res.status(400).json({ error: "Thiếu thông tin" });
 
-        // --- 1. XỬ LÝ DỮ LIỆU ---
-        
-        // A. Xử lý Gmail: Lấy phần tên, bỏ đuôi @gmail.com, xóa ký tự lạ
+        // Xử lý dữ liệu
         let userPart = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
-        // Giới hạn Gmail 10 ký tự để nhường chỗ cho Mã và Tập
-        // B. Xử lý Mã truyện: Viết hoa, xóa ký tự lạ
         const cleanCode = storyCode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
-        // C. Xử lý Tập: Chuyển "Tập 1 - 10" thành "1I10" (Số I Số)
-        // Logic: Xóa chữ "Tập", xóa khoảng trắng, thay dấu "-" thành chữ "I"
         const cleanTap = tapText.replace(/Tập/gi, '').replace(/\s/g, '').replace(/-/g, 'I');
 
-        // --- 2. TẠO NỘI DUNG ---
-
-        // Nội dung CK: "quocnghia FATUICU 1I10" (Tối đa 25 ký tự)
+        // Tạo nội dung chuyển khoản ngắn gọn
         let description = `${userPart} ${cleanCode} ${cleanTap}`;
-        description = description.substring(0, 25); // Cắt chốt chặn cuối cùng
+        description = description.substring(0, 25); 
 
-        // Tên sản phẩm trong đơn hàng: "FATUICU 1I10"
         const itemName = `${cleanCode} ${cleanTap}`;
 
-        // --- 3. CHUẨN BỊ GỬI PAYOS ---
+        // PayOS Config
         const orderCode = Number(String(Date.now()).slice(-6));
         const finalAmount = Number(amount);
         const finalReturnUrl = returnUrl || `http://localhost:3000/`;
         const finalCancelUrl = returnUrl || `http://localhost:3000/`;
 
-        // Tạo chữ ký (Signature)
+        // Tạo chữ ký
         const signatureString = `amount=${finalAmount}&cancelUrl=${finalCancelUrl}&description=${description}&orderCode=${orderCode}&returnUrl=${finalReturnUrl}`;
         const checksumKey = process.env.PAYOS_CHECKSUM_KEY;
         const signature = crypto.createHmac('sha256', checksumKey).update(signatureString).digest('hex');
@@ -157,7 +160,7 @@ exports.createPaymentLink = async (req, res) => {
         const bodyData = {
             orderCode: orderCode,
             amount: finalAmount,
-            description: description, // <--- Đã chuẩn theo ý bạn (Gmail trước)
+            description: description,
             buyerName: userPart,
             buyerEmail: email,
             cancelUrl: finalCancelUrl,
@@ -165,14 +168,14 @@ exports.createPaymentLink = async (req, res) => {
             signature: signature,
             items: [
                 {
-                    name: itemName, // <--- Đã chuẩn theo ý bạn (Code + 1I10)
+                    name: itemName,
                     quantity: 1,
                     price: finalAmount,
                 },
             ],
         };
 
-        // Gọi API
+        // Gọi API PayOS
         const response = await fetch('https://api-merchant.payos.vn/v2/payment-requests', {
             method: 'POST',
             headers: {

@@ -4,6 +4,7 @@ const ThongBao = require('../models/ThongBao');
 const bcrypt = require('bcryptjs');
 const cloudinary = require('../config/cloudinary'); 
 const fs = require('fs');
+const Category = require('../models/Category'); // <-- QUAN TRỌNG: Nhớ import dòng này
 
 // --- 1. LOGIN / LOGOUT (Giữ nguyên) ---
 exports.getLogin = (req, res) => {
@@ -41,10 +42,10 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
-exports.getAddPage = (req, res) => {
-    res.render('admin/form', { truyen: null, error: null });
+exports.getAddPage = async (req, res) => { // Thêm async
+    const categories = await Category.find(); // Lấy list category
+    res.render('admin/form', { truyen: null, error: null, categories }); // Truyền categories qua view
 };
-
 // Xử lý Thêm Mới
 exports.postAdd = async (req, res) => {
     try {
@@ -81,14 +82,10 @@ exports.postAdd = async (req, res) => {
 exports.getEditPage = async (req, res) => {
     try {
         const truyen = await Truyen.findById(req.params.id);
-        console.log("Đang sửa truyện:", truyen ? truyen.name : "Không tìm thấy"); // Check log xem có tên không
-        
+        const categories = await Category.find(); // Lấy list category
         if (!truyen) return res.redirect('/admin');
-        res.render('admin/form', { truyen, error: null });
-    } catch (err) {
-        console.error(err);
-        res.redirect('/admin');
-    }
+        res.render('admin/form', { truyen, error: null, categories }); // Truyền categories qua view
+    } catch (err) { /*...*/ }
 };
 
 // Xử lý Cập nhật

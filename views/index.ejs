@@ -14,10 +14,51 @@
             font-family: 'Quicksand', sans-serif;
             background-color: #f3f4f6;
         }
+
+        /* CSS CHO DANH MỤC TRƯỢT NGANG */
+        .category-bar {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto; 
+            padding: 5px 2px 15px 2px;
+            margin-bottom: 10px;
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; 
+        }
+        .category-bar::-webkit-scrollbar { display: none; }
+
+        .cat-pill {
+            white-space: nowrap;
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 25px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            flex-shrink: 0;
+            cursor: pointer; /* Thêm con trỏ tay */
+        }
+
+        .cat-pill:hover {
+            border-color: #6366f1;
+            color: #6366f1;
+            transform: translateY(-1px);
+        }
+
+        .cat-pill.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+        }
         
+        /* Grid Truyện */
         .story-grid {
             display: grid;
-            /* THAY ĐỔI 1: Tăng kích thước cột tối thiểu từ 160px lên 280px để thẻ bè ra */
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 20px;
             padding-bottom: 40px;
@@ -42,7 +83,6 @@
 
         .card-img-wrapper {
             width: 100%;
-            /* THAY ĐỔI 2: Giảm tỷ lệ từ 140% (dọc) xuống 56.25% (ngang - chuẩn 16:9) */
             padding-top: 56.25%; 
             position: relative;
             background-color: #e5e7eb;
@@ -58,7 +98,7 @@
         }
 
         .card-body {
-            padding: 15px; /* Tăng padding một chút cho thoáng */
+            padding: 15px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -66,7 +106,7 @@
         }
 
         .story-card-title {
-            font-size: 1.1rem; /* Tăng cỡ chữ tiêu đề lên chút */
+            font-size: 1.1rem;
             font-weight: 700;
             color: #111827;
             margin-bottom: 8px;
@@ -137,7 +177,6 @@
 
         @media (max-width: 640px) {
             .story-grid {
-                /* THAY ĐỔI 3: Mobile nên để 1 cột nếu dùng ảnh ngang cho to rõ */
                 grid-template-columns: 1fr; 
                 gap: 15px;
             }
@@ -154,36 +193,19 @@
             <div class="guide-img-box">
                 <img src="/images/appaudio.png" alt="App nghe truyện" onerror="this.src='/images/logo.png'">
             </div>
-
             <div class="guide-content">
-                <div class="guide-title">
-                    🎧 TỐI ƯU TRẢI NGHIỆM NGHE AUDIO
-                </div>
-                
+                <div class="guide-title">🎧 TỐI ƯU TRẢI NGHIỆM NGHE AUDIO</div>
                 <div class="guide-desc">
                     Máy ae nghe mà không có chức năng <strong>tua nhanh</strong> thì tải app này nhé!
-                    <ul style="margin-top: 8px; padding-left: 20px; color: #475569;">
-                        <li style="margin-bottom: 5px;">
-                            Ae chỉ cần tải file MP3 truyện về máy.
-                        </li>
-                        <li>
-                            Mở ứng dụng lên, nó sẽ <strong>tự động quét file âm thanh</strong> rồi nghe bình thường nha ae.
-                        </li>
-                    </ul>
                 </div>
-
                 <div class="guide-action">
-                    <a href="https://play.google.com/store/apps/details?id=musicplayer.musicapps.music.mp3player" target="_blank" class="btn-store btn-google">
-                        🤖 Google Play
-                    </a>
-                    
-                    <a href="https://apps.apple.com/us/app/documents-file-manager-docs/id364901807" target="_blank" class="btn-store btn-apple">
-                        🍎 App Store
-                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=musicplayer.musicapps.music.mp3player" target="_blank" class="btn-store btn-google">🤖 Google Play</a>
+                    <a href="https://apps.apple.com/us/app/documents-file-manager-docs/id364901807" target="_blank" class="btn-store btn-apple">🍎 App Store</a>
                 </div>
             </div>
         </div>
-<div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 30px auto;">
+
+        <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 20px auto;">
             <input type="text" id="liveSearch" class="search-input" 
                    placeholder="Nhập tên truyện cần tìm..." 
                    value="<%= keyword %>" autocomplete="off"
@@ -191,8 +213,32 @@
             <div id="loadingIcon" class="input-loading" style="position: absolute; right: 15px; top: 12px; display: none;">⏳</div>
         </div>
 
+        <div class="category-bar">
+            <a href="/" onclick="selectCategory(event, '')" class="cat-pill <%= !currentCatSlug ? 'active' : '' %>">Tất cả</a>
+            
+            <% if (typeof allCategories !== 'undefined' && allCategories.length > 0) { %>
+                <% allCategories.forEach(cat => { %>
+                    <a href="/?cat=<%= cat.slug %>" 
+                       onclick="selectCategory(event, '<%= cat.slug %>', '<%= cat.name %>')" 
+                       class="cat-pill <%= (typeof currentCatSlug !== 'undefined' && currentCatSlug === cat.slug) ? 'active' : '' %>">
+                        <%= cat.name %>
+                    </a>
+                <% }) %>
+            <% } %>
+        </div>
+
         <h2 id="pageTitle" style="margin-bottom: 25px; font-size: 1.5rem; color: #1f2937; border-left: 5px solid #6366f1; padding-left: 15px;">
-            <% if(keyword) { %>Kết quả cho: "<%= keyword %>"<% } else { %>Danh Sách Truyện Mới<% } %>
+            <% if(keyword) { %>
+                Kết quả cho: "<%= keyword %>"
+            <% } else if(typeof currentCatSlug !== 'undefined' && currentCatSlug) { %>
+                 <% 
+                    const currCatObj = allCategories.find(c => c.slug === currentCatSlug);
+                    const catName = currCatObj ? currCatObj.name : "Danh Mục";
+                %>
+                Danh mục: <%= catName %>
+            <% } else { %>
+                Danh Sách Truyện Mới
+            <% } %>
         </h2>
         
         <div id="storyContainer" class="story-grid">
@@ -202,11 +248,9 @@
                         <div class="card-img-wrapper">
                             <% 
                                 let imgUrl = truyen.image || '/images/default-cover.png'; 
-                                // THAY ĐỔI 4: Tăng kích thước ảnh lấy về từ Cloudinary lên 500px
                                 if(imgUrl.includes('cloudinary')) {
                                     const uploadIndex = imgUrl.indexOf('/upload/');
                                     if(uploadIndex !== -1) {
-                                        // w_500: rộng 500px, h_280: cao 280px (tỉ lệ ~16:9), c_fill: cắt vừa khung
                                         imgUrl = imgUrl.slice(0, uploadIndex + 8) + 'w_500,h_280,c_fill,q_auto,f_auto/' + imgUrl.slice(uploadIndex + 8);
                                     }
                                 }
@@ -223,7 +267,13 @@
                             </div>
                             <div class="badges">
                                 <span class="badge"><%= truyen.totalChapters %> tập</span>
-                                <span class="badge badge-audio">Audio</span>
+                                <% if(truyen.categories && truyen.categories.length > 0) { %>
+                                    <span class="badge" style="background:#e0e7ff; color:#4338ca">
+                                        <%= truyen.categories[0].name %>
+                                    </span>
+                                <% } else { %>
+                                    <span class="badge badge-audio">Audio</span>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -247,6 +297,8 @@
         let currentPage = Number('<%= (typeof currentPage != "undefined") ? currentPage : 1 %>');
         let totalPages = Number('<%= (typeof totalPages != "undefined") ? totalPages : 1 %>');
         let currentKeyword = "<%= keyword %>";
+        let currentCatSlug = "<%= (typeof currentCatSlug != 'undefined') ? currentCatSlug : '' %>";
+        
         let debounceTimer;
 
         const input = document.getElementById('liveSearch');
@@ -256,9 +308,36 @@
         const pageTitle = document.getElementById('pageTitle');
         const paginationDiv = document.getElementById('pagination');
 
+        // Init
         renderPagination(currentPage, totalPages);
 
-        // 1. SỰ KIỆN GÕ TÌM KIẾM
+        // --- 1. HÀM CHỌN DANH MỤC (AJAX) ---
+        function selectCategory(event, slug, name) {
+            // Chặn hành vi chuyển trang mặc định của thẻ <a>
+            event.preventDefault();
+
+            // Cập nhật biến
+            currentCatSlug = slug;
+            currentKeyword = ''; // Reset tìm kiếm khi chọn danh mục
+            input.value = '';    // Xóa ô tìm kiếm
+            currentPage = 1;     // Về trang 1
+
+            // Cập nhật giao diện nút Active
+            document.querySelectorAll('.cat-pill').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active'); // Highlight nút vừa bấm
+
+            // Cập nhật Tiêu đề
+            if (slug) {
+                pageTitle.innerText = "Danh mục: " + (name || slug);
+            } else {
+                pageTitle.innerText = "Danh Sách Truyện Mới";
+            }
+
+            // Gọi AJAX
+            fetchData(1, '', slug);
+        }
+
+        // --- 2. SỰ KIỆN TÌM KIẾM ---
         input.addEventListener('input', function() {
             const keyword = this.value.trim();
             loading.style.display = 'block';
@@ -267,32 +346,43 @@
             debounceTimer = setTimeout(() => {
                 currentKeyword = keyword;
                 currentPage = 1; 
-                fetchData(1, currentKeyword);
+                // Khi tìm kiếm thì giữ nguyên category đang chọn (nếu muốn tìm trong category)
+                // Hoặc reset category tuỳ logic của bạn. Ở đây mình giữ nguyên category để lọc sâu hơn.
+                fetchData(1, currentKeyword, currentCatSlug); 
             }, 500); 
         });
 
-        // 2. HÀM LẤY DỮ LIỆU
-        async function fetchData(page, keyword) {
+        // --- 3. HÀM LẤY DỮ LIỆU ---
+        async function fetchData(page, keyword, catSlug) {
             try {
-                const urlDisplay = keyword ? `/?q=${keyword}&page=${page}` : `/?page=${page}`;
+                loading.style.display = 'block';
+                
+                // Update URL không reload trang
+                let urlDisplay = `/?page=${page}`;
+                if (keyword) urlDisplay += `&q=${keyword}`;
+                if (catSlug) urlDisplay += `&cat=${catSlug}`;
                 window.history.pushState(null, '', urlDisplay);
 
-                const res = await fetch(`/?q=${keyword}&page=${page}&type=json`);
+                // Gọi API
+                const res = await fetch(`/?q=${keyword || ''}&cat=${catSlug || ''}&page=${page}&type=json`);
                 const data = await res.json();
 
                 renderStories(data.listTruyen);
                 renderPagination(data.currentPage, data.totalPages);
                 
-                pageTitle.innerText = keyword ? `Kết quả cho: "${keyword}"` : "Danh Sách Truyện Mới";
-                loading.style.display = 'none';
+                // Nếu đang tìm kiếm thì cập nhật tiêu đề theo keyword
+                if (keyword) {
+                    pageTitle.innerText = `Kết quả cho: "${keyword}"`;
+                }
 
+                loading.style.display = 'none';
             } catch (err) {
                 console.error(err);
                 loading.style.display = 'none';
             }
         }
 
-        // 3. HÀM VẼ DANH SÁCH TRUYỆN
+        // --- 4. RENDER HTML ---
         function renderStories(list) {
             container.innerHTML = ''; 
             
@@ -305,14 +395,20 @@
             list.forEach(truyen => {
                 const intro = truyen.introduction ? truyen.introduction : "Đang cập nhật nội dung...";
                 
-                // THAY ĐỔI 5: Cập nhật JS logic cho ảnh to hơn
                 let imgUrl = truyen.image || '/images/default-cover.png';
                 if(imgUrl.includes('cloudinary')) {
                      const uploadIndex = imgUrl.indexOf('/upload/');
                      if(uploadIndex !== -1) {
-                        // w_500, h_280
                         imgUrl = imgUrl.slice(0, uploadIndex + 8) + 'w_500,h_280,c_fill,q_auto,f_auto/' + imgUrl.slice(uploadIndex + 8);
                      }
+                }
+
+                // Xử lý hiển thị badge danh mục từ JSON trả về
+                let badgeHtml = '<span class="badge badge-audio">Audio</span>';
+                if (truyen.categories && truyen.categories.length > 0) {
+                    // Nếu populate trả về object
+                    const catName = truyen.categories[0].name || "Truyện"; 
+                    badgeHtml = `<span class="badge" style="background:#e0e7ff; color:#4338ca">${catName}</span>`;
                 }
 
                 const html = `
@@ -328,7 +424,7 @@
                                 </div>
                                 <div class="badges">
                                     <span class="badge">${truyen.totalChapters} tập</span>
-                                    <span class="badge badge-audio">Audio</span>
+                                    ${badgeHtml}
                                 </div>
                             </div>
                         </div>
@@ -366,7 +462,7 @@
 
         function changePage(newPage) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            fetchData(newPage, currentKeyword);
+            fetchData(newPage, currentKeyword, currentCatSlug);
         }
     </script>
 </body>

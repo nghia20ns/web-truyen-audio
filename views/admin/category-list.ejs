@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quản Lý Danh Mục</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <%- include('../partials/admin-sidebar') %>
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>📂 Danh Mục Truyện</h2>
+                <a href="/admin/categories/add" class="btn-primary" style="width:auto;">+ Thêm Danh Mục</a>
+            </div>
+            <div class="card">
+                <table style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background:#f1f5f9; text-align:left;">
+                            <th style="padding:10px;">Tên Danh Mục</th>
+                            <th style="padding:10px;">Số lượng truyện</th>
+                            <th style="padding:10px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% categories.forEach(cat => { %>
+                        <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:10px;"><strong><%= cat.name %></strong><br><small>/<%= cat.slug %></small></td>
+                            <td style="padding:10px;"><span class="badge"><%= cat.storyCount %> truyện</span></td>
+                            <td style="padding:10px;">
+                                <a href="/admin/categories/edit/<%= cat._id %>" style="color:#d97706; font-weight:bold; margin-right:10px;">Sửa</a>
+                                <a href="/admin/categories/delete/<%= cat._id %>" onclick="return confirm('Xóa danh mục này?')" style="color:#ef4444; font-weight:bold;">Xóa</a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

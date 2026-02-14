@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const categoryController = require('../controllers/categoryController'); // Import mới
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs'); // <--- BẮT BUỘC PHẢI CÓ DÒNG NÀY
@@ -51,5 +52,17 @@ router.get('/delete/:id', requireAuth, adminController.deleteTruyen);
 // 4. Cấu hình thông báo
 router.get('/alert', requireAuth, adminController.getAlertPage);
 router.post('/alert', requireAuth, adminController.postAlert);
+
+
+// ... Giữ nguyên các route login, dashboard cũ ...
+
+// --- QUẢN LÝ DANH MỤC (Thêm đoạn này) ---
+router.get('/categories', requireAuth, categoryController.getList);
+router.get('/categories/add', requireAuth, categoryController.getForm);
+router.post('/categories/add', requireAuth, categoryController.saveCategory);
+router.get('/categories/edit/:id', requireAuth, categoryController.getForm);
+router.post('/categories/edit/:id', requireAuth, categoryController.saveCategory);
+router.get('/categories/delete/:id', requireAuth, categoryController.deleteCategory);
+
 
 module.exports = router;

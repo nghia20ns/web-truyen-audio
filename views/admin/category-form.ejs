@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= category ? 'Sửa Danh Mục' : 'Thêm Danh Mục' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .story-select-box {
+            max-height: 300px; overflow-y: auto; 
+            border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;
+        }
+        .story-option { display: flex; align-items: center; gap: 8px; padding: 5px; background: #f8fafc; border-radius: 5px; }
+        .story-option:hover { background: #e0e7ff; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <%- include('../partials/admin-sidebar') %>
+        <main class="admin-content">
+            <div class="content-header">
+                <h2><%= category ? 'Chỉnh Sửa: ' + category.name : 'Tạo Danh Mục Mới' %></h2>
+            </div>
+            
+            <form method="POST" class="card" style="max-width: 800px;">
+                <label>Tên Danh Mục:</label>
+                <input type="text" name="name" value="<%= category ? category.name : '' %>" required placeholder="Ví dụ: Tiên Hiệp">
+                
+                <label>Mô tả:</label>
+                <textarea name="description" rows="3"><%= category ? category.description : '' %></textarea>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ccc;">
+                
+                <label style="color: #6366f1; font-weight: bold;">
+                    📚 Chọn các truyện thuộc danh mục này (<%= selectedStoryIds.length %> đã chọn):
+                </label>
+                <small style="display:block; margin-bottom:10px; color:#666;">Tick vào ô để thêm truyện vào danh mục này.</small>
+                
+                <div class="story-select-box">
+                    <% allStories.forEach(truyen => { 
+                        // Kiểm tra xem truyện này có đang thuộc danh mục ko
+                        const isSelected = selectedStoryIds.includes(truyen._id.toString());
+                    %>
+                        <label class="story-option">
+                            <input type="checkbox" name="storyIds[]" value="<%= truyen._id %>" <%= isSelected ? 'checked' : '' %>>
+                            <span><%= truyen.name %></span>
+                        </label>
+                    <% }) %>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn-primary">Lưu Danh Mục & Cập Nhật Truyện</button>
+                </div>
+            </form>
+        </main>
+    </div>
+</body>
+</html>

@@ -28,7 +28,26 @@
                 
                 <label>Tên Truyện:</label>
                 <input type="text" name="name" value="<%= truyen ? truyen.name : '' %>" required>
-
+                <label>Thể loại / Danh mục:</label>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                        <% categories.forEach(cat => { 
+                            // Kiểm tra nếu đang sửa truyện thì tick sẵn các danh mục cũ
+                            let isChecked = false;
+                            if (truyen && truyen.categories && truyen.categories.length > 0) {
+                                // truyen.categories có thể là mảng object hoặc string tùy lúc load
+                                isChecked = truyen.categories.some(c => c.toString() === cat._id.toString() || c._id.toString() === cat._id.toString());
+                            }
+                        %>
+                            <label style="background: #f1f5f9; padding: 5px 10px; border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="categories[]" value="<%= cat._id %>" <%= isChecked ? 'checked' : '' %>>
+                                <%= cat.name %>
+                            </label>
+                        <% }) %>
+                    <% } else { %>
+                        <p>Chưa có danh mục nào. <a href="/admin/categories/add">Thêm ngay</a></p>
+                    <% } %>
+                </div>
                 <label>Ảnh bìa (Nếu muốn thay đổi):</label>
                 <input type="file" name="image" accept="image/*" style="padding: 10px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
                 
