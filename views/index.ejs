@@ -150,10 +150,7 @@
 <body>
 <%- include('partials/header') %>
     <div class="container">
-            <%- include('partials/header') %>
-    <div class="container">
-        
-<div class="guide-banner">
+        <div class="guide-banner">
             <div class="guide-img-box">
                 <img src="/images/appaudio.png" alt="App nghe truyện" onerror="this.src='/images/logo.png'">
             </div>
@@ -164,26 +161,29 @@
                 </div>
                 
                 <div class="guide-desc">
-                    Trình duyệt web chưa hỗ trợ tua nhanh? <br>
-                    Hãy sử dụng <strong>Music Player</strong> - Ứng dụng chuyên nghiệp giúp bạn nghe truyện với tốc độ <strong>x1.5, x2</strong> mượt mà.
-                    <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #475569; font-size: 0.9rem;">
-                        <li>⚡ Tự động quét file âm thanh trong máy.</li>
-                        <li>🔋 Nghe tắt màn hình, tiết kiệm pin.</li>
+                    Máy ae nghe mà không có chức năng <strong>tua nhanh</strong> thì tải app này nhé!
+                    <ul style="margin-top: 8px; padding-left: 20px; color: #475569;">
+                        <li style="margin-bottom: 5px;">
+                            Ae chỉ cần tải file MP3 truyện về máy.
+                        </li>
+                        <li>
+                            Mở ứng dụng lên, nó sẽ <strong>tự động quét file âm thanh</strong> rồi nghe bình thường nha ae.
+                        </li>
                     </ul>
                 </div>
 
                 <div class="guide-action">
-                    <a href="https://play.google.com/store/apps/details?id=musicplayer.musicapps.music.mp3player" target="_blank" class="btn-download">
-                        📥 Tải ngay trên CH Play
+                    <a href="https://play.google.com/store/apps/details?id=musicplayer.musicapps.music.mp3player" target="_blank" class="btn-store btn-google">
+                        🤖 Google Play
                     </a>
                     
-                    <span style="font-size: 0.85rem; color: #64748b; font-style: italic;">
-                        *Miễn phí & An toàn
-                    </span>
+                    <a href="https://apps.apple.com/us/app/documents-file-manager-docs/id364901807" target="_blank" class="btn-store btn-apple">
+                        🍎 App Store
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 30px auto;">
+<div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 30px auto;">
             <input type="text" id="liveSearch" class="search-input" 
                    placeholder="Nhập tên truyện cần tìm..." 
                    value="<%= keyword %>" autocomplete="off"
