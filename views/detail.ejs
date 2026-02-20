@@ -8,135 +8,62 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- RESET & GLOBAL COMPACT STYLES --- */
-        body { 
-            font-family: 'Quicksand', sans-serif; 
-            background: #fff; 
-            color: #333;
-            margin: 0; padding: 0;
-            padding-bottom: 60px;
-        }
-        
-        .compact-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 15px;
-        }
+        body { font-family: 'Quicksand', sans-serif; background: #fff; color: #333; margin: 0; padding: 0; padding-bottom: 60px; }
+        .compact-container { max-width: 800px; margin: 0 auto; padding: 15px; }
 
-        /* --- 1. HERO SECTION --- */
-        .hero-wrap {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .hero-img {
-            width: 90px;
-            flex-shrink: 0;
-            border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            aspect-ratio: 2/3;
-            object-fit: cover;
-        }
+        .hero-wrap { display: flex; gap: 15px; margin-bottom: 15px; }
+        .hero-img { width: 90px; flex-shrink: 0; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); aspect-ratio: 2/3; object-fit: cover; }
         .hero-info { flex-grow: 1; }
-        .hero-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            line-height: 1.3;
-            margin: 0 0 6px 0;
-            color: #111;
-        }
-        .meta-text {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 6px;
-        }
+        .hero-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; margin: 0 0 6px 0; color: #111; }
+        .meta-text { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
         .tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tiny-tag {
-            background: #f3f4f6;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: #555;
-            font-weight: 600;
+        .tiny-tag { background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; color: #555; font-weight: 600; }
+
+        .desc-box { background: #f9fafb; padding: 12px 14px; border-radius: 8px; font-size: 0.95rem; color: #444; line-height: 1.6; margin-bottom: 20px; text-align: justify; }
+        .desc-content { display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; transition: max-height 0.3s ease; }
+        .desc-content.full-show { -webkit-line-clamp: unset !important; display: block; }
+        .toggle-desc { color: #6366f1; font-weight: 700; font-size: 0.85rem; cursor: pointer; margin-top: 8px; display: inline-block; user-select: none; }
+
+        .section-title { font-size: 0.95rem; font-weight: 700; color: #111; margin-bottom: 10px; border-left: 3px solid #6366f1; padding-left: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+        .chapter-grid-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+
+        /* Style Checkbox mới */
+        .part-checkbox { display: none; } 
+        .chapter-option {
+            background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 5px;
+            text-align: center; cursor: pointer; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; min-height: 60px; transition: all 0.2s; position: relative; user-select: none;
+        }
+        .chapter-option:hover { border-color: #6366f1; background: #f5f7ff; }
+
+        /* Ô vuông hiển thị tick */
+        .chk-indicator {
+            width: 18px; height: 18px; border: 2px solid #d1d5db; border-radius: 4px;
+            margin-bottom: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
         }
 
-        /* --- 2. DESCRIPTION (Cập nhật logic từng đoạn) --- */
-        .desc-box {
-            background: #f9fafb;
-            padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 0.95rem; /* Chữ to rõ hơn xíu */
-            color: #444;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: justify;
-        }
-        .desc-content {
-            display: -webkit-box;
-            -webkit-line-clamp: 8; /* [QUAN TRỌNG] Mặc định hiện 8 dòng */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        /* Class này dùng khi đã hiện hết */
-        .desc-content.full-show { 
-            -webkit-line-clamp: unset !important; 
-            display: block;
-        }
+        /* Khi được chọn */
+        .chapter-option.selected { border-color: #4f46e5; background: #e0e7ff; box-shadow: 0 0 0 1px #4f46e5; }
+        .chapter-option.selected .chk-indicator { background: #4f46e5; border-color: #4f46e5; }
+        .chapter-option.selected .chk-indicator::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+        .chapter-option.selected .cp-num { color: #4338ca; }
         
-        .toggle-desc {
-            color: #6366f1; font-weight: 700; font-size: 0.85rem;
-            cursor: pointer; margin-top: 8px; display: inline-block;
-            user-select: none;
-        }
+        .cp-num { font-size: 0.85rem; font-weight: 600; color: #333; margin-bottom: 2px; }
+        .cp-price { font-size: 0.75rem; color: #d97706; font-weight: 700; }
 
-        /* --- 3. CHAPTER LIST --- */
-        .section-title {
-            font-size: 0.95rem; font-weight: 700; color: #111;
-            margin-bottom: 10px;
-            border-left: 3px solid #6366f1; padding-left: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .nav-back { display: inline-flex; align-items: center; gap: 5px; color: #666; font-size: 0.9rem; font-weight: 600; text-decoration: none; margin-bottom: 15px; }
 
-        .chapter-grid-compact {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-            gap: 8px;
-        }
+        .cart-box { margin-top: 25px; padding: 15px; background: #fff; border-radius: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; position: sticky; bottom: 10px; z-index: 100; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 700; color: #111; margin-bottom: 15px; }
+        .total-price { color: #059669; font-size: 1.3rem; }
 
-        .chapter-btn {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 8px 5px;
-            text-align: center;
-            text-decoration: none;
-            transition: all 0.1s;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 50px;
-        }
-
-        .chapter-btn:hover {
-            border-color: #6366f1;
-            background: #eef2ff;
-        }
-        
-        .cp-num {
-            font-size: 0.85rem; font-weight: 600; color: #333;
-            margin-bottom: 2px;
-        }
-        .cp-price {
-            font-size: 0.75rem; color: #d97706; font-weight: 700;
-        }
-
-        .nav-back {
-            display: inline-flex; align-items: center; gap: 5px;
-            color: #666; font-size: 0.9rem; font-weight: 600;
-            text-decoration: none; margin-bottom: 15px;
-        }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none; margin-bottom: 10px; }
+        .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); }
+        .pay-btn { width: 100%; background: #4f46e5; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; display: flex; justify-content: center; align-items: center; }
+        .pay-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .spinner { width: 18px; height: 18px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -159,12 +86,9 @@
                 }
             %>
             <img src="<%= imgUrl %>" class="hero-img" alt="Cover">
-            
             <div class="hero-info">
                 <h1 class="hero-title"><%= truyen.name %></h1>
-                <div class="meta-text">
-                    Số tập: <%= truyen.totalChapters %> • Audio
-                </div>
+                <div class="meta-text">Số tập: <%= truyen.totalChapters %> • Audio</div>
                 <div class="tag-row">
                     <% if(truyen.categories && truyen.categories.length > 0) { %>
                         <% truyen.categories.forEach(cat => { %>
@@ -185,69 +109,112 @@
         </div>
 
         <div class="section-title">
-            <span>Danh sách tập</span>
+            <span>Chọn tập để mua</span>
             <span style="font-weight:400; font-size:0.8rem; color:#888"><%= parts.length %> gói</span>
         </div>
 
-        <div class="chapter-grid-compact">
+        <div class="chapter-grid-compact" id="chapter-list">
             <% parts.forEach(function(part) { %>
-                <a href="/payment?truyenId=<%= truyen._id %>&partCode=<%= part.code %>" class="chapter-btn">
-                    <span class="cp-num"><%= part.name.replace('Tập ', '') %></span>
+                <label class="chapter-option" id="label-<%= part.code %>">
+                    <input type="checkbox" class="part-checkbox" value="<%= part.code %>" data-price="<%= part.price %>" onchange="toggleSelection(this, '<%= part.code %>')">
+                    <div class="chk-indicator"></div> <span class="cp-num"><%= part.name.replace('Tập ', '') %></span>
                     <span class="cp-price"><%= part.priceText %>đ</span>
-                </a>
+                </label>
             <% }); %>
         </div>
 
-        <% if(parts.length === 0) { %>
-            <div style="text-align:center; padding:30px; color:#999; font-size:0.9rem;">
-                Chưa có tập nào.
+        <div class="cart-box" id="cart-box">
+            <div class="total-row">
+                <span>Tổng tiền:</span>
+                <span class="total-price" id="display-total">0đ</span>
             </div>
-        <% } %>
+
+            <div id="payment-input-area">
+                <input type="email" id="customer-email" class="form-input" placeholder="Nhập Gmail nhận truyện (Bắt buộc)..." inputmode="email">
+                <button class="pay-btn" id="btn-submit" onclick="submitOrder()">
+                    Tiến hành thanh toán
+                </button>
+            </div>
+        </div>
     </div>
 
     <%- include('partials/footer') %>
 
     <script>
-        // --- LOGIC XEM THÊM TỪNG ĐOẠN (LẦN LẦN) ---
-        let currentLines = 8; // Mặc định ban đầu
-        const step = 10;       // Mỗi lần bấm hiện thêm 8 dòng
+        const truyenId = "<%= truyen._id %>";
+        
+        function toggleSelection(checkbox, code) {
+            const label = document.getElementById('label-' + code);
+            if (checkbox.checked) { label.classList.add('selected'); } 
+            else { label.classList.remove('selected'); }
+            calculateTotal();
+        }
 
-        function toggleDescription() {
-            const content = document.getElementById('descText');
-            const btn = document.getElementById('toggleDesc');
+        function calculateTotal() {
+            let totalAmount = 0;
+            const checkboxes = document.querySelectorAll('.part-checkbox:checked');
+            checkboxes.forEach(cb => { totalAmount += parseInt(cb.getAttribute('data-price')); });
+            document.getElementById('display-total').innerText = totalAmount.toLocaleString('vi-VN') + 'đ';
+        }
+
+        async function submitOrder() {
+            const emailInput = document.getElementById('customer-email');
+            const email = emailInput.value.trim();
+            const btn = document.getElementById('btn-submit');
             
-            // Nếu đang trạng thái "Thu gọn" -> Reset về ban đầu
-            if (btn.innerText.includes('Thu gọn')) {
-                currentLines = 8;
-                content.style.webkitLineClamp = currentLines;
-                content.classList.remove('full-show');
-                btn.innerText = 'Xem thêm v';
-                // Cuộn nhẹ lên lại phần giới thiệu nếu nó quá dài
-                content.scrollIntoView({ behavior: "smooth", block: "center" });
-                return;
-            }
+            const checkboxes = document.querySelectorAll('.part-checkbox:checked');
+            if (checkboxes.length === 0) { alert("Bạn chưa chọn tập nào!"); return; }
+            if (!email || !email.endsWith("@gmail.com")) { alert("Vui lòng nhập đúng địa chỉ Gmail (@gmail.com)!"); emailInput.focus(); return; }
 
-            // Tăng số dòng hiển thị
-            currentLines += step;
-            content.style.webkitLineClamp = currentLines;
+            btn.innerHTML = '<div class="spinner"></div> Đang tạo hóa đơn...';
+            btn.disabled = true;
 
-            // Kiểm tra xem đã hiện hết nội dung chưa
-            // (So sánh chiều cao nội dung thực vs chiều cao đang hiển thị)
-            if (content.scrollHeight <= content.clientHeight) {
-                // Đã hiện hết -> Đổi nút thành Thu gọn
-                content.classList.add('full-show'); // Class này bỏ luôn clamp để chắc chắn
-                btn.innerText = 'Thu gọn ^';
+            try {
+                let selectedParts = [];
+                checkboxes.forEach(cb => selectedParts.push(cb.value));
+
+                const response = await fetch('/api/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        truyenId: truyenId,
+                        selectedParts: selectedParts,
+                        email: email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // CHUYỂN HƯỚNG SANG TRANG THANH TOÁN
+                    window.location.href = `/payment?cartId=${data.cartId}`;
+                } else {
+                    alert(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
+                    btn.innerHTML = 'Tiến hành thanh toán';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi kết nối Server!");
+                btn.innerHTML = 'Tiến hành thanh toán';
+                btn.disabled = false;
             }
         }
 
-        // Tự động ẩn nút "Xem thêm" nếu văn bản ngắn hơn 8 dòng từ đầu
-        window.addEventListener('load', () => {
+        let currentLines = 8;
+        function toggleDescription() {
             const content = document.getElementById('descText');
             const btn = document.getElementById('toggleDesc');
-            if (content.scrollHeight <= content.clientHeight) {
-                btn.style.display = 'none';
+            if (btn.innerText.includes('Thu gọn')) {
+                currentLines = 8; content.style.webkitLineClamp = currentLines;
+                content.classList.remove('full-show'); btn.innerText = 'Xem thêm v';
+                content.scrollIntoView({ behavior: "smooth", block: "center" }); return;
             }
-        });
+            currentLines += 10; content.style.webkitLineClamp = currentLines;
+            if (content.scrollHeight <= content.clientHeight) {
+                content.classList.add('full-show'); btn.innerText = 'Thu gọn ^';
+            }
+        }
     </script>
 </body>
 </html>

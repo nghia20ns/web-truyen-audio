@@ -10,8 +10,10 @@ const requireLogin = require('../middleware/auth');
 // --- ROUTE CHO KHÁCH ---
 router.get('/', clientController.getHomePage);
 router.get('/truyen/:id', clientController.getTruyenDetail);
-router.get('/payment', clientController.getPayment);
-router.post('/create-payment-link', clientController.createPaymentLink);
+
+// [ĐÃ SỬA Ở ĐÂY] - Cập nhật lại route thanh toán mới
+router.get('/payment', clientController.getPayment); 
+router.post('/api/create-order', clientController.createOrderCart); 
 
 // --- ROUTE CHO ADMIN (LOGIN/LOGOUT) ---
 router.get('/login', adminController.getLogin);
@@ -34,9 +36,11 @@ router.get('/chat/manager', requireLogin, (req, res) => {
     res.render('admin/chat-manager'); // Render file views/admin/chat-manager.ejs
 });
 router.delete('/chat/delete/:sessionId', requireLogin, chatController.deleteConversation);
+
 // API Bật/Tắt (Dành cho Admin)
 router.post('/chat/toggle-status', requireLogin, chatController.toggleStatus);
 
 // API Kiểm tra trạng thái (Dành cho Khách)
 router.get('/chat/status', chatController.getStatus);
+
 module.exports = router;
