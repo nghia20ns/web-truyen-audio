@@ -37,6 +37,17 @@
                         <div class="story-actions">
                             <a href="/admin/edit/<%= truyen._id %>" class="btn-edit">✏️ Sửa</a>
                         </div>
+                        <div class="story-actions" style="display: flex; align-items: center; gap: 15px;">
+                            <a href="/admin/edit/<%= truyen._id %>" class="btn-edit">✏️ Sửa</a>
+                            
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: #ef4444; font-weight: bold; font-size: 0.95rem; background: #fef2f2; padding: 5px 10px; border-radius: 8px; border: 1px solid #fecaca;">
+                                <input type="checkbox" 
+                                       onchange="toggleHot('<%= truyen._id %>', this.checked)" 
+                                       <%= truyen.isHot ? 'checked' : '' %> 
+                                       style="width: 18px; height: 18px; cursor: pointer; margin: 0;">
+                                🔥 Hot
+                            </label>
+                        </div>
                     </div>
                 <% }); %>
             </div>
@@ -44,4 +55,26 @@
     </div>
 
 </body>
+<script>
+        // Hàm tự động gọi API khi bạn tick/bỏ tick
+        async function toggleHot(id, isHot) {
+            try {
+                const res = await fetch(`/admin/toggle-hot/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isHot })
+                });
+                const data = await res.json();
+                
+                if(!data.success) {
+                    alert("Lỗi: Không thể cập nhật trạng thái Hot!");
+                    // Load lại trang nếu lỗi để reset ô tick
+                    window.location.reload(); 
+                }
+            } catch(err) {
+                alert("Lỗi kết nối đến máy chủ!");
+                window.location.reload();
+            }
+        }
+    </script>
 </html>

@@ -140,3 +140,14 @@ exports.postAlert = async (req, res) => {
         res.redirect('/admin/alert');
     } catch (err) { res.send('Lỗi: ' + err.message); }
 };
+
+// --- XỬ LÝ NÚT TICK HOT Ở DASHBOARD ---
+exports.toggleHot = async (req, res) => {
+    try {
+        const { isHot } = req.body;
+        await Truyen.findByIdAndUpdate(req.params.id, { isHot });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

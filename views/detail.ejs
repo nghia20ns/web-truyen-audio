@@ -74,7 +74,21 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
             Trang chủ
         </a>
-
+        <div class="guide-banner">
+            <div class="guide-img-box">
+                <img src="/images/appaudio.png" alt="App nghe truyện" onerror="this.src='/images/logo.png'">
+            </div>
+            <div class="guide-content">
+                <div class="guide-title">🎧 TỐI ƯU TRẢI NGHIỆM NGHE AUDIO</div>
+                <div class="guide-desc">
+                    Máy ae nghe mà không có chức năng <strong>tua nhanh</strong> thì tải app này nhé!
+                </div>
+                <div class="guide-action">
+                    <a href="https://play.google.com/store/apps/details?id=musicplayer.musicapps.music.mp3player" target="_blank" class="btn-store btn-google">🤖 Google Play</a>
+                    <a href="https://apps.apple.com/us/app/documents-file-manager-docs/id364901807" target="_blank" class="btn-store btn-apple">🍎 App Store</a>
+                </div>
+            </div>
+        </div>
         <div class="hero-wrap">
             <% 
                 let imgUrl = truyen.image || '/images/default-cover.png'; 
@@ -109,7 +123,7 @@
         </div>
 
         <div class="section-title">
-            <span>Chọn tập để mua</span>
+            <span>Chọn gói các tập để mua (mỗi tập dài 5h)</span>
             <span style="font-weight:400; font-size:0.8rem; color:#888"><%= parts.length %> gói</span>
         </div>
 

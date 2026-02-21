@@ -63,6 +63,6 @@ router.post('/categories/add', requireAuth, categoryController.saveCategory);
 router.get('/categories/edit/:id', requireAuth, categoryController.getForm);
 router.post('/categories/edit/:id', requireAuth, categoryController.saveCategory);
 router.get('/categories/delete/:id', requireAuth, categoryController.deleteCategory);
-
+router.post('/toggle-hot/:id', requireAuth, adminController.toggleHot);
 
 module.exports = router;

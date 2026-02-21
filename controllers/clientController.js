@@ -47,12 +47,19 @@ exports.getHomePage = async (req, res) => {
         const totalStories = await Truyen.countDocuments(filter);
         const totalPages = Math.ceil(totalStories / limit);
 
-        const listTruyen = await Truyen.find(filter)
+const listTruyen = await Truyen.find(filter)
             .populate('categories', 'name slug')
             .select('-link -price -shortCode')
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });
+
+        // === THÊM ĐOẠN NÀY ĐỂ LẤY TRUYỆN HOT ===
+        const listHot = await Truyen.find({ isHot: true, isDeleted: false })
+            .select('name image')
+            .sort({ updatedAt: -1 }) // Ưu tiên những truyện mới được tick lên Hot
+            .limit(10); // Lấy tối đa 10 truyện (Bạn có thể sửa số lượng)
+        // =======================================
 
         if (req.query.type === 'json') {
             return res.json({ listTruyen, currentPage: page, totalPages, totalStories });
@@ -64,7 +71,8 @@ exports.getHomePage = async (req, res) => {
             currentPage: page, 
             totalPages,
             allCategories,      
-            currentCatSlug: catSlug 
+            currentCatSlug: catSlug,
+            listHot // <--- THÊM BIẾN NÀY ĐỂ TRUYỀN RA GIAO DIỆN
         }); 
 
     } catch (e) {

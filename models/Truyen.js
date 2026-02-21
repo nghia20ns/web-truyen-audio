@@ -11,6 +11,7 @@ const truyenSchema = new mongoose.Schema({
     chunkSize: { type: Number, default: 10 },
     // --- THÊM DÒNG NÀY ---
     image: { type: String, default: '' },
+    isHot: { type: Boolean, default: false },
     categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }]
     // ---------------------
 }, { timestamps: true });
