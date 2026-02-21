@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 exports.getHomePage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 12;
+        const limit = 100;
         const skip = (page - 1) * limit;
         
         const keyword = req.query.q || ''; 
