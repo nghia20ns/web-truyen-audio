@@ -304,7 +304,7 @@
 <%- include('partials/header') %>
     <div class="container">
 
-        <% if (!keyword && (typeof currentCatSlug === 'undefined' || !currentCatSlug) && typeof listHot !== 'undefined' && listHot.length > 0) { %>
+<% if (!keyword && (typeof currentCatSlug === 'undefined' || !currentCatSlug) && typeof listHot !== 'undefined' && listHot.length > 0) { %>
             <div class="vip-hot-section">
                 <h2 class="vip-hot-title">
                     <span style="font-size: 1.2rem;">🔥</span> Truyện Đang Hot
@@ -329,17 +329,20 @@
                                         <div class="hot-flash-badge">HOT</div>
                                     </div>
         
-                                    <div class="card-body">
-                                        <div class="story-card-hot-title" style="margin-bottom: 0;"><%= hot.name %></div>
+                                    <div class="card-body" style="padding: 8px; text-align: center;">
+                                        <div class="story-card-hot-title" style="margin-bottom: 2px;"><%= hot.name %></div>
+                                        <div style="font-size: 0.65rem; color: #6b7280; font-weight: 600;">
+                                            <%= hot.totalChapters ? hot.totalChapters : 0 %> tập
+                                        </div>
                                     </div>
+                                    
                                 </div>
                             </a>
                         </div>
                     <% }) %>
                 </div>
             </div>
-        <% } %>
-        <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 20px auto;">
+        <% } %>        <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 20px auto;">
             <input type="text" id="liveSearch" class="search-input" 
                    placeholder="Nhập tên truyện cần tìm..." 
                    value="<%= keyword %>" autocomplete="off"
