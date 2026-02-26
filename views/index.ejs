@@ -108,26 +108,32 @@
         }
 
         .story-card-title {
-            font-size: 0.9rem; /* Chữ nhỏ gọn */
+            font-size: 0.9rem;
             font-weight: 700;
             color: #1f2937;
             margin-bottom: 4px;
             line-height: 1.3;
-            display: block; 
-            overflow: visible;
-            white-space: normal; 
-        }
-        .story-card-hot-title {
-            font-size: 0.6rem; /* Chữ nhỏ gọn */
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 4px;
-            line-height: 1.3;
-            display: block; 
-            overflow: visible;
-            white-space: normal; 
+            /* FIX: Cắt chữ khi dài quá 2 dòng, ép xuống dòng để không phá Grid */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
         }
 
+        .story-card-hot-title {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+            line-height: 1.3;
+            /* FIX: Cắt chữ tương tự title thường */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
         .story-card-intro {
             font-size: 0.7rem; 
             color: #6b7280;
@@ -268,9 +274,18 @@
         }
 
         /* === TỐI ƯU GIAO DIỆN ĐIỆN THOẠI === */
+        /* FIX: Khắc phục lỗi co rúm thẻ a do style.css gây ra */
+        .story-grid a {
+            display: block; 
+            height: 100%;
+            min-width: 0; /* Quan trọng: Tránh tình trạng Grid Blowout (tràn grid) */
+        }
+
+        /* === TỐI ƯU GIAO DIỆN ĐIỆN THOẠI === */
         @media (max-width: 640px) {
             .story-grid {
-                grid-template-columns: repeat(2, 1fr); 
+                /* FIX: Dùng minmax(0, 1fr) giúp 2 cột bằng nhau tuyệt đối dù nội dung bên trong có dài */
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px; 
             }
             
@@ -278,23 +293,23 @@
                 padding: 8px;
             }
             .story-card-title {
-                font-size: 0.75rem; 
+                font-size: 0.75rem;
                 margin-bottom: 4px;
             }
             .story-card-intro {
-                font-size: 0.65rem; 
+                font-size: 0.65rem;
                 margin-bottom: 6px;
             }
 
             .vip-hot-section {
-                padding: 12px; 
+                padding: 12px;
                 border-radius: 10px; 
             }
             .vip-hot-title { 
-                font-size: 1rem; 
+                font-size: 1rem;
             }
             .vip-hot-card-wrapper {
-                width: 42vw; 
+                width: 42vw;
                 min-width: 42vw;
             }
         }
