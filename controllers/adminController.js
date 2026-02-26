@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const cloudinary = require('../config/cloudinary'); 
 const fs = require('fs');
 const Category = require('../models/Category'); // <-- QUAN TRỌNG: Nhớ import dòng này
-
+const Order = require('../models/Order');
 // --- 1. LOGIN / LOGOUT (Giữ nguyên) ---
 exports.getLogin = (req, res) => {
     if (req.session.adminId) return res.redirect('/admin');
@@ -147,6 +147,32 @@ exports.toggleHot = async (req, res) => {
         const { isHot } = req.body;
         await Truyen.findByIdAndUpdate(req.params.id, { isHot });
         res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// --- QUẢN LÝ ĐƠN HÀNG ---
+exports.getOrders = async (req, res) => {
+    try {
+        // Lấy danh sách order, populate truyenId để lấy thông tin truyện (như link, tên)
+        const orders = await Order.find().populate('truyenId').sort({ createdAt: -1 });
+        res.render('admin/order-list', { orders });
+    } catch (err) {
+        res.send('Lỗi tải danh sách đơn hàng: ' + err.message);
+    }
+};
+
+exports.toggleOrderStatus = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        
+        // Đảo ngược trạng thái isProcessed
+        order.isProcessed = !order.isProcessed;
+        await order.save();
+        
+        res.json({ success: true, isProcessed: order.isProcessed });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

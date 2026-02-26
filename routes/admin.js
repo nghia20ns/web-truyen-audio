@@ -65,4 +65,8 @@ router.post('/categories/edit/:id', requireAuth, categoryController.saveCategory
 router.get('/categories/delete/:id', requireAuth, categoryController.deleteCategory);
 router.post('/toggle-hot/:id', requireAuth, adminController.toggleHot);
 
+// --- QUẢN LÝ ĐƠN HÀNG ---
+router.get('/orders', requireAuth, adminController.getOrders);
+router.post('/orders/toggle/:id', requireAuth, adminController.toggleOrderStatus);
+
 module.exports = router;

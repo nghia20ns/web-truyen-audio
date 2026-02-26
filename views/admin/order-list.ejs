@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quản Lý Đơn Hàng</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .badge-status { 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            border: none; 
+            outline: none; 
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .status-processed { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .status-pending { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-status:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        .parts-badge {
+            background: #e0e7ff; 
+            color: #4338ca; 
+            border: 1px solid #c7d2fe; 
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* --- NÚT COPY NHANH --- */
+        .btn-copy {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            color: #475569;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+        .btn-copy:hover { background: #e2e8f0; color: #4f46e5; border-color: #a5b4fc; }
+
+        /* =========================================
+           BẢNG MẶC ĐỊNH CHO PC
+           ========================================= */
+        .table-container {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .admin-table th { background: #f8fafc; padding: 16px 20px; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 700; white-space: nowrap; }
+        .admin-table td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
+        .admin-table tr:hover { background-color: #f8fafc; }
+
+        /* =========================================
+           GIAO DIỆN THẺ (CARD) TỐI ƯU CHO ĐIỆN THOẠI
+           ========================================= */
+        @media (max-width: 768px) {
+            .table-container { background: transparent; box-shadow: none; border: none; }
+            .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; box-sizing: border-box; }
+            .admin-table thead { display: none; } /* Ẩn thẻ tiêu đề cột */
+
+            .admin-table tr {
+                background: #fff;
+                margin-bottom: 20px;
+                border: 1px solid #cbd5e1;
+                border-radius: 12px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                padding: 10px 15px;
+            }
+
+            .admin-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 0;
+                border-bottom: 1px dashed #e2e8f0;
+                gap: 15px;
+                text-align: right;
+            }
+
+            .admin-table td:last-child { border-bottom: none; justify-content: flex-end; padding-bottom: 5px; margin-top: 5px; }
+
+            /* Nhãn thay thế TH trên điện thoại */
+            .admin-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #64748b;
+                text-align: left;
+                flex-shrink: 0;
+            }
+
+            .td-content {
+                flex-grow: 1;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                flex-wrap: wrap; /* Tự động xuống hàng nếu nội dung quá dài */
+                gap: 8px;
+                word-break: break-word; /* Không làm vỡ khung với chuỗi dài */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>🛒 Quản Lý Đơn Hàng</h2>
+                <div class="stat-badge">Tổng: <%= orders.length %> đơn</div>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã Đơn / Ngày</th>
+                            <th>Gmail khách hàng</th>
+                            <th>Mã Truyện (Link)</th>
+                            <th>Phần Mua</th>
+                            <th style="text-align: right;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders.length === 0) { %>
+                            <tr><td colspan="5" style="text-align:center; padding: 40px; color: #64748b;">Chưa có đơn hàng nào</td></tr>
+                        <% } %>
+                        
+                        <% orders.forEach(order => { %>
+                        <tr>
+                            <td data-label="Mã Đơn:">
+                                <div class="td-content" style="flex-direction: column; align-items: flex-end;">
+                                    <strong style="color: #0f172a; font-size: 1.05rem;"><%= order.cartId %></strong>
+                                    <small style="color: #64748b;"><%= new Date(order.createdAt).toLocaleString('vi-VN') %></small>
+                                </div>
+                            </td>
+                            
+                            <td data-label="Gmail:">
+                                <div class="td-content">
+                                    <span style="font-weight: 500; color: #1e293b;" id="email-<%= order._id %>"><%= order.email %></span>
+                                    <button class="btn-copy" onclick="copyText('email-<%= order._id %>', this)">
+                                        📋 Copy
+                                    </button>
+                                </div>
+                            </td>
+                            
+                            <td data-label="Mã Truyện:">
+                                <div class="td-content">
+                                    <% if (order.truyenId) { %>
+                                        <a href="<%= order.truyenId.link %>" target="_blank" style="color: #4f46e5; text-decoration: underline; font-weight: 600; font-family: monospace; font-size: 1.1rem;">
+                                            <%= order.truyenId.shortCode || order.truyenId._id %>
+                                        </a>
+                                    <% } else { %>
+                                        <span style="color: #ef4444; font-style: italic;">Đã xóa</span>
+                                    <% } %>
+                                </div>
+                            </td>
+                            
+                            <td data-label="Phần Mua:">
+                                <div class="td-content">
+                                    <% if (order.selectedParts && order.selectedParts.length > 0) { %>
+                                        <% order.selectedParts.forEach(part => { %>
+                                            <span class="parts-badge"><%= part %></span>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <span style="color: #94a3b8;">Không có</span>
+                                    <% } %>
+                                </div>
+                            </td>
+                            
+                            <td data-label="">
+                                <button onclick="toggleStatus('<%= order._id %>', this)" class="badge-status <%= order.isProcessed ? 'status-processed' : 'status-pending' %>">
+                                    <%= order.isProcessed ? '✅ Hoàn tất' : '❌ Chưa xử lý' %>
+                                </button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- HÀM COPY GMAIL NHANH ---
+        function copyText(elementId, btnElement) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Hiệu ứng đổi chữ nút thành "Đã Copy"
+                const originalText = btnElement.innerHTML;
+                btnElement.innerHTML = '✔️ Đã Copy';
+                btnElement.style.backgroundColor = '#d1e7dd';
+                btnElement.style.color = '#0f5132';
+                btnElement.style.borderColor = '#badbcc';
+                
+                // Trả lại trạng thái cũ sau 2 giây
+                setTimeout(() => {
+                    btnElement.innerHTML = originalText;
+                    btnElement.style = ''; // Reset CSS nội tuyến
+                }, 2000);
+            }).catch(err => {
+                alert('Không thể copy, vui lòng thử lại!');
+            });
+        }
+
+        // --- HÀM CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG ---
+        async function toggleStatus(orderId, btnElement) {
+            const originalText = btnElement.innerText;
+            btnElement.innerText = 'Đang lưu...';
+            btnElement.disabled = true;
+
+            try {
+                const res = await fetch(`/admin/orders/toggle/${orderId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    if (data.isProcessed) {
+                        btnElement.classList.remove('status-pending');
+                        btnElement.classList.add('status-processed');
+                        btnElement.innerText = '✅ Hoàn tất';
+                    } else {
+                        btnElement.classList.remove('status-processed');
+                        btnElement.classList.add('status-pending');
+                        btnElement.innerText = '❌ Chưa xử lý';
+                    }
+                } else {
+                    alert('Lỗi: ' + data.message);
+                    btnElement.innerText = originalText;
+                }
+            } catch (err) {
+                alert('Lỗi kết nối tới máy chủ!');
+                btnElement.innerText = originalText;
+            } finally {
+                btnElement.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
