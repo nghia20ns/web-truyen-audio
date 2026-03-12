@@ -56,7 +56,7 @@ const listTruyen = await Truyen.find(filter)
 
         // === THÊM ĐOẠN NÀY ĐỂ LẤY TRUYỆN HOT ===
         const listHot = await Truyen.find({ isHot: true, isDeleted: false })
-            .select('name image totalChapters, price')
+            .select('name image totalChapters price')
             .sort({ updatedAt: -1 }) // Ưu tiên những truyện mới được tick lên Hot
             .limit(10); // Lấy tối đa 10 truyện (Bạn có thể sửa số lượng)
         // =======================================
