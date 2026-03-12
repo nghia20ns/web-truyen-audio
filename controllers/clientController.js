@@ -49,14 +49,14 @@ exports.getHomePage = async (req, res) => {
 
 const listTruyen = await Truyen.find(filter)
             .populate('categories', 'name slug')
-            .select('-link -price -shortCode')
+            .select('-link -shortCode')
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });
 
         // === THÊM ĐOẠN NÀY ĐỂ LẤY TRUYỆN HOT ===
         const listHot = await Truyen.find({ isHot: true, isDeleted: false })
-            .select('name image totalChapters')
+            .select('name image totalChapters, price')
             .sort({ updatedAt: -1 }) // Ưu tiên những truyện mới được tick lên Hot
             .limit(10); // Lấy tối đa 10 truyện (Bạn có thể sửa số lượng)
         // =======================================

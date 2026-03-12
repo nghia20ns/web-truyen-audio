@@ -346,8 +346,11 @@
         
                                     <div class="card-body" style="padding: 8px; text-align: center;">
                                         <div class="story-card-hot-title" style="margin-bottom: 2px;"><%= hot.name %></div>
-                                        <div style="font-size: 0.65rem; color: #6b7280; font-weight: 600;">
+                                            <div style="font-size: 0.65rem; color: #6b7280; font-weight: 600;">
                                             <%= hot.totalChapters ? hot.totalChapters : 0 %> tập
+                                            <div style="color: #ef4444; margin-top: 2px;">
+                                                <%= hot.price ? hot.price.toLocaleString('vi-VN') : '1.000' %>đ/tập
+                                            </div>
                                         </div>
                                     </div>
                                     
@@ -426,7 +429,11 @@
                                 <% } else { %>
                                     <span class="badge badge-audio">Audio</span>
                                 <% } %>
+                                <span class="badge" style="background:#fee2e2; color:#ef4444">
+                                    <%= truyen.price ? truyen.price.toLocaleString('vi-VN') : '1.000' %>đ/tập
+                                </span>
                             </div>
+
                         </div>
                     </div>
                 </a>
@@ -562,10 +569,15 @@
                                     <div class="story-card-title">${truyen.name}</div>
                                     <div class="story-card-intro">${intro}</div>
                                 </div>
+                                
                                 <div class="badges">
                                     <span class="badge">${truyen.totalChapters} tập</span>
                                     ${badgeHtml}
+                                    <span class="badge" style="background:#fee2e2; color:#ef4444">
+                                        ${truyen.price ? truyen.price.toLocaleString('vi-VN') : '1.000'}đ/tập
+                                    </span>
                                 </div>
+
                             </div>
                         </div>
                     </a>
