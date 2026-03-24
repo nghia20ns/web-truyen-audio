@@ -49,8 +49,8 @@ exports.getAddPage = async (req, res) => { // Thêm async
 // Xử lý Thêm Mới
 exports.postAdd = async (req, res) => {
     try {
-        const { name, shortCode, totalChapters, price, link, introduction, chunkSize } = req.body;
-        
+        const { name, shortCode, totalChapters, price, link, introduction, chunkSize, publishedChapters } = req.body;
+
         const exist = await Truyen.findOne({ shortCode });
         if (exist) {
             if (req.file) fs.unlinkSync(req.file.path);
@@ -69,6 +69,7 @@ exports.postAdd = async (req, res) => {
         await Truyen.create({
             name, shortCode, totalChapters, price, link, introduction,
             chunkSize: chunkSize || 10,
+            publishedChapters: publishedChapters || 0, // <-- Thêm dòng này
             image: imageUrl
         });
         res.redirect('/admin');
@@ -91,7 +92,7 @@ exports.getEditPage = async (req, res) => {
 // Xử lý Cập nhật
 exports.postEdit = async (req, res) => {
     try {
-        const { name, shortCode, totalChapters, price, link, introduction, chunkSize } = req.body;
+        const { name, shortCode, totalChapters, price, link, introduction, chunkSize, publishedChapters } = req.body;
         const exist = await Truyen.findOne({ shortCode, _id: { $ne: req.params.id } });
         
         if (exist) {
@@ -99,7 +100,7 @@ exports.postEdit = async (req, res) => {
             return res.render('admin/form', { truyen: { ...req.body, _id: req.params.id }, error: 'Mã này đã có người dùng!' });
         }
 
-        let updateData = { name, shortCode, totalChapters, price, link, introduction, chunkSize: chunkSize || 10 };
+        let updateData = { name, shortCode, totalChapters, price, link, introduction, chunkSize: chunkSize || 10, publishedChapters: publishedChapters || 0};
 
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file.path, { folder: 'web-truyen-audio' });
@@ -173,6 +174,32 @@ exports.toggleOrderStatus = async (req, res) => {
         await order.save();
         
         res.json({ success: true, isProcessed: order.isProcessed });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// --- QUẢN LÝ NHANH TẬP PUBLIC ---
+
+// 1. Hiển thị trang danh sách
+exports.getPublishedChaptersPage = async (req, res) => {
+    try {
+        // Lấy tất cả truyện, ưu tiên truyện mới cập nhật lên đầu
+        const listTruyen = await Truyen.find().sort({ updatedAt: -1 });
+        res.render('admin/published-chapters', { listTruyen });
+    } catch (err) {
+        res.status(500).send('Lỗi tải danh sách: ' + err.message);
+    }
+};
+
+// 2. API Cập nhật bằng AJAX
+exports.updatePublishedChapters = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { publishedChapters } = req.body;
+        
+        await Truyen.findByIdAndUpdate(id, { publishedChapters: Number(publishedChapters) });
+        res.json({ success: true, message: "Cập nhật thành công" });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

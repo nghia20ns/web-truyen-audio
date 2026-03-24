@@ -71,6 +71,10 @@
                 <input type="number" name="chunkSize" value="<%= truyen && truyen.chunkSize ? truyen.chunkSize : 10 %>" required min="1">
                 <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 10px;">* Nhập 10 -> Web chia: 1-10, 11-20...</small>
 
+                <label>Số tập đã Public (Miễn phí):</label>
+                <input type="number" name="publishedChapters" value="<%= truyen && truyen.publishedChapters ? truyen.publishedChapters : 0 %>" min="0" required>
+                <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 10px;">* Những tập này sẽ tự động được bỏ qua khi chia gói bán. Ví dụ: Đã up 2 tập thì gói đầu bán từ tập 3.</small>
+                
                 <label>Link Truyện (Gốc/Youtube):</label>
                 <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://...">
 

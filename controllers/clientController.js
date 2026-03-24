@@ -90,14 +90,26 @@ exports.getTruyenDetail = async (req, res) => {
 
     let parts = [];
     const chunkSize = (truyen.chunkSize && truyen.chunkSize > 0) ? truyen.chunkSize : 10;
-    
     const totalParts = Math.ceil(truyen.totalChapters / chunkSize);
     const pricePerChapter = truyen.price || 1000;
+    
+    // Lấy số tập đã public từ DB (nếu không có thì mặc định là 0)
+    const publishedChapters = truyen.publishedChapters || 0;
 
     for (let i = 0; i < totalParts; i++) {
-        const start = i * chunkSize + 1;
-        const end = Math.min((i + 1) * chunkSize, truyen.totalChapters);
+        let start = i * chunkSize + 1;
+        let end = Math.min((i + 1) * chunkSize, truyen.totalChapters);
         
+        // Cập nhật lại số bắt đầu nếu nằm trong khoảng tập đã public
+        if (publishedChapters >= start) {
+            start = publishedChapters + 1;
+        }
+
+        // Nếu toàn bộ gói này đã được public (ví dụ gói 1-5 mà public 6 tập) thì bỏ qua
+        if (start > end) {
+            continue;
+        }
+
         const chapterCount = end - start + 1;
         const partPrice = chapterCount * pricePerChapter;
 
