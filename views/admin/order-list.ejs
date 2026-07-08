@@ -190,7 +190,9 @@
                             <td data-label="Mã Đơn:">
                                 <div class="td-content" style="flex-direction: column; align-items: flex-end;">
                                     <strong style="color: #0f172a; font-size: 1.05rem;"><%= order.cartId %></strong>
-                                    <small style="color: #64748b;"><%= new Date(order.createdAt).toLocaleString('vi-VN') %></small>
+                                <small style="color: #64748b;">
+                                    <%= new Date(order.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %>
+                                </small>
                                 </div>
                             </td>
                             

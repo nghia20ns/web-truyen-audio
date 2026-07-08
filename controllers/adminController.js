@@ -223,7 +223,7 @@ exports.exportOrdersExcel = async (req, res) => {
                 shortCode: order.truyenId ? (order.truyenId.shortCode || order.truyenId._id) : 'Đã xóa',
                 selectedParts: order.selectedParts ? order.selectedParts.join(', ') : '',
                 totalAmount: order.totalAmount,
-                createdAt: new Date(order.createdAt).toLocaleString('vi-VN')
+                createdAt: new Date(order.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
             });
         });
 
