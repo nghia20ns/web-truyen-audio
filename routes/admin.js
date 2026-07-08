@@ -67,6 +67,7 @@ router.post('/toggle-hot/:id', requireAuth, adminController.toggleHot);
 
 // --- QUẢN LÝ ĐƠN HÀNG ---
 router.get('/orders', requireAuth, adminController.getOrders);
+router.get('/orders/export-excel', requireAuth, adminController.exportOrdersExcel);
 router.post('/orders/toggle/:id', requireAuth, adminController.toggleOrderStatus);
 // Thêm 2 dòng này vào file routes/admin.js (nhớ đặt dưới các middleware xác thực authAdmin nếu có)
 router.get('/published-chapters',requireAuth, adminController.getPublishedChaptersPage);

@@ -154,13 +154,97 @@ exports.toggleHot = async (req, res) => {
 };
 
 // --- QUẢN LÝ ĐƠN HÀNG ---
+const ExcelJS = require('exceljs'); // Khai báo thư viện exceljs ở đầu vùng quản lý đơn hàng
+
 exports.getOrders = async (req, res) => {
     try {
+        const { search } = req.query;
+        let query = {};
+
+        // Nếu có từ khóa tìm kiếm, lọc theo cartId (Mã đơn) hoặc email (Gmail)
+        if (search) {
+            query = {
+                $or: [
+                    { cartId: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } }
+                ]
+            };
+        }
+
         // Lấy danh sách order, populate truyenId để lấy thông tin truyện (như link, tên)
-        const orders = await Order.find().populate('truyenId').sort({ createdAt: -1 });
-        res.render('admin/order-list', { orders });
+        const orders = await Order.find(query).populate('truyenId').sort({ createdAt: -1 });
+        
+        // Truyền thêm biến search ngược lại cho view để hiển thị vào thanh ô nhập liệu
+        res.render('admin/order-list', { orders, search: search || '' });
     } catch (err) {
         res.send('Lỗi tải danh sách đơn hàng: ' + err.message);
+    }
+};
+
+// API / Route xuất file Excel đơn hàng hoàn tất (Đã bỏ cột Link Truyện)
+exports.exportOrdersExcel = async (req, res) => {
+    try {
+        // Chỉ lấy các đơn hàng có trạng thái isProcessed = true (Hoàn tất)
+        const orders = await Order.find({ isProcessed: true }).populate('truyenId').sort({ createdAt: -1 });
+
+        // Tạo một workbook mới
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Đơn hàng hoàn tất');
+
+        // Định nghĩa cấu trúc các cột (Đã xóa cột Link Truyện)
+        worksheet.columns = [
+            { header: 'ID Card (Mã Đơn)', key: 'cartId', width: 25 },
+            { header: 'Gmail Khách Hàng', key: 'email', width: 30 },
+            { header: 'Mã Truyện', key: 'shortCode', width: 20 },
+            { header: 'Phần Mua', key: 'selectedParts', width: 25 },
+            { header: 'Tổng Tiền Thanh Toán', key: 'totalAmount', width: 25 },
+            { header: 'Ngày Tạo', key: 'createdAt', width: 20 }
+        ];
+
+        // Định dạng tiêu đề cột (In đậm, nền xám nhẹ)
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.getRow(1).eachCell((cell) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'F2F2F2' }
+            };
+            cell.border = {
+                top: { style: 'thin' }, left: { style: 'thin' },
+                bottom: { style: 'thin' }, right: { style: 'thin' }
+            };
+        });
+
+        // Thêm dữ liệu vào bảng tính
+        orders.forEach(order => {
+            worksheet.addRow({
+                cartId: order.cartId,
+                email: order.email,
+                shortCode: order.truyenId ? (order.truyenId.shortCode || order.truyenId._id) : 'Đã xóa',
+                selectedParts: order.selectedParts ? order.selectedParts.join(', ') : '',
+                totalAmount: order.totalAmount,
+                createdAt: new Date(order.createdAt).toLocaleString('vi-VN')
+            });
+        });
+
+        // Áp dụng định dạng số (tiền tệ) cho cột tổng tiền
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) {
+                const priceCell = row.getCell('totalAmount');
+                priceCell.numberFormat = '#,##0'; // Định dạng hiển thị ví dụ: 50,000
+            }
+        });
+
+        // Thiết lập thông tin phản hồi của file tải về
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=don_hang_hoan_tat_' + Date.now() + '.xlsx');
+
+        // Ghi dữ liệu luồng trực tiếp ra phản hồi res
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        res.status(500).send('Lỗi xuất file Excel: ' + err.message);
     }
 };
 
