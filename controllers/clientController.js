@@ -3,11 +3,11 @@ const Category = require('../models/Category');
 const Order = require('../models/Order'); // Model lưu giỏ hàng
 const mongoose = require('mongoose');
 
-// 1. Trang chủ + Tìm kiếm + Lọc theo Danh mục
+// 1. Trang chủ + Tìm kiếm + Lọc theo Danh mục (Tối ưu hóa cuộn vô hạn chống sót truyện)
 exports.getHomePage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 100;
+        const limit = 16; // Số lượng truyện tải mỗi lượt (Bạn có thể đổi thành 12 tùy ý)
         const skip = (page - 1) * limit;
         
         const keyword = req.query.q || ''; 
@@ -16,10 +16,10 @@ exports.getHomePage = async (req, res) => {
         // Lấy danh sách Categories để hiển thị menu
         const allCategories = await Category.find(); 
 
-        // Xây dựng bộ lọc
+        // Xây dựng bộ lọc dữ liệu mặc định
         let filter = { isDeleted: false }; 
 
-        // Nếu có chọn danh mục
+        // Nếu người dùng chọn lọc theo danh mục
         let currentCat = null;
         if (catSlug) {
             currentCat = await Category.findOne({ slug: catSlug });
@@ -28,7 +28,7 @@ exports.getHomePage = async (req, res) => {
             }
         }
 
-        // Nếu có tìm kiếm
+        // Nếu người dùng sử dụng thanh tìm kiếm trực tiếp (Live Search)
         if (keyword) {
             filter = {
                 $and: [
@@ -43,28 +43,31 @@ exports.getHomePage = async (req, res) => {
             };
         }
 
-        // Đếm và lấy danh sách
-        const totalStories = await Truyen.countDocuments(filter);
+        // CHẠY SONG SONG BA TRUY VẤN: Đếm tổng số truyện, Lấy danh sách phân trang, và Lấy danh sách truyện HOT
+        // Việc thêm `_id: -1` vào hàm .sort giúp cố định thứ tự tuyệt đối, giải quyết triệt để lỗi sót truyện khi lướt cuộn
+        const [totalStories, listTruyen, listHot] = await Promise.all([
+            Truyen.countDocuments(filter),
+            Truyen.find(filter)
+                .populate('categories', 'name slug')
+                .select('-link -shortCode')
+                .skip(skip)
+                .limit(limit)
+                .sort({ createdAt: -1, _id: -1 }), // <-- CỐ ĐỊNH THỨ TỰ TUYỆT ĐỐI CHỐNG SÓT/TRÙNG
+            Truyen.find({ isHot: true, isDeleted: false })
+                .select('name image totalChapters price')
+                .sort({ updatedAt: -1 }) // Ưu tiên những truyện mới được tick Hot lên đầu
+                .limit(10) // Lấy tối đa 10 truyện Hot hiển thị ở thanh trượt ngang
+        ]);
+
+        // Tính toán tổng số trang dựa trên lượng dữ liệu thực tế đã lọc
         const totalPages = Math.ceil(totalStories / limit);
 
-const listTruyen = await Truyen.find(filter)
-            .populate('categories', 'name slug')
-            .select('-link -shortCode')
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
-
-        // === THÊM ĐOẠN NÀY ĐỂ LẤY TRUYỆN HOT ===
-        const listHot = await Truyen.find({ isHot: true, isDeleted: false })
-            .select('name image totalChapters price')
-            .sort({ updatedAt: -1 }) // Ưu tiên những truyện mới được tick lên Hot
-            .limit(10); // Lấy tối đa 10 truyện (Bạn có thể sửa số lượng)
-        // =======================================
-
+        // Nếu Client gửi yêu cầu AJAX lấy thêm dữ liệu khi lướt cuộn (type=json)
         if (req.query.type === 'json') {
             return res.json({ listTruyen, currentPage: page, totalPages, totalStories });
         }
 
+        // Nếu người dùng truy cập trực tiếp bằng trình duyệt (Nạp giao diện ban đầu)
         res.render('index', { 
             listTruyen, 
             keyword, 
@@ -72,11 +75,11 @@ const listTruyen = await Truyen.find(filter)
             totalPages,
             allCategories,      
             currentCatSlug: catSlug,
-            listHot // <--- THÊM BIẾN NÀY ĐỂ TRUYỀN RA GIAO DIỆN
+            listHot
         }); 
 
     } catch (e) {
-        console.error(e);
+        console.error("Lỗi tại getHomePage:", e);
         res.status(500).send("Lỗi Server: " + e.message);
     }
 };

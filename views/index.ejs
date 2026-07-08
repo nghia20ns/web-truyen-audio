@@ -62,7 +62,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
             gap: 12px;
-            padding-bottom: 40px;
+            padding-bottom: 20px;
         }
 
         .card {
@@ -87,7 +87,7 @@
             width: 100%;
             padding-top: 56.25%; /* Tỉ lệ gốc 16:9 */
             position: relative;
-            background-color: #f8fafc; /* Nền xám cực nhạt để hợp với ảnh contain */
+            background-color: #f8fafc; 
         }
 
         .card-img-top {
@@ -96,7 +96,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Đảm bảo KHÔNG CẮT ảnh bìa */
+            object-fit: contain; 
         }
 
         .card-body {
@@ -113,7 +113,6 @@
             color: #1f2937;
             margin-bottom: 4px;
             line-height: 1.3;
-            /* FIX: Cắt chữ khi dài quá 2 dòng, ép xuống dòng để không phá Grid */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -127,7 +126,6 @@
             color: #1f2937;
             margin-bottom: 4px;
             line-height: 1.3;
-            /* FIX: Cắt chữ tương tự title thường */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -165,42 +163,10 @@
             color: #be185d;
         }
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-
-        .page-btn {
-            padding: 6px 14px;
-            border: 1px solid #d1d5db;
-            background: #fff;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #374151;
-            transition: all 0.2s;
-        }
-
-        .page-btn:hover:not(:disabled) {
-            background-color: #f3f4f6;
-            border-color: #9ca3af;
-        }
-
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* =========================================
-           CSS KHU VỰC TRUYỆN HOT (HÀI HÒA & TINH TẾ)
-           ========================================= */
+        /* CSS TRUYỆN HOT */
         .vip-hot-section {
-            background: #ffffff; /* Nền trắng hòa hợp với web */
-            border: 1px solid #fee2e2; /* Viền đỏ pastel siêu nhẹ */
+            background: #ffffff; 
+            border: 1px solid #fee2e2; 
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 25px;
@@ -210,7 +176,7 @@
         .vip-hot-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #ef4444; /* Chữ đỏ thanh lịch */
+            color: #ef4444; 
             margin-bottom: 12px;
             display: flex;
             align-items: center;
@@ -231,7 +197,6 @@
         .vip-scroll-track::-webkit-scrollbar-track { background: transparent; }
         .vip-scroll-track::-webkit-scrollbar-thumb { background: #fca5a5; border-radius: 10px; }
 
-        /* Khung bọc thẻ Hot trên PC nhỏ hơn thẻ mới 1 tí tẹo (140px so với 160px) */
         .vip-hot-card-wrapper {
             width: 140px; 
             min-width: 140px;
@@ -239,10 +204,9 @@
             flex-shrink: 0;
         }
 
-        /* Đồng bộ style thẻ hot với thẻ thường để hài hòa */
         .vip-hot-card-wrapper .card {
             border: 1px solid #f1f5f9;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02); /* Bóng phẳng */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
         }
         
         .vip-hot-card-wrapper .card:hover {
@@ -273,18 +237,14 @@
             100% { transform: scale(1); }
         }
 
-        /* === TỐI ƯU GIAO DIỆN ĐIỆN THOẠI === */
-        /* FIX: Khắc phục lỗi co rúm thẻ a do style.css gây ra */
         .story-grid a {
             display: block; 
             height: 100%;
-            min-width: 0; /* Quan trọng: Tránh tình trạng Grid Blowout (tràn grid) */
+            min-width: 0; 
         }
 
-        /* === TỐI ƯU GIAO DIỆN ĐIỆN THOẠI === */
         @media (max-width: 640px) {
             .story-grid {
-                /* FIX: Dùng minmax(0, 1fr) giúp 2 cột bằng nhau tuyệt đối dù nội dung bên trong có dài */
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px; 
             }
@@ -319,7 +279,7 @@
 <%- include('partials/header') %>
     <div class="container">
 
-<% if (!keyword && (typeof currentCatSlug === 'undefined' || !currentCatSlug) && typeof listHot !== 'undefined' && listHot.length > 0) { %>
+        <% if (!keyword && (typeof currentCatSlug === 'undefined' || !currentCatSlug) && typeof listHot !== 'undefined' && listHot.length > 0) { %>
             <div class="vip-hot-section">
                 <h2 class="vip-hot-title">
                     <span style="font-size: 1.2rem;">🔥</span> Truyện Đang Hot
@@ -346,7 +306,7 @@
         
                                     <div class="card-body" style="padding: 8px; text-align: center;">
                                         <div class="story-card-hot-title" style="margin-bottom: 2px;"><%= hot.name %></div>
-                                            <div style="font-size: 0.65rem; color: #6b7280; font-weight: 600;">
+                                        <div class="font-size: 0.65rem; color: #6b7280; font-weight: 600;">
                                             <%= hot.totalChapters ? hot.totalChapters : 0 %> tập
                                             <div style="color: #ef4444; margin-top: 2px;">
                                                 <%= hot.price ? hot.price.toLocaleString('vi-VN') : '1.000' %>đ/tập
@@ -361,6 +321,7 @@
                 </div>
             </div>
         <% } %>
+
         <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 20px auto;">
             <input type="text" id="liveSearch" class="search-input" 
                    placeholder="Nhập tên truyện cần tìm..." 
@@ -396,6 +357,7 @@
                 Danh Sách Truyện Mới
             <% } %>
         </h2>
+
         <div id="storyContainer" class="story-grid">
             <% listTruyen.forEach(function(truyen) { %>
                 <a href="/truyen/<%= truyen._id %>" style="text-decoration: none; color: inherit;">
@@ -433,7 +395,6 @@
                                     <%= truyen.price ? truyen.price.toLocaleString('vi-VN') : '1.000' %>đ/tập
                                 </span>
                             </div>
-
                         </div>
                     </div>
                 </a>
@@ -445,30 +406,96 @@
              <p style="font-size: 0.9rem;">Không tìm thấy truyện nào phù hợp.</p>
         </div>
 
-        <div id="pagination" class="pagination">
+        <div id="infinite-scroll-trigger" style="text-align: center; padding: 20px 0; font-size: 0.9rem; color: #6b7280; font-weight: 600;">
+            <% if (totalPages > currentPage) { %>
+                <span id="scroll-loading-text">🔄 Đang lướt tải thêm truyện...</span>
+            <% } else { %>
+                <span id="scroll-loading-text">🎉 Đã hiển thị hết danh sách truyện!</span>
+            <% } %>
         </div>
     </div>
 
     <%- include('partials/footer') %>
 
     <script>
-        // --- LOGIC JAVASCRIPT GIỮ NGUYÊN GỐC ---
+        // Cấu hình các biến điều khiển trạng thái cuộn lướt
         let currentPage = Number('<%= (typeof currentPage != "undefined") ? currentPage : 1 %>');
         let totalPages = Number('<%= (typeof totalPages != "undefined") ? totalPages : 1 %>');
         let currentKeyword = "<%= keyword %>";
         let currentCatSlug = "<%= (typeof currentCatSlug != 'undefined') ? currentCatSlug : '' %>";
         
         let debounceTimer;
+        let isLoading = false; // Biến cờ ngăn chặn gọi trùng API khi cuộn nhanh
+        let scrollObserver;
 
         const input = document.getElementById('liveSearch');
         const container = document.getElementById('storyContainer');
         const loading = document.getElementById('loadingIcon');
         const notFound = document.getElementById('notFound');
         const pageTitle = document.getElementById('pageTitle');
-        const paginationDiv = document.getElementById('pagination');
+        const trigger = document.getElementById('infinite-scroll-trigger');
+        const loadingText = document.getElementById('scroll-loading-text');
 
-        // Init
-        renderPagination(currentPage, totalPages);
+        // Hàm khởi tạo bộ lắng nghe hành vi cuộn lướt màn hình
+        function initInfiniteScroll() {
+            // Nếu đã có bộ quan sát cũ thì xóa đi trước để làm mới
+            if (scrollObserver) {
+                scrollObserver.disconnect();
+            }
+
+            // Nếu ngay từ đầu tổng số trang nhỏ hơn hoặc bằng trang hiện tại, dừng nạp thêm
+            if (currentPage >= totalPages) {
+                loadingText.innerText = '🎉 Đã hiển thị hết danh sách truyện!';
+                return;
+            } else {
+                loadingText.innerText = '🔄 Đang lướt tải thêm truyện...';
+            }
+
+            scrollObserver = new IntersectionObserver(async (entries) => {
+                const entry = entries[0];
+                
+                // Khi thẻ trigger xuất hiện dưới đáy màn hình và hệ thống không bận nạp dữ liệu
+                if (entry.isIntersecting && !isLoading) {
+                    const nextPage = currentPage + 1;
+                    
+                    if (nextPage > totalPages) {
+                        scrollObserver.unobserve(trigger);
+                        loadingText.innerText = '🎉 Đã hiển thị hết danh sách truyện!';
+                        return;
+                    }
+
+                    isLoading = true;
+
+                    try {
+                        const res = await fetch(`/?q=${currentKeyword || ''}&cat=${currentCatSlug || ''}&page=${nextPage}&type=json`);
+                        const data = await res.json();
+
+                        if (data.listTruyen && data.listTruyen.length > 0) {
+                            appendStories(data.listTruyen);
+                            currentPage = data.currentPage;
+                            totalPages = data.totalPages;
+
+                            if (currentPage >= totalPages) {
+                                scrollObserver.unobserve(trigger);
+                                loadingText.innerText = '🎉 Đã hiển thị hết danh sách truyện!';
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Lỗi cuộn tải thêm:', err);
+                        loadingText.innerText = '❌ Lỗi tải dữ liệu. Đang thử lại...';
+                    } finally {
+                        isLoading = false;
+                    }
+                }
+            }, {
+                rootMargin: '200px' // Tự động tải trước khi người dùng kéo cách đáy màn hình 200px
+            });
+
+            scrollObserver.observe(trigger);
+        }
+
+        // Kích hoạt tính năng cuộn lướt ngay khi tải trang xong
+        initInfiniteScroll();
 
         // --- 1. HÀM CHỌN DANH MỤC (AJAX) ---
         function selectCategory(event, slug, name) {
@@ -488,10 +515,12 @@
                 pageTitle.innerText = "Danh Sách Truyện Mới";
             }
 
-            fetchData(1, '', slug);
+            // Xóa rỗng container để nạp lại từ đầu cho danh mục mới
+            container.innerHTML = '';
+            fetchData(1, '', slug, true);
         }
 
-        // --- 2. SỰ KIỆN TÌM KIẾM ---
+        // --- 2. SỰ KIỆN TÌM KIẾM LIVE SEARCH ---
         input.addEventListener('input', function() {
             const keyword = this.value.trim();
             loading.style.display = 'block';
@@ -500,12 +529,13 @@
             debounceTimer = setTimeout(() => {
                 currentKeyword = keyword;
                 currentPage = 1; 
-                fetchData(1, currentKeyword, currentCatSlug); 
+                container.innerHTML = ''; // Xóa rỗng container để lọc từ trang đầu
+                fetchData(1, currentKeyword, currentCatSlug, true); 
             }, 500); 
         });
 
-        // --- 3. HÀM LẤY DỮ LIỆU ---
-        async function fetchData(page, keyword, catSlug) {
+        // --- 3. HÀM LẤY DỮ LIỆU BAN ĐẦU (KHI ĐỔI DANH MỤC / TÌM KIẾM) ---
+        async function fetchData(page, keyword, catSlug, isReset = false) {
             try {
                 loading.style.display = 'block';
                 
@@ -517,30 +547,36 @@
                 const res = await fetch(`/?q=${keyword || ''}&cat=${catSlug || ''}&page=${page}&type=json`);
                 const data = await res.json();
 
-                renderStories(data.listTruyen);
-                renderPagination(data.currentPage, data.totalPages);
+                currentPage = data.currentPage;
+                totalPages = data.totalPages;
+
+                if (!data.listTruyen || data.listTruyen.length === 0) {
+                    notFound.style.display = 'block';
+                    loadingText.style.display = 'none';
+                } else {
+                    notFound.style.display = 'none';
+                    loadingText.style.display = 'block';
+                    appendStories(data.listTruyen);
+                }
                 
                 if (keyword) {
                     pageTitle.innerText = `Kết quả cho: "${keyword}"`;
                 }
 
                 loading.style.display = 'none';
+
+                // Nếu là lệnh làm mới danh sách, tái kích hoạt bộ theo dõi cuộn từ trang 1
+                if (isReset) {
+                    initInfiniteScroll();
+                }
             } catch (err) {
                 console.error(err);
                 loading.style.display = 'none';
             }
         }
 
-        // --- 4. RENDER HTML ---
-        function renderStories(list) {
-            container.innerHTML = ''; 
-            
-            if (!list || list.length === 0) {
-                notFound.style.display = 'block';
-                return;
-            }
-            notFound.style.display = 'none';
-
+        // --- 4. HÀM NỐI THÊM HTML TRUYỆN VÀO LƯỚI ---
+        function appendStories(list) {
             list.forEach(truyen => {
                 const intro = truyen.introduction ? truyen.introduction : "Đang cập nhật nội dung...";
                 
@@ -577,45 +613,12 @@
                                         ${truyen.price ? truyen.price.toLocaleString('vi-VN') : '1.000'}đ/tập
                                     </span>
                                 </div>
-
                             </div>
                         </div>
                     </a>
                 `;
                 container.insertAdjacentHTML('beforeend', html);
             });
-        }
-
-        function renderPagination(current, total) {
-            paginationDiv.innerHTML = '';
-            if (total <= 1) return;
-
-            const prevBtn = document.createElement('button');
-            prevBtn.innerHTML = '&laquo; Trước';
-            prevBtn.className = 'page-btn';
-            prevBtn.disabled = current === 1;
-            prevBtn.onclick = () => changePage(current - 1);
-            paginationDiv.appendChild(prevBtn);
-
-            const info = document.createElement('span');
-            info.innerText = ` ${current} / ${total} `;
-            info.style.alignSelf = 'center';
-            info.style.fontWeight = 'bold';
-            info.style.color = '#4b5563';
-            info.style.fontSize = '0.9rem';
-            paginationDiv.appendChild(info);
-
-            const nextBtn = document.createElement('button');
-            nextBtn.innerHTML = 'Sau &raquo;';
-            nextBtn.className = 'page-btn';
-            nextBtn.disabled = current === total;
-            nextBtn.onclick = () => changePage(current + 1);
-            paginationDiv.appendChild(nextBtn);
-        }
-
-        function changePage(newPage) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            fetchData(newPage, currentKeyword, currentCatSlug);
         }
     </script>
 </body>
