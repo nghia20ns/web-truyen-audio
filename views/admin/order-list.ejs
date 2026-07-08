@@ -131,10 +131,22 @@
                         <a href="/admin/orders/export-excel" class="btn-copy" style="background: #107c41; color: white; border-color: #107c41; padding: 8px 15px; font-size: 0.9rem;">
                             📥 Xuất Excel Đơn Hoàn Tất
                         </a>
-                        <div class="stat-badge">Tổng: <%= orders.length %> đơn</div>
+                        <div class="stat-badge">
+                            <% 
+                                // Đếm số đơn hàng đã hoàn tất
+                                let processedCount = orders.filter(o => o.isProcessed).length; 
+                            %>
+                            Tổng: <%= processedCount %> đơn hoàn tất
+                        </div>
+
                         <% 
                             let grandTotal = 0; 
-                            orders.forEach(o => { grandTotal += (o.totalAmount || 0); }); 
+                            // Chỉ cộng dồn tiền của các đơn hàng có trạng thái isProcessed là true
+                            orders.forEach(o => { 
+                                if (o.isProcessed) {
+                                    grandTotal += (o.totalAmount || 0); 
+                                }
+                            }); 
                         %>
                         <div class="stat-badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">
                             Tổng tiền: <%= grandTotal.toLocaleString('vi-VN') %> đ
