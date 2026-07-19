@@ -72,4 +72,7 @@ router.post('/orders/toggle/:id', requireAuth, adminController.toggleOrderStatus
 // Thêm 2 dòng này vào file routes/admin.js (nhớ đặt dưới các middleware xác thực authAdmin nếu có)
 router.get('/published-chapters',requireAuth, adminController.getPublishedChaptersPage);
 router.post('/published-chapters/update/:id', requireAuth, adminController.updatePublishedChapters);
+// Thêm 2 dòng này vào khu vực khai báo các route admin của bạn
+router.get('/quick-ytb', adminController.getQuickYtbPage);
+router.post('/quick-ytb/update/:id', adminController.postQuickYtbUpdate);
 module.exports = router;

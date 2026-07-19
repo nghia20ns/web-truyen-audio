@@ -5,33 +5,37 @@
 <nav class="admin-sidebar" id="myAdminSidebar">
     <div class="sidebar-brand">🎧 Admin Panel</div>
     
-    <ul class="sidebar-menu">
-        <li class="menu-label">Chức năng chính</li>
-        <li><a href="/admin">🏠 Tổng quan</a></li>
-        <li><a href="/admin/add">➕ Thêm Truyện Mới</a></li>
-        <li><a href="/admin/categories">📂 Quản Lý Danh Mục</a></li>
-        <li><a href="/admin/orders">🛒 Quản Lý Đơn Hàng</a></li>
-        <li><a href="/admin/published-chapters" class="sidebar-item">📺 Quản lý Tập Public</a></li>
-        <li>
-            <a href="/chat/manager" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>💬 Quản Lý Chat</span>
-                <span id="chat-badge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; display: none; font-weight: bold;">0</span>
-            </a>
-        </li>
-        
-        <li class="menu-label">Hệ thống</li>
-        <li><a href="/admin/alert">📢 Cấu Hình Thông Báo</a></li>
-        <li><a href="/" target="_blank">🌏 Xem Trang Web</a></li>
-        
-        <li>
-            <a href="#" onclick="toggleOnlineStatus(event)" id="status-link">
-                🟢 Trạng thái: Đang Check...
-            </a>
-        </li>
+        <ul class="sidebar-menu">
+            <li class="menu-label">Chức năng chính</li>
+            <li><a href="/admin">🏠 Tổng quan</a></li>
+            <li><a href="/admin/add">➕ Thêm Truyện Mới</a></li>
+            <li><a href="/admin/categories">📂 Quản Lý Danh Mục</a></li>
+            <li><a href="/admin/orders">🛒 Quản Lý Đơn Hàng</a></li>
+            <li><a href="/admin/published-chapters" class="sidebar-item">📺 Quản lý Tập Public</a></li>
+            
+            <!-- ĐOẠN ĐƯỢC THÊM VÀO MENU CHÍNH -->
+            <li><a href="/admin/quick-ytb" class="sidebar-item">🎵 Cập Nhật Nhanh YTB</a></li>
+            
+            <li>
+                <a href="/chat/manager" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>💬 Quản Lý Chat</span>
+                    <span id="chat-badge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; display: none; font-weight: bold;">0</span>
+                </a>
+            </li>
+            
+            <li class="menu-label">Hệ thống</li>
+            <li><a href="/admin/alert">📢 Cấu Hình Thông Báo</a></li>
+            <li><a href="/" target="_blank">🌏 Xem Trang Web</a></li>
+            
+            <li>
+                <a href="#" onclick="toggleOnlineStatus(event)" id="status-link">
+                    🟢 Trạng thái: Đang Check...
+                </a>
+            </li>
 
-        <li style="margin-top: 20px; border-top: 1px solid #334155;"></li>
-        <li><a href="/admin/logout" class="logout-link">🚪 Đăng xuất</a></li>
-    </ul>
+            <li style="margin-top: 20px; border-top: 1px solid #334155;"></li>
+            <li><a href="/admin/logout" class="logout-link">🚪 Đăng xuất</a></li>
+        </ul>
 </nav>
 
 <div class="admin-sidebar-overlay" id="myAdminOverlay" onclick="toggleAdminSidebar()"></div>

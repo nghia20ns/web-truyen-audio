@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cập Nhật Nhanh Link YouTube</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .table-public { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        .table-public th, .table-public td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .table-public th { background: #f8fafc; font-weight: 600; color: #334155; }
+        .input-public { width: 100%; max-width: 400px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: left; font-weight: 500; color: #1e293b; outline: none; transition: border 0.2s;}
+        .input-public:focus { border-color: #ff0000; box-shadow: 0 0 0 1px #ff0000; }
+        .btn-save-row { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; min-width: 60px; }
+        .btn-save-row:hover:not(:disabled) { background: #dc2626; }
+        .btn-save-row:disabled { background: #94a3b8; cursor: not-allowed; }
+        .row-item:hover { background: #f1f5f9; }
+
+        /* --- CSS CHO THÔNG BÁO NỔI (TOAST) --- */
+        #toastBox {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform: translateX(120%);
+            z-index: 9999;
+        }
+        #toastBox.show { transform: translateX(0); }
+        #toastBox.success { background-color: #10b981; }
+        #toastBox.error { background-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <%- include('../partials/admin-sidebar') %>
+
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>Cập Nhật Nhanh Link YouTube</h2>
+            </div>
+
+            <div class="card" style="padding: 0; overflow-x: auto;">
+                <table class="table-public">
+                    <thead>
+                        <tr>
+                            <th>Tên Truyện</th>
+                            <th>Mã Rút Gọn</th>
+                            <th>Đường dẫn YouTube hiện tại</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% listTruyen.forEach(truyen => { %>
+                            <tr class="row-item">
+                                <td><strong><%= truyen.name %></strong></td>
+                                <td><span style="background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 0.85em;"><%= truyen.shortCode %></span></td>
+                                <td>
+                                    <input type="text" id="ytb-<%= truyen._id %>" class="input-public" 
+                                           value="<%= truyen.linkYtb || '' %>" placeholder="https://youtube.com/...">
+                                </td>
+                                <td>
+                                    <button id="btn-<%= truyen._id %>" class="btn-save-row" onclick="updateYtb('<%= truyen._id %>')">Lưu</button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="toastBox">Cập nhật thành công!</div>
+
+    <script>
+        let toastTimeout;
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toastBox');
+            toast.innerText = message;
+            toast.className = '';
+            toast.classList.add('show', type);
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        async function updateYtb(id) {
+            const input = document.getElementById(`ytb-${id}`);
+            const btn = document.getElementById(`btn-${id}`);
+            const value = input.value;
+            
+            const originalText = btn.innerText;
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/admin/quick-ytb/update/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ linkYtb: value })
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    showToast('✓ Cập nhật Link YouTube thành công!', 'success');
+                } else {
+                    showToast('⚠ Lỗi: ' + data.message, 'error');
+                }
+            } catch(err) {
+                console.error(err);
+                showToast('⚠ Lỗi kết nối mạng!', 'error');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

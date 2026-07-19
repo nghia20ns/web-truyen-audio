@@ -49,7 +49,8 @@ exports.getAddPage = async (req, res) => { // Thêm async
 // Xử lý Thêm Mới
 exports.postAdd = async (req, res) => {
     try {
-        const { name, shortCode, totalChapters, price, link, introduction, chunkSize, publishedChapters } = req.body;
+        // 1. Nhận thêm link và linkYtb từ req.body (bỏ trường link cũ)
+        const { name, shortCode, totalChapters, price, link, linkYtb, introduction, chunkSize, publishedChapters } = req.body;
 
         const exist = await Truyen.findOne({ shortCode });
         if (exist) {
@@ -66,10 +67,17 @@ exports.postAdd = async (req, res) => {
             } catch (e) { console.error('Lỗi upload ảnh:', e); }
         }
 
+        // 2. Tạo bản ghi truyện mới với link và linkYtb
         await Truyen.create({
-            name, shortCode, totalChapters, price, link, introduction,
+            name, 
+            shortCode, 
+            totalChapters, 
+            price, 
+            link: link || '', // Lưu link Drive
+            linkYtb: linkYtb || '',     // Lưu link Youtube
+            introduction,
             chunkSize: chunkSize || 10,
-            publishedChapters: publishedChapters || 0, // <-- Thêm dòng này
+            publishedChapters: publishedChapters || 0,
             image: imageUrl
         });
         res.redirect('/admin');
@@ -78,7 +86,6 @@ exports.postAdd = async (req, res) => {
         res.render('admin/form', { truyen: req.body, error: 'Lỗi: ' + err.message });
     }
 };
-
 // Hiển thị trang Sửa (QUAN TRỌNG: Kiểm tra hàm này)
 exports.getEditPage = async (req, res) => {
     try {
@@ -92,7 +99,8 @@ exports.getEditPage = async (req, res) => {
 // Xử lý Cập nhật
 exports.postEdit = async (req, res) => {
     try {
-        const { name, shortCode, totalChapters, price, link, introduction, chunkSize, publishedChapters } = req.body;
+        // 1. Nhận thêm link và linkYtb từ dữ liệu form gửi lên
+        const { name, shortCode, totalChapters, price, link, linkYtb, introduction, chunkSize, publishedChapters } = req.body;
         const exist = await Truyen.findOne({ shortCode, _id: { $ne: req.params.id } });
         
         if (exist) {
@@ -100,7 +108,18 @@ exports.postEdit = async (req, res) => {
             return res.render('admin/form', { truyen: { ...req.body, _id: req.params.id }, error: 'Mã này đã có người dùng!' });
         }
 
-        let updateData = { name, shortCode, totalChapters, price, link, introduction, chunkSize: chunkSize || 10, publishedChapters: publishedChapters || 0};
+        // 2. Cập nhật object dữ liệu mới để đẩy vào DB
+        let updateData = { 
+            name, 
+            shortCode, 
+            totalChapters, 
+            price, 
+            link: link || '', // Cập nhật link Drive
+            linkYtb: linkYtb || '',     // Cập nhật link Youtube
+            introduction, 
+            chunkSize: chunkSize || 10, 
+            publishedChapters: publishedChapters || 0
+        };
 
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file.path, { folder: 'web-truyen-audio' });
@@ -115,7 +134,6 @@ exports.postEdit = async (req, res) => {
         res.render('admin/form', { truyen: { ...req.body, _id: req.params.id }, error: 'Lỗi cập nhật: ' + err.message });
     }
 };
-
 exports.deleteTruyen = async (req, res) => {
     try {
         await Truyen.findByIdAndDelete(req.params.id);
@@ -286,5 +304,35 @@ exports.updatePublishedChapters = async (req, res) => {
         res.json({ success: true, message: "Cập nhật thành công" });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// [GET] Hiển thị trang cập nhật nhanh link youtube
+exports.getQuickYtbPage = async (req, res) => {
+    try {
+        // Lấy danh sách toàn bộ truyện xếp theo bảng chữ cái hoặc mới nhất
+        const listTruyen = await Truyen.find().sort({ _id: -1 });
+        res.render('admin/quick-ytb', { listTruyen, error: null });
+    } catch (err) {
+        res.status(500).send("Lỗi máy chủ: " + err.message);
+    }
+};
+
+// [POST] Xử lý cập nhật nhanh qua API (Không làm thay đổi mục hot)
+exports.postQuickYtbUpdate = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { linkYtb } = req.body;
+
+        // Chỉ cập nhật duy nhất trường linkYtb. 
+        // Không chỉnh sửa trường updatedAt hoặc các trường nổi bật hot nếu hệ thống của bạn có sử dụng.
+        await Truyen.findByIdAndUpdate(id, 
+            { $set: { linkYtb: linkYtb || '' } },
+            { timestamps: false } // Ngăn mongoose tự động làm mới thời gian update (nếu schema có bật timestamps)
+        );
+
+        return res.json({ success: true, message: 'Cập nhật thành công!' });
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
     }
 };

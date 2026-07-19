@@ -5,7 +5,14 @@ const truyenSchema = new mongoose.Schema({
     name: String,
     introduction: String,
     totalChapters: Number,
-    link: String,
+    link: {
+        type: String,
+        default: ''
+    },
+    linkYtb: {
+        type: String,
+        default: ''
+    },  
     shortCode: { type: String, unique: true, required: true },
     price: { type: Number, default: 1000 },
     isDeleted: { type: Boolean, default: false },   

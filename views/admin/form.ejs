@@ -28,14 +28,13 @@
                 
                 <label>Tên Truyện:</label>
                 <input type="text" name="name" value="<%= truyen ? truyen.name : '' %>" required>
+                
                 <label>Thể loại / Danh mục:</label>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
                     <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
                         <% categories.forEach(cat => { 
-                            // Kiểm tra nếu đang sửa truyện thì tick sẵn các danh mục cũ
                             let isChecked = false;
                             if (truyen && truyen.categories && truyen.categories.length > 0) {
-                                // truyen.categories có thể là mảng object hoặc string tùy lúc load
                                 isChecked = truyen.categories.some(c => c.toString() === cat._id.toString() || c._id.toString() === cat._id.toString());
                             }
                         %>
@@ -48,6 +47,7 @@
                         <p>Chưa có danh mục nào. <a href="/admin/categories/add">Thêm ngay</a></p>
                     <% } %>
                 </div>
+
                 <label>Ảnh bìa (Nếu muốn thay đổi):</label>
                 <input type="file" name="image" accept="image/*" style="padding: 10px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
                 
@@ -75,8 +75,13 @@
                 <input type="number" name="publishedChapters" value="<%= truyen && truyen.publishedChapters ? truyen.publishedChapters : 0 %>" min="0" required>
                 <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 10px;">* Những tập này sẽ tự động được bỏ qua khi chia gói bán. Ví dụ: Đã up 2 tập thì gói đầu bán từ tập 3.</small>
                 
-                <label>Link Truyện (Gốc/Youtube):</label>
-                <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://...">
+                <!-- BẮT ĐẦU ĐOẠN ĐÃ ĐƯỢC SỬA LẠI THÀNH ĐÔI LINK -->
+                <label>Link Google Drive:</label>
+                <input type="text" name="link" value="<%= truyen ? truyen.link : '' %>" placeholder="https://drive.google.com/...">
+
+                <label>Link YouTube:</label>
+                <input type="text" name="linkYtb" value="<%= truyen ? truyen.linkYtb : '' %>" placeholder="https://youtube.com/...">
+                <!-- KẾT THÚC ĐOẠN ĐÃ ĐƯỢC SỬA LẠI -->
 
                 <label>Giới thiệu:</label>
                 <textarea name="introduction" rows="5"><%= truyen ? truyen.introduction : '' %></textarea>
