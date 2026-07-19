@@ -287,7 +287,7 @@ exports.toggleOrderStatus = async (req, res) => {
 exports.getPublishedChaptersPage = async (req, res) => {
     try {
         // Lấy tất cả truyện, ưu tiên truyện mới cập nhật lên đầu
-        const listTruyen = await Truyen.find().sort({ updatedAt: -1 });
+        const listTruyen = await Truyen.find().sort({ _id: -1 });
         res.render('admin/published-chapters', { listTruyen });
     } catch (err) {
         res.status(500).send('Lỗi tải danh sách: ' + err.message);
