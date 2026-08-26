@@ -16,17 +16,17 @@
             padding: 0;
         }
 
-        /* Khung tìm kiếm có nút bấm */
+        /* --- KHUNG TÌM KIẾM --- */
         .search-container {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .search-input {
             flex: 1;
             box-sizing: border-box;
-            padding: 11px 16px;
+            padding: 12px 16px;
             border: 1.5px solid #cbd5e1;
             border-radius: 8px;
             font-size: 14px;
@@ -41,13 +41,12 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Nút Tra cứu */
         .btn-search {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 0 20px;
+            padding: 0 22px;
             background: #2563eb;
             color: #ffffff;
             border: none;
@@ -56,8 +55,8 @@
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
-            transition: background 0.15s ease;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+            transition: all 0.15s ease;
         }
 
         .btn-search:hover {
@@ -68,40 +67,46 @@
             transform: scale(0.98);
         }
 
-        /* Khung cuộn ngang bảng */
-        .table-responsive {
+        /* --- BẢNG MẶC ĐỊNH CHO PC --- */
+        .table-container {
             width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
         }
 
-        .custom-table {
+        .admin-table {
             width: 100%;
-            min-width: 650px;
             border-collapse: collapse;
-            background: #ffffff;
-        }
-
-        .custom-table th {
-            background: #f1f5f9;
-            color: #475569;
-            font-weight: 600;
-            font-size: 13px;
-            padding: 12px 14px;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
         }
 
-        .custom-table td {
-            padding: 12px 14px;
+        .admin-table th {
+            background: #f8fafc;
+            padding: 14px 18px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #475569;
+            font-weight: 700;
+            font-size: 13.5px;
+            white-space: nowrap;
+        }
+
+        .admin-table td {
+            padding: 14px 18px;
             border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
+            color: #334155;
         }
 
-        /* Cột 1: Tên truyện */
+        .admin-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* --- CÁC PHẦN TỬ HIỂN THỊ DỮ LIỆU --- */
         .story-name-box {
-            max-width: 200px;
+            max-width: 240px;
             max-height: 52px;
             overflow-y: auto;
             font-size: 13px;
@@ -111,15 +116,16 @@
             padding-right: 4px;
             word-break: break-word;
         }
+
         .story-name-box::-webkit-scrollbar {
             width: 3px;
         }
+
         .story-name-box::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 3px;
         }
 
-        /* Cột 2: Danh sách gói tập */
         .chapter-grid-compact {
             display: flex;
             flex-wrap: wrap;
@@ -132,8 +138,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 6px 10px;
-            min-width: 58px;
+            padding: 6px 9px;
+            min-width: 56px;
             border: 1.5px solid #e2e8f0;
             border-radius: 6px;
             background: #ffffff;
@@ -148,8 +154,8 @@
         }
 
         .chapter-option .chk-indicator {
-            width: 14px;
-            height: 14px;
+            width: 13px;
+            height: 13px;
             border: 1.5px solid #94a3b8;
             border-radius: 3px;
             margin-bottom: 3px;
@@ -178,19 +184,18 @@
         }
 
         .chapter-option .cp-num {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             color: #1e1b4b;
         }
 
         .chapter-option .cp-price {
-            font-size: 10.5px;
+            font-size: 10px;
             color: #d97706;
             font-weight: 600;
             margin-top: 1px;
         }
 
-        /* Cột 3: Tổng giá */
         .total-price-text {
             font-size: 14px;
             font-weight: 700;
@@ -198,12 +203,11 @@
             white-space: nowrap;
         }
 
-        /* Cột 4: Nút Google Drive */
         .btn-drive-single {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 5px;
             padding: 8px 14px;
             background: #0284c7;
             color: #ffffff !important;
@@ -227,20 +231,111 @@
             box-shadow: none;
         }
 
+        /* =========================================
+           GIAO DIỆN THẺ (CARD) TỐI ƯU CHO ĐIỆN THOẠI
+           ========================================= */
         @media (max-width: 768px) {
             .admin-content {
                 padding: 12px !important;
             }
+
             .content-header h2 {
                 font-size: 1.25rem;
             }
+
+            .search-container {
+                gap: 6px;
+            }
+
             .search-input {
-                font-size: 13.5px;
+                font-size: 13px;
                 padding: 10px 12px;
             }
+
             .btn-search {
                 padding: 0 14px;
                 font-size: 13px;
+            }
+
+            .table-container {
+                background: transparent;
+                box-shadow: none;
+                border: none;
+            }
+
+            .admin-table,
+            .admin-table tbody,
+            .admin-table tr,
+            .admin-table td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .admin-table thead {
+                display: none;
+            }
+
+            .admin-table tr {
+                background: #ffffff;
+                margin-bottom: 16px;
+                border: 1px solid #cbd5e1;
+                border-radius: 12px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                padding: 12px 14px;
+            }
+
+            .admin-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px dashed #e2e8f0;
+                gap: 12px;
+                text-align: right;
+            }
+
+            .admin-table td:last-child {
+                border-bottom: none;
+                justify-content: flex-end;
+                padding-bottom: 4px;
+                margin-top: 4px;
+            }
+
+            .admin-table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                font-size: 12.5px;
+                color: #64748b;
+                text-align: left;
+                flex-shrink: 0;
+            }
+
+            .td-content {
+                flex-grow: 1;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+                word-break: break-word;
+            }
+
+            .story-name-box {
+                max-width: 100%;
+                max-height: none;
+                text-align: right;
+                font-size: 13.5px;
+            }
+
+            .chapter-grid-compact {
+                justify-content: flex-end;
+                max-width: 100%;
+            }
+
+            .btn-drive-single {
+                width: 100%;
+                padding: 10px 0;
             }
         }
     </style>
@@ -254,7 +349,7 @@
                 <span id="searchStatus" style="font-size: 13px; color: #64748b;">Nhập từ khóa và bấm Tra cứu</span>
             </div>
 
-            <!-- Khung tìm kiếm kèm nút bấm -->
+            <!-- Khung tìm kiếm -->
             <div class="search-container">
                 <input 
                     type="text" 
@@ -269,26 +364,25 @@
                 </button>
             </div>
 
-            <div class="card" style="border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); overflow: hidden;">
-                <div class="table-responsive">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 24%;">Tên Truyện</th>
-                                <th style="width: 44%;">Chọn Gói Các Tập</th>
-                                <th style="width: 16%;">Tổng Giá</th>
-                                <th style="width: 16%;">Google Drive</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultBody">
-                            <tr>
-                                <td colspan="4" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 13px;">
-                                    Nhập từ khóa vào ô trên và bấm "Tra Cứu" hoặc nhấn phím Enter
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Khung bảng tự chuyển sang Card trên Mobile -->
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 24%;">Tên Truyện</th>
+                            <th style="width: 44%;">Chọn Gói Các Tập</th>
+                            <th style="width: 16%;">Tổng Giá</th>
+                            <th style="width: 16%;">Google Drive</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody">
+                        <tr>
+                            <td colspan="4" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 13px; border-bottom: none; display: table-cell;">
+                                Nhập từ khóa vào ô trên và bấm "Tra Cứu" hoặc nhấn phím Enter
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
     </div>
@@ -300,14 +394,13 @@
         const searchStatus = document.getElementById('searchStatus');
         let storiesStore = {};
 
-        // Hàm thực thi tìm kiếm
         function performSearch() {
             const keyword = searchInput.value.trim();
 
             if (!keyword) {
                 resultBody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 13px;">
+                        <td colspan="4" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 13px; border-bottom: none; display: table-cell;">
                             Vui lòng nhập tên truyện hoặc từ viết tắt để tra cứu
                         </td>
                     </tr>`;
@@ -328,7 +421,7 @@
                     if (!res.success || !res.data || res.data.length === 0) {
                         resultBody.innerHTML = `
                             <tr>
-                                <td colspan="4" style="padding: 25px; text-align: center; color: #ef4444; font-size: 13px;">
+                                <td colspan="4" style="padding: 25px; text-align: center; color: #ef4444; font-size: 13px; border-bottom: none; display: table-cell;">
                                     Không tìm thấy truyện phù hợp với từ khóa!
                                 </td>
                             </tr>`;
@@ -369,23 +462,31 @@
 
                         html += `
                             <tr>
-                                <td>
-                                    <div class="story-name-box" title="${item.tenTruyen}">
-                                        ${item.tenTruyen}
+                                <td data-label="Tên Truyện">
+                                    <div class="td-content">
+                                        <div class="story-name-box" title="${item.tenTruyen}">
+                                            ${item.tenTruyen}
+                                        </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="chapter-grid-compact" id="chapter-list-${item._id}">
-                                        ${partsHtml}
+                                <td data-label="Gói Tập">
+                                    <div class="td-content">
+                                        <div class="chapter-grid-compact" id="chapter-list-${item._id}">
+                                            ${partsHtml}
+                                        </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="total-price-text" id="display-total-${item._id}">
-                                        0đ
+                                <td data-label="Tổng Giá">
+                                    <div class="td-content">
+                                        <div class="total-price-text" id="display-total-${item._id}">
+                                            0đ
+                                        </div>
                                     </div>
                                 </td>
-                                <td>
-                                    ${driveBtnHtml}
+                                <td data-label="Drive">
+                                    <div class="td-content" style="width: 100%;">
+                                        ${driveBtnHtml}
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -405,10 +506,8 @@
                 });
         }
 
-        // Sự kiện click nút Tra Cứu
         btnDoSearch.addEventListener('click', performSearch);
 
-        // Sự kiện nhấn phím Enter trong ô input
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
