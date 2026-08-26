@@ -75,4 +75,12 @@ router.post('/published-chapters/update/:id', requireAuth, adminController.updat
 // Thêm 2 dòng này vào khu vực khai báo các route admin của bạn
 router.get('/quick-ytb', adminController.getQuickYtbPage);
 router.post('/quick-ytb/update/:id', adminController.postQuickYtbUpdate);
+
+// Route hiển thị giao diện Tra cứu nhanh
+router.get('/quick-search', adminController.renderQuickSearch);
+
+// Route API trả kết quả AJAX
+router.get('/api/quick-search', adminController.apiQuickSearch);
+
+
 module.exports = router;

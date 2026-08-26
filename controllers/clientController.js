@@ -3,87 +3,170 @@ const Category = require('../models/Category');
 const Order = require('../models/Order'); // Model lưu giỏ hàng
 const mongoose = require('mongoose');
 
-// 1. Trang chủ + Tìm kiếm + Lọc theo Danh mục (Tối ưu hóa cuộn vô hạn chống sót truyện)
+// Hàm chuẩn hóa tiếng Việt & ký tự đặc biệt
+function normalizeText(str) {
+    if (!str) return '';
+    return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'd')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+// Hàm lấy chữ cái đầu (acronym)
+function getAcronym(str) {
+    const clean = normalizeText(str);
+    if (!clean) return '';
+    return clean.split(' ').map(w => w[0]).join('');
+}
+
+// 1. Trang chủ + Tìm kiếm linh hoạt + Lọc theo Danh mục
 exports.getHomePage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 16; // Số lượng truyện tải mỗi lượt (Bạn có thể đổi thành 12 tùy ý)
+        const limit = 16;
         const skip = (page - 1) * limit;
-        
-        const keyword = req.query.q || ''; 
-        const catSlug = req.query.cat || ''; 
 
-        // Lấy danh sách Categories để hiển thị menu
-        const allCategories = await Category.find(); 
+        const rawKeyword = (req.query.q || req.query.keyword || '').trim();
+        const catSlug = req.query.cat || '';
 
-        // Xây dựng bộ lọc dữ liệu mặc định
-        let filter = { isDeleted: false }; 
+        // Lấy danh sách Categories & Danh sách Hot
+        const [allCategories, listHot] = await Promise.all([
+            Category.find(),
+            Truyen.find({ isHot: true, isDeleted: false })
+                .select('name title tenTruyen image hinhAnh totalChapters price gia')
+                .sort({ updatedAt: -1 })
+                .limit(10)
+                .lean()
+        ]);
 
-        // Nếu người dùng chọn lọc theo danh mục
+        // Điều kiện danh mục (nếu có)
+        let baseFilter = { isDeleted: false };
         let currentCat = null;
         if (catSlug) {
             currentCat = await Category.findOne({ slug: catSlug });
             if (currentCat) {
-                filter.categories = currentCat._id; 
+                baseFilter.categories = currentCat._id;
             }
         }
 
-        // Nếu người dùng sử dụng thanh tìm kiếm trực tiếp (Live Search)
-        if (keyword) {
-            filter = {
-                $and: [
-                    filter, 
-                    { 
-                        $or: [ 
-                            { name: { $regex: keyword, $options: 'i' } },
-                            { introduction: { $regex: keyword, $options: 'i' } },
-                        ]
+        let listTruyen = [];
+        let totalStories = 0;
+
+        // TRƯỜNG HỢP 1: Có từ khóa tìm kiếm (Áp dụng thuật toán tính điểm thông minh)
+        if (rawKeyword) {
+            const normalizedKey = normalizeText(rawKeyword);
+            const searchTokens = normalizedKey.split(' ').filter(Boolean);
+            const compactKey = normalizedKey.replace(/\s+/g, '');
+
+            // Lấy danh sách truyện theo danh mục để lọc và chấm điểm
+            const candidateStories = await Truyen.find(baseFilter)
+                .populate('categories', 'name slug')
+                .select('-link -linkDrive -driveLink')
+                .lean();
+
+            const scoredResults = [];
+
+            for (const story of candidateStories) {
+                const name = story.name || story.tenTruyen || story.title || '';
+                const author = story.author || story.tacGia || '';
+                const intro = story.introduction || story.moTa || story.description || '';
+                const customShortCode = story.shortCode || '';
+
+                const normName = normalizeText(name);
+                const normAuthor = normalizeText(author);
+                const normIntro = normalizeText(intro);
+                const acronym = getAcronym(name);
+
+                let score = 0;
+
+                // A. Khớp chính xác cụm từ
+                if (normName === normalizedKey) {
+                    score += 100;
+                } else if (normName.startsWith(normalizedKey)) {
+                    score += 60;
+                } else if (normName.includes(normalizedKey)) {
+                    score += 40;
+                }
+
+                // B. Khớp viết tắt (ShortCode / Acronym)
+                if (customShortCode && normalizeText(customShortCode) === compactKey) {
+                    score += 90;
+                } else if (acronym === compactKey) {
+                    score += 80;
+                } else if (acronym.includes(compactKey) && compactKey.length >= 2) {
+                    score += 45;
+                }
+
+                // C. Khớp theo từng từ khóa (Token Matching)
+                let tokenMatches = 0;
+                for (const token of searchTokens) {
+                    if (normName.includes(token)) {
+                        tokenMatches += 2;
+                    } else if (normAuthor.includes(token) || normIntro.includes(token)) {
+                        tokenMatches += 1;
                     }
-                ]
-            };
+                }
+
+                if (tokenMatches > 0) {
+                    score += (tokenMatches / (searchTokens.length * 2)) * 30;
+                }
+
+                if (score > 0) {
+                    scoredResults.push({ story, score });
+                }
+            }
+
+            // Sắp xếp theo điểm liên quan cao nhất
+            scoredResults.sort((a, b) => b.score - a.score);
+
+            totalStories = scoredResults.length;
+            listTruyen = scoredResults.slice(skip, skip + limit).map(item => item.story);
+
+        } else {
+            // TRƯỜNG HỢP 2: Xem bình thường (Không tìm kiếm -> query trực tiếp tối ưu phân trang)
+            const [total, stories] = await Promise.all([
+                Truyen.countDocuments(baseFilter),
+                Truyen.find(baseFilter)
+                    .populate('categories', 'name slug')
+                    .select('-link -linkDrive -driveLink -shortCode')
+                    .skip(skip)
+                    .limit(limit)
+                    .sort({ createdAt: -1, _id: -1 })
+                    .lean()
+            ]);
+
+            totalStories = total;
+            listTruyen = stories;
         }
 
-        // CHẠY SONG SONG BA TRUY VẤN: Đếm tổng số truyện, Lấy danh sách phân trang, và Lấy danh sách truyện HOT
-        // Việc thêm `_id: -1` vào hàm .sort giúp cố định thứ tự tuyệt đối, giải quyết triệt để lỗi sót truyện khi lướt cuộn
-        const [totalStories, listTruyen, listHot] = await Promise.all([
-            Truyen.countDocuments(filter),
-            Truyen.find(filter)
-                .populate('categories', 'name slug')
-                .select('-link -shortCode')
-                .skip(skip)
-                .limit(limit)
-                .sort({ createdAt: -1, _id: -1 }), // <-- CỐ ĐỊNH THỨ TỰ TUYỆT ĐỐI CHỐNG SÓT/TRÙNG
-            Truyen.find({ isHot: true, isDeleted: false })
-                .select('name image totalChapters price')
-                .sort({ updatedAt: -1 }) // Ưu tiên những truyện mới được tick Hot lên đầu
-                .limit(10) // Lấy tối đa 10 truyện Hot hiển thị ở thanh trượt ngang
-        ]);
-
-        // Tính toán tổng số trang dựa trên lượng dữ liệu thực tế đã lọc
         const totalPages = Math.ceil(totalStories / limit);
 
-        // Nếu Client gửi yêu cầu AJAX lấy thêm dữ liệu khi lướt cuộn (type=json)
+        // Phản hồi AJAX cho cuộn vô hạn
         if (req.query.type === 'json') {
             return res.json({ listTruyen, currentPage: page, totalPages, totalStories });
         }
 
-        // Nếu người dùng truy cập trực tiếp bằng trình duyệt (Nạp giao diện ban đầu)
-        res.render('index', { 
-            listTruyen, 
-            keyword, 
-            currentPage: page, 
+        // Render giao diện SSR ban đầu
+        res.render('index', {
+            listTruyen,
+            keyword: rawKeyword,
+            currentPage: page,
             totalPages,
-            allCategories,      
+            allCategories,
             currentCatSlug: catSlug,
             listHot
-        }); 
+        });
 
     } catch (e) {
         console.error("Lỗi tại getHomePage:", e);
         res.status(500).send("Lỗi Server: " + e.message);
     }
 };
-
 // 2. Chi tiết truyện
 exports.getTruyenDetail = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.send("Lỗi ID");
