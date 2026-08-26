@@ -1,34 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tra Cứu Nhanh Truyện</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        .search-container {
-            margin-bottom: 20px;
-        }
-        .search-input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-        }
-        .search-input:focus {
-            border-color: #3b82f6;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #1e293b;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
         }
 
-        /* 1. Tên truyện font nhỏ gọn, có thanh trượt chống tràn */
-        .story-name-box {
-            max-width: 220px;
-            max-height: 55px;
-            overflow-y: auto;
-            font-size: 12px;
-            line-height: 1.4;
+        /* Khung tìm kiếm có nút bấm */
+        .search-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            box-sizing: border-box;
+            padding: 11px 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Nút Tra cứu */
+        .btn-search {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 20px;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
-            color: #1e293b;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+            transition: background 0.15s ease;
+        }
+
+        .btn-search:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-search:active {
+            transform: scale(0.98);
+        }
+
+        /* Khung cuộn ngang bảng */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+        }
+
+        .custom-table {
+            width: 100%;
+            min-width: 650px;
+            border-collapse: collapse;
+            background: #ffffff;
+        }
+
+        .custom-table th {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .custom-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        /* Cột 1: Tên truyện */
+        .story-name-box {
+            max-width: 200px;
+            max-height: 52px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.45;
+            font-weight: 600;
+            color: #0f172a;
             padding-right: 4px;
             word-break: break-word;
         }
@@ -40,31 +119,34 @@
             border-radius: 3px;
         }
 
-        /* 2. Style các ô gói tập chuẩn detail.ejs */
+        /* Cột 2: Danh sách gói tập */
         .chapter-grid-compact {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
             max-width: 380px;
         }
+
         .chapter-option {
             display: inline-flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 6px 8px;
+            padding: 6px 10px;
             min-width: 58px;
-            border: 1.5px solid #cbd5e1;
+            border: 1.5px solid #e2e8f0;
             border-radius: 6px;
             background: #ffffff;
             cursor: pointer;
             user-select: none;
             position: relative;
-            transition: all 0.15s ease;
+            transition: all 0.15s ease-in-out;
         }
+
         .chapter-option input.part-checkbox {
             display: none;
         }
+
         .chapter-option .chk-indicator {
             width: 14px;
             height: 14px;
@@ -74,63 +156,92 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
+            background: #ffffff;
+            transition: all 0.15s;
         }
+
         .chapter-option.selected {
-            background-color: #e0e7ff;
+            background-color: #eef2ff;
             border-color: #4f46e5;
         }
+
         .chapter-option.selected .chk-indicator {
             background-color: #4f46e5;
             border-color: #4f46e5;
         }
+
         .chapter-option.selected .chk-indicator::after {
             content: "✓";
-            color: #fff;
+            color: #ffffff;
             font-size: 10px;
             font-weight: bold;
         }
+
         .chapter-option .cp-num {
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #1e1b4b;
         }
+
         .chapter-option .cp-price {
-            font-size: 10px;
+            font-size: 10.5px;
             color: #d97706;
             font-weight: 600;
             margin-top: 1px;
         }
 
-        /* 3. Giá tương ứng */
+        /* Cột 3: Tổng giá */
         .total-price-text {
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 700;
             color: #059669;
             white-space: nowrap;
         }
 
-        /* 4. Nút đi đến drive duy nhất */
+        /* Cột 4: Nút Google Drive */
         .btn-drive-single {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 4px;
-            padding: 6px 12px;
+            padding: 8px 14px;
             background: #0284c7;
             color: #ffffff !important;
-            border-radius: 4px;
+            border-radius: 6px;
             text-decoration: none;
             font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(2, 132, 199, 0.2);
+            transition: background 0.15s;
         }
+
         .btn-drive-single:hover {
             background: #0369a1;
         }
+
         .btn-drive-single.disabled {
             background: #94a3b8;
             pointer-events: none;
             opacity: 0.7;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            .admin-content {
+                padding: 12px !important;
+            }
+            .content-header h2 {
+                font-size: 1.25rem;
+            }
+            .search-input {
+                font-size: 13.5px;
+                padding: 10px 12px;
+            }
+            .btn-search {
+                padding: 0 14px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
@@ -140,10 +251,10 @@
         <main class="admin-content">
             <div class="content-header">
                 <h2>⚡ Tra Cứu Nhanh Truyện</h2>
-                <span id="searchStatus" style="font-size: 13px; color: #64748b;">Nhập từ khóa để tra cứu</span>
+                <span id="searchStatus" style="font-size: 13px; color: #64748b;">Nhập từ khóa và bấm Tra cứu</span>
             </div>
 
-            <!-- Khung tìm kiếm AJAX -->
+            <!-- Khung tìm kiếm kèm nút bấm -->
             <div class="search-container">
                 <input 
                     type="text" 
@@ -153,149 +264,158 @@
                     autofocus
                     autocomplete="off"
                 >
+                <button type="button" id="btnDoSearch" class="btn-search">
+                    Tra Cứu
+                </button>
             </div>
 
-            <div class="card">
-                <table style="width:100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background:#f1f5f9; text-align:left;">
-                            <th style="padding:10px; width: 22%;">Tên Truyện</th>
-                            <th style="padding:10px; width: 44%;">Chọn Gói Các Tập</th>
-                            <th style="padding:10px; width: 18%;">Tổng Giá</th>
-                            <th style="padding:10px; width: 16%;">Google Drive</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultBody">
-                        <tr>
-                            <td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8; font-size: 13px;">
-                                Gõ tên truyện hoặc từ viết tắt vào ô trên để tìm nhanh
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card" style="border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 24%;">Tên Truyện</th>
+                                <th style="width: 44%;">Chọn Gói Các Tập</th>
+                                <th style="width: 16%;">Tổng Giá</th>
+                                <th style="width: 16%;">Google Drive</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultBody">
+                            <tr>
+                                <td colspan="4" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 13px;">
+                                    Nhập từ khóa vào ô trên và bấm "Tra Cứu" hoặc nhấn phím Enter
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
         const searchInput = document.getElementById('quickSearchInput');
+        const btnDoSearch = document.getElementById('btnDoSearch');
         const resultBody = document.getElementById('resultBody');
         const searchStatus = document.getElementById('searchStatus');
-        let timer = null;
-
         let storiesStore = {};
 
-        searchInput.addEventListener('input', function() {
-            const keyword = this.value.trim();
-            clearTimeout(timer);
+        // Hàm thực thi tìm kiếm
+        function performSearch() {
+            const keyword = searchInput.value.trim();
 
             if (!keyword) {
                 resultBody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8; font-size: 13px;">
-                            Gõ tên truyện hoặc từ viết tắt vào ô trên để tìm nhanh
+                        <td colspan="4" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 13px;">
+                            Vui lòng nhập tên truyện hoặc từ viết tắt để tra cứu
                         </td>
                     </tr>`;
-                searchStatus.innerText = 'Nhập từ khóa để tra cứu';
+                searchStatus.innerText = 'Nhập từ khóa và bấm Tra cứu';
                 return;
             }
 
-            searchStatus.innerText = 'Đang tìm kiếm...';
+            searchStatus.innerText = 'Đang tra cứu dữ liệu...';
+            btnDoSearch.disabled = true;
+            btnDoSearch.innerText = 'Đang tìm...';
 
-            timer = setTimeout(() => {
-                fetch(`/admin/api/quick-search?keyword=${encodeURIComponent(keyword)}`)
-                    .then(res => res.json())
-                    .then(res => {
-                        if (!res.success || !res.data || res.data.length === 0) {
-                            resultBody.innerHTML = `
-                                <tr>
-                                    <td colspan="4" style="padding: 25px; text-align: center; color: #ef4444; font-size: 13px;">
-                                        Không tìm thấy truyện phù hợp với từ khóa!
-                                    </td>
-                                </tr>`;
-                            searchStatus.innerText = 'Tìm thấy: 0 truyện';
-                            return;
-                        }
+            fetch(`/admin/api/quick-search?keyword=${encodeURIComponent(keyword)}`)
+                .then(res => res.json())
+                .then(res => {
+                    btnDoSearch.disabled = false;
+                    btnDoSearch.innerText = 'Tra Cứu';
 
-                        searchStatus.innerText = `Tìm thấy: ${res.data.length} truyện`;
-                        storiesStore = {};
+                    if (!res.success || !res.data || res.data.length === 0) {
+                        resultBody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="padding: 25px; text-align: center; color: #ef4444; font-size: 13px;">
+                                    Không tìm thấy truyện phù hợp với từ khóa!
+                                </td>
+                            </tr>`;
+                        searchStatus.innerText = 'Tìm thấy: 0 truyện';
+                        return;
+                    }
 
-                        let html = '';
-                        res.data.forEach(item => {
-                            storiesStore[item._id] = item;
+                    searchStatus.innerText = `Tìm thấy: ${res.data.length} truyện`;
+                    storiesStore = {};
 
-                            // Render danh sách chapter-option theo mẫu detail.ejs
-                            let partsHtml = '';
-                            item.parts.forEach((part, index) => {
-                                const isDefaultChecked = index === 0 ? 'checked' : '';
-                                const isDefaultSelected = index === 0 ? 'selected' : '';
+                    let html = '';
+                    res.data.forEach(item => {
+                        storiesStore[item._id] = item;
 
-                                partsHtml += `
-                                    <label class="chapter-option ${isDefaultSelected}" id="label-${item._id}-${part.code}">
-                                        <input type="checkbox" 
-                                               class="part-checkbox part-chk-${item._id}" 
-                                               value="${part.code}" 
-                                               data-price="${part.price}" 
-                                               ${isDefaultChecked}
-                                               onchange="toggleSelection(this, '${item._id}', '${part.code}')">
-                                        <div class="chk-indicator"></div>
-                                        <span class="cp-num">${part.name}</span>
-                                        <span class="cp-price">${part.priceText}đ</span>
-                                    </label>
-                                `;
-                            });
+                        let partsHtml = '';
+                        item.parts.forEach((part, index) => {
+                            const isDefaultChecked = index === 0 ? 'checked' : '';
+                            const isDefaultSelected = index === 0 ? 'selected' : '';
 
-                            // Nút duy nhất "Đi đến Drive"
-                            const driveBtnHtml = item.linkDrive 
-                                ? `<a href="${item.linkDrive}" target="_blank" class="btn-drive-single">Đi đến Drive ↗</a>`
-                                : `<a href="javascript:void(0)" class="btn-drive-single disabled">Chưa có link</a>`;
-
-                            html += `
-                                <tr style="border-bottom:1px solid #eee;">
-                                    <!-- 1. Tên truyện -->
-                                    <td style="padding:10px;">
-                                        <div class="story-name-box" title="${item.tenTruyen}">
-                                            ${item.tenTruyen}
-                                        </div>
-                                    </td>
-
-                                    <!-- 2. Chọn gói tập -->
-                                    <td style="padding:10px;">
-                                        <div class="chapter-grid-compact" id="chapter-list-${item._id}">
-                                            ${partsHtml}
-                                        </div>
-                                    </td>
-
-                                    <!-- 3. Giá tương ứng -->
-                                    <td style="padding:10px;">
-                                        <div class="total-price-text" id="display-total-${item._id}">
-                                            0đ
-                                        </div>
-                                    </td>
-
-                                    <!-- 4. Nút Drive duy nhất -->
-                                    <td style="padding:10px;">
-                                        ${driveBtnHtml}
-                                    </td>
-                                </tr>
+                            partsHtml += `
+                                <label class="chapter-option ${isDefaultSelected}" id="label-${item._id}-${part.code}">
+                                    <input type="checkbox" 
+                                           class="part-checkbox part-chk-${item._id}" 
+                                           value="${part.code}" 
+                                           data-price="${part.price}" 
+                                           ${isDefaultChecked}
+                                           onchange="toggleSelection(this, '${item._id}', '${part.code}')">
+                                    <div class="chk-indicator"></div>
+                                    <span class="cp-num">${part.name}</span>
+                                    <span class="cp-price">${part.priceText}đ</span>
+                                </label>
                             `;
                         });
 
-                        resultBody.innerHTML = html;
+                        const driveBtnHtml = item.linkDrive 
+                            ? `<a href="${item.linkDrive}" target="_blank" class="btn-drive-single">Đi đến Drive ↗</a>`
+                            : `<a href="javascript:void(0)" class="btn-drive-single disabled">Chưa có link</a>`;
 
-                        // Tính giá khởi tạo cho từng truyện
-                        res.data.forEach(item => {
-                            recalculateStory(item._id);
-                        });
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        searchStatus.innerText = 'Lỗi tra cứu';
+                        html += `
+                            <tr>
+                                <td>
+                                    <div class="story-name-box" title="${item.tenTruyen}">
+                                        ${item.tenTruyen}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="chapter-grid-compact" id="chapter-list-${item._id}">
+                                        ${partsHtml}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="total-price-text" id="display-total-${item._id}">
+                                        0đ
+                                    </div>
+                                </td>
+                                <td>
+                                    ${driveBtnHtml}
+                                </td>
+                            </tr>
+                        `;
                     });
-            }, 250);
+
+                    resultBody.innerHTML = html;
+
+                    res.data.forEach(item => {
+                        recalculateStory(item._id);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    btnDoSearch.disabled = false;
+                    btnDoSearch.innerText = 'Tra Cứu';
+                    searchStatus.innerText = 'Lỗi tra cứu';
+                });
+        }
+
+        // Sự kiện click nút Tra Cứu
+        btnDoSearch.addEventListener('click', performSearch);
+
+        // Sự kiện nhấn phím Enter trong ô input
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
         });
 
-        // Hàm xử lý chọn checkbox từng gói tập
         function toggleSelection(checkbox, storyId, code) {
             const label = document.getElementById(`label-${storyId}-${code}`);
             if (label) {
@@ -308,7 +428,6 @@
             recalculateStory(storyId);
         }
 
-        // Tính lại tổng tiền của các gói đang chọn
         function recalculateStory(storyId) {
             const story = storiesStore[storyId];
             if (!story) return;
@@ -326,7 +445,8 @@
 
             const totalEl = document.getElementById(`display-total-${storyId}`);
             if (totalEl) {
-            totalEl.innerText = total > 0 ? Number(total).toLocaleString('vi-VN') + 'đ' : '0đ';            }
+                totalEl.innerText = total > 0 ? Number(total).toLocaleString('vi-VN') + 'đ' : '0đ';
+            }
         }
     </script>
 </body>
