@@ -391,6 +391,7 @@ function getAcronym(str) {
     return clean.split(' ').map(w => w[0]).join('');
 }
 
+// Thay thế hàm apiQuickSearch trong controllers/adminController.js
 exports.apiQuickSearch = async (req, res) => {
     try {
         const rawKey = (req.query.keyword || '').trim();
@@ -398,96 +399,56 @@ exports.apiQuickSearch = async (req, res) => {
             return res.json({ success: true, total: 0, data: [] });
         }
 
-        const normalizedKey = normalizeText(rawKey);
-        const searchTokens = normalizedKey.split(' ').filter(Boolean); // Tách từng từ đơn
-        const compactKey = normalizedKey.replace(/\s+/g, ''); // Từ khóa dính liền (dùng cho viết tắt)
+        // Tạo Regex an toàn
+        const safeKey = rawKey.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        const likeRegex = new RegExp(safeKey, 'i');
 
-        // 1. Lấy toàn bộ danh sách truyện hoạt động (chỉ load các field cần thiết để tối ưu RAM)
-        const allStories = await Truyen.find({ isDeleted: { $ne: true } })
-            .select('tenTruyen title name parts danhSachGoi packages goiTap totalChapters tongSoTap tongSoChuong chunkSize price gia publishedChapters linkDrive driveLink link tacGia author theLoai shortCode')
-            .lean();
+        // Regex tìm viết tắt (VD: "ttnt" -> "t.*t.*n.*t")
+        const acronymPattern = rawKey.replace(/[^a-zA-Z0-9]/g, '').split('').join('.*');
+        const acronymRegex = acronymPattern ? new RegExp(acronymPattern, 'i') : null;
 
-        // 2. Chấm điểm độ khớp (Scoring System)
-        const scoredResults = [];
+        // Query trực tiếp từ MongoDB (tận dụng index, không load toàn bộ DB vào RAM)
+        const orConditions = [
+            { tenTruyen: likeRegex },
+            { title: likeRegex },
+            { name: likeRegex },
+            { shortCode: likeRegex },
+            { tacGia: likeRegex },
+            { author: likeRegex }
+        ];
 
-        for (const truyen of allStories) {
-            const name = truyen.tenTruyen || truyen.title || truyen.name || '';
-            const author = truyen.tacGia || truyen.author || '';
-            const category = truyen.theLoai || '';
-            const customShortCode = truyen.shortCode || '';
-
-            const normName = normalizeText(name);
-            const normAuthor = normalizeText(author);
-            const normCategory = normalizeText(category);
-            const acronymName = getAcronym(name); // Viết tắt tự động tạo ra từ tên truyện
-
-            let score = 0;
-
-            // --- A. Khớp chính xác hoàn toàn ---
-            if (normName === normalizedKey) {
-                score += 100;
-            } else if (normName.startsWith(normalizedKey)) {
-                score += 60;
-            } else if (normName.includes(normalizedKey)) {
-                score += 40;
-            }
-
-            // --- B. Khớp viết tắt (ShortCode / Acronym) ---
-            if (customShortCode && normalizeText(customShortCode) === compactKey) {
-                score += 90;
-            } else if (acronymName === compactKey) {
-                score += 80;
-            } else if (acronymName.includes(compactKey) && compactKey.length >= 2) {
-                score += 45;
-            }
-
-            // --- C. Khớp theo từng từ khóa (Token Matching) ---
-            let tokenMatchCount = 0;
-            for (const token of searchTokens) {
-                if (normName.includes(token)) {
-                    tokenMatchCount += 2;
-                } else if (normAuthor.includes(token) || normCategory.includes(token)) {
-                    tokenMatchCount += 1;
-                }
-            }
-
-            if (tokenMatchCount > 0) {
-                score += (tokenMatchCount / (searchTokens.length * 2)) * 30;
-            }
-
-            // Nếu đạt điểm thì đưa vào danh sách kết quả
-            if (score > 0) {
-                scoredResults.push({ truyen, score });
-            }
+        if (acronymRegex) {
+            orConditions.push({ tenTruyen: acronymRegex });
+            orConditions.push({ title: acronymRegex });
+            orConditions.push({ name: acronymRegex });
         }
 
-        // 3. Sắp xếp theo độ liên quan từ cao xuống thấp và lấy 30 kết quả đầu
-        scoredResults.sort((a, b) => b.score - a.score);
-        const topStories = scoredResults.slice(0, 30).map(item => item.truyen);
+        // Chỉ lấy các field thực sự cần thiết và giới hạn tối đa 15 truyện
+        const matchedStories = await Truyen.find({ 
+            $or: orConditions, 
+            isDeleted: { $ne: true } 
+        })
+        .select('tenTruyen title name totalChapters tongSoTap tongSoChuong chunkSize price gia publishedChapters linkDrive driveLink link')
+        .limit(5)
+        .lean();
 
-        // 4. Định dạng và tính toán chia tập (parts) tương thích detail.ejs
-        const formattedData = topStories.map(truyen => {
-            let parts = [];
+        // Xử lý danh sách gói tập gọn nhẹ
+        const formattedData = matchedStories.map(truyen => {
             const totalChapters = truyen.totalChapters || truyen.tongSoTap || truyen.tongSoChuong || 0;
             const chunkSize = (truyen.chunkSize && truyen.chunkSize > 0) ? truyen.chunkSize : 10;
             const pricePerChapter = truyen.price !== undefined ? truyen.price : (truyen.gia || 1000);
             const publishedChapters = truyen.publishedChapters || 0;
             const driveLink = truyen.linkDrive || truyen.driveLink || truyen.link || '';
 
+            let parts = [];
             if (totalChapters > 0) {
                 const totalParts = Math.ceil(totalChapters / chunkSize);
-
                 for (let i = 0; i < totalParts; i++) {
                     let start = i * chunkSize + 1;
                     let end = Math.min((i + 1) * chunkSize, totalChapters);
 
-                    if (publishedChapters >= start) {
-                        start = publishedChapters + 1;
-                    }
-
-                    if (start > end) {
-                        continue;
-                    }
+                    if (publishedChapters >= start) start = publishedChapters + 1;
+                    if (start > end) continue;
 
                     const chapterCount = end - start + 1;
                     const partPrice = chapterCount * pricePerChapter;
@@ -496,8 +457,7 @@ exports.apiQuickSearch = async (req, res) => {
                         name: `${start} - ${end}`,
                         code: `${start}-${end}`,
                         price: partPrice,
-                        priceText: partPrice.toLocaleString('vi-VN'),
-                        linkDrive: driveLink
+                        priceText: Number(partPrice).toLocaleString('vi-VN')
                     });
                 }
             }
@@ -508,8 +468,7 @@ exports.apiQuickSearch = async (req, res) => {
                     name: 'Trọn bộ',
                     code: 'full',
                     price: singlePrice,
-                    priceText: singlePrice.toLocaleString('vi-VN'),
-                    linkDrive: driveLink
+                    priceText: Number(singlePrice).toLocaleString('vi-VN')
                 });
             }
 
