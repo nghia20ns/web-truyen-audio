@@ -350,28 +350,8 @@ exports.renderQuickSearch = async (req, res) => {
         res.status(500).send('Lỗi máy chủ');
     }
 };
-
-// Hàm chuyển đổi chuỗi tiếng Việt có dấu thành không dấu
+// 1. Chuẩn hóa tiếng Việt & xóa ký tự đặc biệt
 function removeVietnameseTones(str) {
-    if (!str) return '';
-    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
-    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
-    str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
-    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
-    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
-    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
-    str = str.replace(/đ/g, "d");
-    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
-    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
-    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
-    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
-    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
-    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
-    str = str.replace(/Đ/g, "D");
-    return str.toLowerCase().trim();
-}
-// Hàm loại bỏ dấu tiếng Việt và ký tự đặc biệt
-function normalizeText(str) {
     if (!str) return '';
     return str
         .toLowerCase()
@@ -379,19 +359,10 @@ function normalizeText(str) {
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/đ/g, 'd')
         .replace(/Đ/g, 'd')
-        .replace(/[^a-z0-9\s]/g, ' ')
-        .replace(/\s+/g, ' ')
         .trim();
 }
 
-// Hàm lấy chữ cái đầu của mỗi từ (Acronym / Shortcode)
-function getAcronym(str) {
-    const clean = normalizeText(str);
-    if (!clean) return '';
-    return clean.split(' ').map(w => w[0]).join('');
-}
-
-// Thay thế hàm apiQuickSearch trong controllers/adminController.js
+// 2. API Tra Cứu Nhanh theo shortCode và name
 exports.apiQuickSearch = async (req, res) => {
     try {
         const rawKey = (req.query.keyword || '').trim();
@@ -399,46 +370,73 @@ exports.apiQuickSearch = async (req, res) => {
             return res.json({ success: true, total: 0, data: [] });
         }
 
-        // Tạo Regex an toàn
-        const safeKey = rawKey.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-        const likeRegex = new RegExp(safeKey, 'i');
+        const cleanKey = removeVietnameseTones(rawKey).replace(/[^a-z0-9]/g, '');
+        const words = rawKey.split(/\s+/).filter(Boolean);
 
-        // Regex tìm viết tắt (VD: "ttnt" -> "t.*t.*n.*t")
-        const acronymPattern = rawKey.replace(/[^a-zA-Z0-9]/g, '').split('').join('.*');
-        const acronymRegex = acronymPattern ? new RegExp(acronymPattern, 'i') : null;
+        // Lấy danh sách truyện hợp lệ từ database
+        const allStories = await Truyen.find({ isDeleted: false })
+            .select('name shortCode totalChapters chunkSize price publishedChapters link')
+            .lean();
 
-        // Query trực tiếp từ MongoDB (tận dụng index, không load toàn bộ DB vào RAM)
-        const orConditions = [
-            { tenTruyen: likeRegex },
-            { title: likeRegex },
-            { name: likeRegex },
-            { shortCode: likeRegex },
-            { tacGia: likeRegex },
-            { author: likeRegex }
-        ];
+        const scoredResults = [];
 
-        if (acronymRegex) {
-            orConditions.push({ tenTruyen: acronymRegex });
-            orConditions.push({ title: acronymRegex });
-            orConditions.push({ name: acronymRegex });
+        for (const truyen of allStories) {
+            const name = truyen.name || '';
+            const shortCode = truyen.shortCode || '';
+
+            const nameNoTone = removeVietnameseTones(name);
+            const nameClean = nameNoTone.replace(/[^a-z0-9]/g, '');
+            const shortCodeClean = removeVietnameseTones(shortCode).replace(/[^a-z0-9]/g, '');
+
+            let isMatch = false;
+            let score = 0;
+
+            // --- 1. TÌM THEO SHORTCODE TRONG MODEL ---
+            if (shortCodeClean === cleanKey) {
+                isMatch = true;
+                score += 100;
+            } else if (shortCodeClean.startsWith(cleanKey)) {
+                isMatch = true;
+                score += 85;
+            } else if (shortCodeClean.includes(cleanKey)) {
+                isMatch = true;
+                score += 70;
+            }
+
+            // --- 2. TÌM THEO NAME (TÊN TRUYỆN) ---
+            if (nameClean.includes(cleanKey)) {
+                isMatch = true;
+                score += 90;
+            }
+
+            // Khớp từng từ đơn lẻ khi gõ từ khóa ngắt quãng
+            let matchWordsCount = 0;
+            for (const w of words) {
+                if (nameNoTone.includes(removeVietnameseTones(w))) {
+                    matchWordsCount++;
+                }
+            }
+            if (matchWordsCount === words.length && words.length > 0) {
+                isMatch = true;
+                score += 75;
+            }
+
+            if (isMatch) {
+                scoredResults.push({ truyen, score });
+            }
         }
 
-        // Chỉ lấy các field thực sự cần thiết và giới hạn tối đa 15 truyện
-        const matchedStories = await Truyen.find({ 
-            $or: orConditions, 
-            isDeleted: { $ne: true } 
-        })
-        .select('tenTruyen title name totalChapters tongSoTap tongSoChuong chunkSize price gia publishedChapters linkDrive driveLink link')
-        .limit(5)
-        .lean();
+        // Sắp xếp ưu tiên độ khớp cao nhất lên đầu, giới hạn tối đa 20 kết quả
+        scoredResults.sort((a, b) => b.score - a.score);
+        const matchedStories = scoredResults.slice(0, 20).map(item => item.truyen);
 
-        // Xử lý danh sách gói tập gọn nhẹ
+        // --- 3. TÍNH TOÁN CÁC GÓI TẬP (PARTS) DỰA THEO SCHEMA TRUYEN ---
         const formattedData = matchedStories.map(truyen => {
-            const totalChapters = truyen.totalChapters || truyen.tongSoTap || truyen.tongSoChuong || 0;
+            const totalChapters = truyen.totalChapters || 0;
             const chunkSize = (truyen.chunkSize && truyen.chunkSize > 0) ? truyen.chunkSize : 10;
-            const pricePerChapter = truyen.price !== undefined ? truyen.price : (truyen.gia || 1000);
+            const pricePerChapter = truyen.price !== undefined ? truyen.price : 1000;
             const publishedChapters = truyen.publishedChapters || 0;
-            const driveLink = truyen.linkDrive || truyen.driveLink || truyen.link || '';
+            const driveLink = truyen.link || '';
 
             let parts = [];
             if (totalChapters > 0) {
@@ -447,7 +445,9 @@ exports.apiQuickSearch = async (req, res) => {
                     let start = i * chunkSize + 1;
                     let end = Math.min((i + 1) * chunkSize, totalChapters);
 
-                    if (publishedChapters >= start) start = publishedChapters + 1;
+                    if (publishedChapters >= start) {
+                        start = publishedChapters + 1;
+                    }
                     if (start > end) continue;
 
                     const chapterCount = end - start + 1;
@@ -463,7 +463,7 @@ exports.apiQuickSearch = async (req, res) => {
             }
 
             if (parts.length === 0) {
-                const singlePrice = truyen.price !== undefined ? truyen.price : (truyen.gia || 0);
+                const singlePrice = truyen.price || 0;
                 parts.push({
                     name: 'Trọn bộ',
                     code: 'full',
@@ -474,7 +474,7 @@ exports.apiQuickSearch = async (req, res) => {
 
             return {
                 _id: truyen._id,
-                tenTruyen: truyen.tenTruyen || truyen.title || truyen.name || 'Chưa đặt tên',
+                tenTruyen: truyen.name || 'Chưa đặt tên',
                 parts: parts,
                 linkDrive: driveLink
             };
