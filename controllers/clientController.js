@@ -4,6 +4,10 @@ const Order = require('../models/Order'); // Model lưu giỏ hàng
 const mongoose = require('mongoose');
 
 // Hàm chuẩn hóa tiếng Việt & ký tự đặc biệt
+// ==========================================
+// 1. CÁC HÀM XỬ LÝ CHUỖI & TÍNH ĐIỂM
+// ==========================================
+
 function normalizeText(str) {
     if (!str) return '';
     return str
@@ -17,14 +21,100 @@ function normalizeText(str) {
         .trim();
 }
 
-// Hàm lấy chữ cái đầu (acronym)
 function getAcronym(str) {
     const clean = normalizeText(str);
     if (!clean) return '';
     return clean.split(' ').map(w => w[0]).join('');
 }
 
-// 1. Trang chủ + Tìm kiếm linh hoạt + Lọc theo Danh mục
+// Tính khoảng cách ký tự (bắt lỗi 'phongg' vs 'phong')
+function levenshteinDistance(a, b) {
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+function wordSimilarity(w1, w2) {
+    if (w1 === w2) return 1.0;
+    const maxLen = Math.max(w1.length, w2.length);
+    if (maxLen === 0) return 1.0;
+    return 1 - (levenshteinDistance(w1, w2) / maxLen);
+}
+
+// Tính điểm khớp giữa Query và Tên truyện
+function calculateMatchScore(targetText, queryText) {
+    if (!targetText || !queryText) return 0;
+    
+    // 1. Khớp chính xác tuyệt đối
+    if (targetText === queryText) return 100;
+    
+    // 2. Chứa toàn bộ chuỗi của nhau (vd: query dài chứa tên truyện hoặc ngược lại)
+    if (queryText.includes(targetText)) return 95;
+    if (targetText.includes(queryText)) return 90;
+
+    const targetTokens = targetText.split(' ').filter(w => w.length > 1);
+    const queryTokens = queryText.split(' ').filter(w => w.length > 1);
+
+    if (targetTokens.length === 0 || queryTokens.length === 0) return 0;
+
+    let matchedCount = 0;
+    let totalScore = 0;
+
+    for (const qToken of queryTokens) {
+        let maxSim = 0;
+        for (const tToken of targetTokens) {
+            const sim = wordSimilarity(qToken, tToken);
+            if (sim > maxSim) maxSim = sim;
+        }
+
+        // Khớp từ nếu giống >= 70% (bắt được 'phongg' và 'phong')
+        if (maxSim >= 0.7) {
+            matchedCount++;
+            totalScore += maxSim;
+        }
+    }
+
+    if (matchedCount === 0) return 0;
+
+    // Tỉ lệ từ trong tên truyện xuất hiện trong query
+    const targetCoverage = matchedCount / targetTokens.length;
+    const queryCoverage = matchedCount / queryTokens.length;
+
+    // Nếu tên truyện có 8 từ mà trong ô tìm kiếm có 5-6 từ khớp -> Điểm rất cao
+    if (targetCoverage >= 0.6) {
+        return 70 + (targetCoverage * 25);
+    }
+
+    if (queryCoverage >= 0.6) {
+        return 60 + (queryCoverage * 20);
+    }
+
+    // Nếu chỉ trùng 1 vài từ lẻ tẻ
+    return (matchedCount / Math.max(targetTokens.length, queryTokens.length)) * 50;
+}
+
+
+// ==========================================
+// 2. CONTROLLER TÌM KIẾM HOÀN CHỈNH
+// ==========================================
+
 exports.getHomePage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -34,7 +124,6 @@ exports.getHomePage = async (req, res) => {
         const rawKeyword = (req.query.q || req.query.keyword || '').trim();
         const catSlug = req.query.cat || '';
 
-        // Lấy danh sách Categories & Danh sách Hot
         const [allCategories, listHot] = await Promise.all([
             Category.find(),
             Truyen.find({ isHot: true, isDeleted: false })
@@ -44,91 +133,71 @@ exports.getHomePage = async (req, res) => {
                 .lean()
         ]);
 
-        // Điều kiện danh mục (nếu có)
         let baseFilter = { isDeleted: false };
-        let currentCat = null;
         if (catSlug) {
-            currentCat = await Category.findOne({ slug: catSlug });
-            if (currentCat) {
-                baseFilter.categories = currentCat._id;
-            }
+            const currentCat = await Category.findOne({ slug: catSlug });
+            if (currentCat) baseFilter.categories = currentCat._id;
         }
 
         let listTruyen = [];
         let totalStories = 0;
 
-        // TRƯỜNG HỢP 1: Có từ khóa tìm kiếm (Áp dụng thuật toán tính điểm thông minh)
         if (rawKeyword) {
+            // Chuẩn hóa từ khóa tìm kiếm
             const normalizedKey = normalizeText(rawKeyword);
-            const searchTokens = normalizedKey.split(' ').filter(Boolean);
             const compactKey = normalizedKey.replace(/\s+/g, '');
 
-            // Lấy danh sách truyện theo danh mục để lọc và chấm điểm
+            // Lấy danh sách truyện từ DB (Chỉ lấy các trường cần thiết để nhẹ RAM)
             const candidateStories = await Truyen.find(baseFilter)
                 .populate('categories', 'name slug')
-                .select('-link -linkDrive -driveLink')
+                .select('name title tenTruyen author tacGia shortCode slug image hinhAnh totalChapters price gia')
                 .lean();
 
             const scoredResults = [];
 
             for (const story of candidateStories) {
-                const name = story.name || story.tenTruyen || story.title || '';
-                const author = story.author || story.tacGia || '';
-                const intro = story.introduction || story.moTa || story.description || '';
+                const rawName = story.name || story.tenTruyen || story.title || '';
+                const rawAuthor = story.author || story.tacGia || '';
                 const customShortCode = story.shortCode || '';
 
-                const normName = normalizeText(name);
-                const normAuthor = normalizeText(author);
-                const normIntro = normalizeText(intro);
-                const acronym = getAcronym(name);
+                const normName = normalizeText(rawName);
+                const normAuthor = normalizeText(rawAuthor);
+                const acronym = getAcronym(rawName);
 
                 let score = 0;
 
-                // A. Khớp chính xác cụm từ
-                if (normName === normalizedKey) {
-                    score += 100;
-                } else if (normName.startsWith(normalizedKey)) {
-                    score += 60;
-                } else if (normName.includes(normalizedKey)) {
-                    score += 40;
-                }
+                // 1. So khớp tên truyện (Fuzzy + Phủ từ)
+                const nameScore = calculateMatchScore(normName, normalizedKey);
+                score = Math.max(score, nameScore);
 
-                // B. Khớp viết tắt (ShortCode / Acronym)
+                // 2. So khớp từ viết tắt (Acronym / Shortcode)
                 if (customShortCode && normalizeText(customShortCode) === compactKey) {
-                    score += 90;
+                    score = Math.max(score, 95);
                 } else if (acronym === compactKey) {
-                    score += 80;
-                } else if (acronym.includes(compactKey) && compactKey.length >= 2) {
-                    score += 45;
+                    score = Math.max(score, 90);
+                } else if (acronym && compactKey.length >= 2 && acronym.includes(compactKey)) {
+                    score = Math.max(score, 60);
                 }
 
-                // C. Khớp theo từng từ khóa (Token Matching)
-                let tokenMatches = 0;
-                for (const token of searchTokens) {
-                    if (normName.includes(token)) {
-                        tokenMatches += 2;
-                    } else if (normAuthor.includes(token) || normIntro.includes(token)) {
-                        tokenMatches += 1;
-                    }
+                // 3. So khớp tác giả
+                if (normAuthor && (normAuthor.includes(normalizedKey) || normalizedKey.includes(normAuthor))) {
+                    score = Math.max(score, 65);
                 }
 
-                if (tokenMatches > 0) {
-                    score += (tokenMatches / (searchTokens.length * 2)) * 30;
-                }
-
-                if (score > 0) {
+                // CHẶN RÁC: Chỉ lấy truyện có điểm >= 35
+                if (score >= 35) {
                     scoredResults.push({ story, score });
                 }
             }
 
-            // Sắp xếp theo điểm liên quan cao nhất
+            // Sắp xếp truyện có điểm cao nhất lên đầu
             scoredResults.sort((a, b) => b.score - a.score);
 
             totalStories = scoredResults.length;
             listTruyen = scoredResults.slice(skip, skip + limit).map(item => item.story);
 
         } else {
-            // TRƯỜNG HỢP 2: Xem bình thường (Không tìm kiếm -> query trực tiếp tối ưu phân trang)
+            // Không tìm kiếm -> Phân trang bình thường
             const [total, stories] = await Promise.all([
                 Truyen.countDocuments(baseFilter),
                 Truyen.find(baseFilter)
@@ -146,12 +215,10 @@ exports.getHomePage = async (req, res) => {
 
         const totalPages = Math.ceil(totalStories / limit);
 
-        // Phản hồi AJAX cho cuộn vô hạn
         if (req.query.type === 'json') {
             return res.json({ listTruyen, currentPage: page, totalPages, totalStories });
         }
 
-        // Render giao diện SSR ban đầu
         res.render('index', {
             listTruyen,
             keyword: rawKeyword,
