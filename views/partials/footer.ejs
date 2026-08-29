@@ -5,14 +5,17 @@
         </div>
         <div class="footer-contact">
             <span>Liên hệ:</span>
-            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo">Zalo</a>
+            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.04l-.84 3.09 3.44-1.5c1.12.3 2.33.47 3.56.47 5.52 0 10-4.03 10-9s-4.48-9-10-9zm1.25 12.5h-4.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3.19L8.22 8.78c-.2-.25-.17-.62.08-.82.25-.2.62-.17.82.08l4.13 5.16V8.75c0-.41.34-.75.75-.75s.75.34.75.75v5c0 .41-.34.75-.75.75z"/></svg>
+                Zalo
+            </a>
         </div>
     </div>
 </footer>
 
 <div id="chat-box" class="chat-box">
     <div class="chat-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
             <span>💬 Hỗ trợ trực tuyến</span>
         </div>
         <div class="close-chat-btn" onclick="toggleChat()">✖</div>
@@ -23,7 +26,7 @@
         <input type="email" id="chat-email-input" placeholder="Nhập Gmail..." class="chat-input-styled">
         <button onclick="startChat()" class="btn-primary btn-start-chat">Bắt đầu Chat</button>
         <p id="chat-error" class="chat-error-msg"></p>
-        <small style="color: #999; font-size: 0.75rem; margin-top: 15px;">*Tên hiển thị lấy theo Gmail.</small>
+        <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 15px;">*Tên hiển thị lấy theo Gmail.</small>
     </div>
 
     <div id="chat-interface" class="chat-body" style="display: none; padding: 0;">
@@ -31,9 +34,18 @@
         
         <div id="offline-alert" class="offline-screen" style="display: none;">
             <div class="offline-icon">😴</div>
-            <h3>Admin Offline</h3>
-            <p>Vui lòng liên hệ Zalo để được hỗ trợ.</p>
-            <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo large">Chat Zalo</a>
+            <h3>Ae cần hỗ trợ liên hệ qua Zalo hoặc Discord nha</h3>
+            <div class="offline-btns">
+                <a href="https://zalo.me/0336672088" target="_blank" class="contact-btn zalo large">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.04l-.84 3.09 3.44-1.5c1.12.3 2.33.47 3.56.47 5.52 0 10-4.03 10-9s-4.48-9-10-9zm1.25 12.5h-4.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3.19L8.22 8.78c-.2-.25-.17-.62.08-.82.25-.2.62-.17.82.08l4.13 5.16V8.75c0-.41.34-.75.75-.75s.75.34.75.75v5c0 .41-.34.75-.75.75z"/></svg>
+                    Chat Zalo
+                </a>
+                <p>Ae nào cần đề xuất e Cat ra truyện gì thì vào discord nha</p>
+                <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="contact-btn discord large">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Chat Discord
+                </a>
+            </div>
         </div>
 
         <div id="input-area-wrapper" class="chat-input-area">
@@ -48,22 +60,59 @@
 </div>
 
 <style>
-    :root { --primary: #6366f1; }
+    :root {
+        --primary: #6366f1;
+        --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .simple-footer, .chat-box, .floating-chat-btn {
+        font-family: var(--font-stack);
+        -webkit-font-smoothing: antialiased;
+    }
+
     .simple-footer { background-color: white; border-top: 1px solid #f1f5f9; padding: 25px 0; margin-top: 60px; font-size: 0.95rem; color: #64748b; }
     .footer-flex { display: flex; justify-content: space-between; align-items: center; }
-    .contact-btn { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 6px 14px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; color: white !important; }
+    .footer-contact { display: flex; align-items: center; gap: 10px; }
+
+    .contact-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        padding: 7px 16px;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        line-height: 1;
+        color: #ffffff !important;
+        transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .contact-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .contact-btn.large {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        width: 100%;
+        max-width: 220px;
+        box-sizing: border-box;
+    }
+
     .contact-btn.zalo { background: #0068FF; }
-    
-    /* Nút chat tròn */
+    .contact-btn.discord { background: #5865F2; }
+
     .floating-chat-btn { 
         position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
         background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 50%; 
         display: flex; justify-content: center; align-items: center; cursor: pointer; 
         z-index: 10001; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); 
-        transition: all 0.3s ease; /* Hiệu ứng mượt */
+        transition: all 0.3s ease;
     }
     
-    /* Class ẩn nút chat (Thêm cái này theo yêu cầu của bạn) */
     .floating-chat-btn.hidden {
         opacity: 0;
         transform: scale(0);
@@ -76,34 +125,35 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10000; 
         display: flex; flex-direction: column;
         opacity: 0; pointer-events: none; 
-        
-        /* --- SỬA Ở ĐÂY: Chỉ transition opacity và transform --- */
         transition: opacity 0.3s, transform 0.3s; 
-        /* ----------------------------------------------------- */
-        
         transform: translateY(20px); 
     }
     .chat-box.active { opacity: 1; pointer-events: all; transform: translateY(0); }
     
-    .chat-header { background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-    .close-chat-btn { cursor: pointer; font-size: 1.2rem; }
+    .chat-header { background: linear-gradient(to right, #6366f1, #8b5cf6); color: white; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+    .close-chat-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.9; }
+    .close-chat-btn:hover { opacity: 1; }
     
     .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
-    .chat-login-screen { justify-content: center; align-items: center; padding: 20px; text-align: center; }
-    .chat-input-styled { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-    .btn-start-chat { width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer; }
-    
+    .chat-login-screen { justify-content: center; align-items: center; padding: 24px; text-align: center; }
+    .chat-input-styled { width: 100%; padding: 10px 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; }
+    .chat-input-styled:focus { outline: none; border-color: #6366f1; }
+    .btn-start-chat { width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: 600; font-family: inherit; cursor: pointer; }
+    .chat-error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 5px; display: none; }
+
     .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-    .msg { padding: 8px 12px; border-radius: 12px; max-width: 80%; word-wrap: break-word; font-size: 0.9rem; }
+    .msg { padding: 9px 13px; border-radius: 12px; max-width: 80%; word-wrap: break-word; font-size: 0.9rem; line-height: 1.4; }
     .msg.me { align-self: flex-end; background: #6366f1; color: white; }
-    .msg.admin { align-self: flex-start; background: white; border: 1px solid #eee; }
+    .msg.admin { align-self: flex-start; background: white; border: 1px solid #e2e8f0; color: #1e293b; }
     
-    .chat-input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #eee; }
-    .chat-input-area input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 8px 12px; border-radius: 20px; }
-    .btn-send-msg { border: none; background: #6366f1; color: white; width: 35px; height: 35px; border-radius: 50%; margin-left: 8px; cursor: pointer; }
+    .chat-input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #f1f5f9; }
+    .chat-input-area input { flex: 1; border: none; outline: none; background: #f1f5f9; padding: 8px 14px; border-radius: 20px; font-family: inherit; font-size: 0.9rem; }
+    .btn-send-msg { border: none; background: #6366f1; color: white; width: 36px; height: 36px; border-radius: 50%; margin-left: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     
-    .offline-screen { flex: 1; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; background: #fff1f2; }
-    .offline-icon { font-size: 3rem; margin-bottom: 10px; }
+    .offline-screen { flex: 1; flex-direction: column; justify-content: center; align-items: center; padding: 24px; text-align: center; background: #fafafa; }
+    .offline-screen h3 { font-size: 1rem; color: #334155; margin: 0 0 16px 0; font-weight: 600; line-height: 1.4; }
+    .offline-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .offline-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center; }
     
     @media (max-width: 480px) {
         .chat-box { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; }
@@ -116,7 +166,7 @@
     let sessionId = localStorage.getItem('chat_session_id');
     let userName = localStorage.getItem('chat_user_name');
     let isAdminOnline = true;
-    let lastMsgCount = 0; // Vẫn cần biến này để check có tin mới không để render
+    let lastMsgCount = 0;
     
     if (!sessionId) {
         sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
@@ -125,12 +175,11 @@
 
     async function toggleChat() {
         const box = document.getElementById('chat-box');
-        const triggerBtn = document.getElementById('chat-trigger'); // Lấy nút tròn
+        const triggerBtn = document.getElementById('chat-trigger');
 
         box.classList.toggle('active');
         
         if (box.classList.contains('active')) {
-            // Mở chat -> Ẩn nút tròn
             triggerBtn.classList.add('hidden');
 
             const res = await fetch('/chat/status');
@@ -138,9 +187,7 @@
             isAdminOnline = data.isOnline;
             checkLoginStatus();
         } else {
-            // Đóng chat -> Hiện lại nút tròn
             triggerBtn.classList.remove('hidden');
-
             if (chatInterval) clearInterval(chatInterval);
         }
     }
@@ -202,8 +249,6 @@
             const res = await fetch(`/chat/history?sessionId=${sessionId}`);
             const msgs = await res.json();
             
-            // Chỉ render lại nếu số lượng tin nhắn thay đổi
-            // KHÔNG CÒN LOGIC THÔNG BÁO Ở ĐÂY NỮA
             if (msgs.length > lastMsgCount) {
                 const list = document.getElementById('messages-list');
                 list.innerHTML = ''; 
@@ -231,16 +276,11 @@
     }
     
     if (window.visualViewport) {
-        // Hàm xử lý resize tối ưu
         const handleResize = () => {
              const box = document.getElementById('chat-box');
-             // Chỉ chạy logic khi đang ở Mobile (<= 480px) và Chat đang mở
              if(box.classList.contains('active') && window.innerWidth <= 480) {
-                 // Dùng requestAnimationFrame để mượt hơn, tránh giật cục
                  requestAnimationFrame(() => {
-                     // Cập nhật chiều cao bằng đúng phần nhìn thấy được (trừ bàn phím)
                      box.style.height = window.visualViewport.height + 'px';
-                     // Đảm bảo chat luôn dính đáy (quan trọng cho iOS)
                      box.style.bottom = '0px'; 
                      scrollToBottom();
                  });
@@ -248,7 +288,6 @@
         };
 
         window.visualViewport.addEventListener('resize', handleResize);
-        window.visualViewport.addEventListener('scroll', handleResize); // Thêm sự kiện scroll để chắc chắn
+        window.visualViewport.addEventListener('scroll', handleResize);
     }
-
 </script>

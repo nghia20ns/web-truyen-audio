@@ -1,93 +1,175 @@
 <div id="fixed-header-wrapper">
-    
     <nav class="navbar">
         <div class="nav-content">
             <a href="/" class="logo">🎧 Cat Audio</a>
+            <div class="nav-actions">
+                <a href="https://zalo.me/0336672088" target="_blank" class="nav-btn-social zalo" title="Chat Zalo">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.04l-.84 3.09 3.44-1.5c1.12.3 2.33.47 3.56.47 5.52 0 10-4.03 10-9s-4.48-9-10-9zm1.25 12.5h-4.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3.19L8.22 8.78c-.2-.25-.17-.62.08-.82.25-.2.62-.17.82.08l4.13 5.16V8.75c0-.41.34-.75.75-.75s.75.34.75.75v5c0 .41-.34.75-.75.75z"/></svg>
+                    <span>Zalo</span>
+                </a>
+                <a href="https://discord.gg/edkSbVmP4D" target="_blank" class="nav-btn-social discord" title="Tham gia Discord">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    <span>Discord</span>
+                </a>
+            </div>
         </div>
     </nav>
     <% if (typeof globalAlert !== 'undefined' && globalAlert.isOn) { %>
         <div class="global-alert alert-<%= globalAlert.type %>">
-            <%= globalAlert.content %>
+            <div class="alert-track">
+                <span class="alert-text">📢 <%= globalAlert.content %></span>
+            </div>
         </div>
     <% } %>
-
 </div>
 
 <style>
-    /* 1. Cố định cả cụm Header lên đầu trang */
+    /* 1. Cố định cụm Header */
     #fixed-header-wrapper {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         z-index: 9999;
-        background-color: #fff; /* Đặt nền trắng để tránh bị xuyên thấu khi scroll */
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         display: flex;
-        flex-direction: column; /* Đảm bảo các phần tử xếp chồng dọc */
+        flex-direction: column;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     /* Navbar */
     .navbar {
         width: 100%;
         background: #fff;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #f1f5f9;
         position: relative;
-        /* Padding mẫu cho đẹp */
-        padding: 10px 20px; 
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        padding: 10px 20px;
+        box-sizing: border-box;
     }
     
-    .nav-content { width: 100%; display: flex; justify-content: space-between; }
-    .logo { font-weight: bold; text-decoration: none; color: #333; font-size: 1.2rem; }
-    .nav-btn { text-decoration: none; color: #555; font-weight: 500; }
+    .nav-content { 
+        width: 100%; 
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
 
-    /* Style cho Alert Chính */
-/* Style cho Alert Chính - ĐÃ SỬA */
+    .logo { 
+        font-weight: 700; 
+        text-decoration: none; 
+        color: #1e293b; 
+        font-size: 1.2rem; 
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Nhóm nút mạng xã hội */
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-btn-social {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #ffffff !important;
+        text-decoration: none;
+        padding: 6px 13px;
+        border-radius: 9999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1;
+        transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .nav-btn-social:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .nav-btn-social.zalo { background-color: #0068FF; }
+    .nav-btn-social.discord { background-color: #5865F2; }
+
+    /* 2. Thanh thông báo nổi bật & Chữ chạy chậm */
     .global-alert {
         width: 100%;
-        padding: 12px 20px;
-        
-        /* QUAN TRỌNG: Dòng này giúp padding không làm vỡ khung */
+        padding: 7px 0;                  /* Tăng nhẹ chiều cao để chữ thoáng hơn */
         box-sizing: border-box; 
-        
-        /* Căn giữa tuyệt đối bằng Flexbox */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        
-        font-weight: 500;
-        font-size: 0.95rem;
-        animation: slideDown 0.4s ease-out;
+        font-size: 0.95rem;              /* TĂNG CỠ CHỮ */
+        font-weight: 600;                /* CHỮ ĐẬM, NỔI BẬT */
+        line-height: 1.4;
+        overflow: hidden;
+        white-space: nowrap;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
+    }
+
+    .alert-track {
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .alert-text {
+        display: inline-block;
+        padding-left: 100%;
+        animation: marqueeSlide 25s linear infinite; /* 25s: Chạy chậm, rất dễ đọc */
+        letter-spacing: 0.3px;
+    }
+
+    /* Rê chuột vào chữ sẽ dừng lại để đọc */
+    .global-alert:hover .alert-text {
+        animation-play-state: paused;
+    }
+
+    @keyframes marqueeSlide {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
     }
     
-    .alert-warning { background: #fff3cd; color: #856404; border-bottom: 1px solid #ffeeba; }
-    .alert-danger  { background: #f8d7da; color: #721c24; border-bottom: 1px solid #f5c6cb; }
-    .alert-info    { background: #cff4fc; color: #055160; border-bottom: 1px solid #b6effb; }
-    .alert-success { background: #d1e7dd; color: #0f5132; border-bottom: 1px solid #badbcc; }
-
-    /* Style cho Thông báo thẻ cào (MỚI) */
-    .payment-notice {
-        width: 100%;
-        background-color: #2c3e50; /* Màu nền tối (xanh đen) để nổi bật nhưng không chói */
-        color: #fff; /* Chữ trắng */
-        text-align: center;
-        padding: 8px 20px;
-        font-size: 0.85rem; /* Font nhỏ hơn một chút cho tinh tế */
-        letter-spacing: 0.5px;
+    /* Màu sắc cảnh báo đậm đà, tương phản cao hơn */
+    .alert-warning { 
+        background: #fef08a; 
+        color: #854d0e; 
+        border-bottom: 2px solid #facc15; 
+    }
+    .alert-danger  { 
+        background: #fee2e2; 
+        color: #991b1b; 
+        border-bottom: 2px solid #f87171; 
+    }
+    .alert-info    { 
+        background: #e0f2fe; 
+        color: #075985; 
+        border-bottom: 2px solid #38bdf8; 
+    }
+    .alert-success { 
+        background: #dcfce7; 
+        color: #166534; 
+        border-bottom: 2px solid #4ade80; 
     }
 
-    @keyframes slideDown {
-        from { transform: translateY(-20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+    /* Responsive Mobile */
+    @media (max-width: 480px) {
+        .nav-btn-social span {
+            display: none;
+        }
+        .nav-btn-social {
+            padding: 7px;
+            border-radius: 50%;
+        }
+        .global-alert {
+            font-size: 0.88rem; /* Tinh chỉnh nhỏ lại một chút trên màn hình quá bé */
+        }
     }
 </style>
 
 <script>
-    // Script tự động tính toán khoảng cách (Giữ nguyên, không cần sửa)
     document.addEventListener("DOMContentLoaded", function() {
         const header = document.getElementById('fixed-header-wrapper');
         const body = document.body;
@@ -95,15 +177,12 @@
         function adjustPadding() {
             if (header) {
                 const height = header.offsetHeight;
-                // Thêm padding-top cho body
                 body.style.paddingTop = (height + 20) + 'px';
             }
         }
 
         adjustPadding();
         window.addEventListener('resize', adjustPadding);
-        
-        // Thêm listener phòng trường hợp hình ảnh hoặc font load chậm làm thay đổi chiều cao
         window.addEventListener('load', adjustPadding);
     });
 </script>
