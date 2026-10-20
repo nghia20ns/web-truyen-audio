@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Ép trình duyệt không tự ép bộ lọc tối lên trang thanh toán -->
+    <meta name="color-scheme" content="light">
     <title>Thanh toán hóa đơn</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
@@ -13,7 +15,7 @@
         .payment-container { max-width: 500px; margin: 20px auto; padding: 15px; }
 
         .receipt-card {
-            background: white; border-radius: 12px; padding: 20px;
+            background: #ffffff; border-radius: 12px; padding: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
         }
 
@@ -25,19 +27,28 @@
         
         .total-amount { font-size: 1.4rem; color: #059669; }
 
-        .qr-section { text-align: center; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .qr-section { text-align: center; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .qr-title { font-size: 1.1rem; color: #4f46e5; font-weight: 700; margin-bottom: 5px; }
         
-        /* ĐÃ SỬA: Thêm display: block và margin: 10px auto để QR canh giữa */
-        .qr-img { width: 100%; max-width: 250px; border-radius: 8px; margin: 10px auto; display: block; border: 1px solid #e5e7eb; padding: 5px; }
+        /* CỐ ĐỊNH NỀN TRẮNG VÀ CHỐNG DARK MODE LÀM ĐẢO MÀU */
+        .qr-img { 
+            width: 100%; 
+            max-width: 250px; 
+            border-radius: 8px; 
+            margin: 10px auto; 
+            display: block; 
+            border: 1px solid #e5e7eb; 
+            padding: 10px;
+            background-color: #ffffff !important; 
+            color-scheme: only light;
+            isolation: isolate;
+        }
 
         .copy-box { background: #f9fafb; padding: 12px; border-radius: 8px; border: 1px dashed #4f46e5; margin-top: 10px; text-align: center; }
         .copy-code { font-family: monospace; font-size: 1.2rem; font-weight: 800; color: #dc2626; letter-spacing: 1px; }
         
-        /* ĐÃ SỬA: Thêm text-align: left để chữ trong hộp lưu ý dễ đọc hơn */
         .note-box { background: #fffbeb; padding: 12px; border-radius: 8px; border-left: 4px solid #f59e0b; font-size: 0.85rem; color: #92400e; margin-top: 15px; line-height: 1.5; text-align: left; }
 
-        /* ĐÃ SỬA: Thêm box-sizing để nút không bị tràn viền */
         .btn-back { display: block; width: 100%; text-align: center; background: #e5e7eb; color: #374151; padding: 12px; border-radius: 8px; font-weight: 700; text-decoration: none; margin-top: 15px; transition: 0.2s; box-sizing: border-box; }
         .btn-back:hover { background: #d1d5db; }
     </style>
@@ -58,7 +69,6 @@
                 <span class="info-label">Tập đã chọn:</span>
                 <span class="info-value">
                     <% 
-                        // Chuyển mảng ["1-10", "11-20"] thành "Tập 1-10, Tập 11-20"
                         const partsList = order.selectedParts.map(p => 'Tập ' + p).join(', '); 
                     %>
                     <%= partsList %>
@@ -90,8 +100,10 @@
             <div class="note-box">
                 <strong>💡 Lưu ý quan trọng:</strong>
                 <ul style="margin: 5px 0 0 0; padding-left: 15px;">
-                    <li>Hệ thống xử lý tự động. Vui lòng không sửa nội dung chuyển khoản.</li>
-                    <li>Sau khi chuyển khoản thành công, truyện sẽ gữi vào drive cho ae, nhma sẽ có 1 khoản thời gian vì mình làm thủ công nha <strong>Google Drive</strong> của Email: <b><%= order.email %></b>.</li>
+                    <li>việc gữi truyện là thủ công, nên sẽ có 1 thời gian delay tí.</li>
+                    <li>nếu ae không có truyện thì liên hệ qua zalo để xử lý nha.</li>
+
+                    <li>Sau khi chuyển khoản thành công, truyện sẽ gửi vào <strong>Google Drive</strong> của Email: <b><%= order.email %></b>.</li>
                 </ul>
             </div>
             
@@ -101,17 +113,15 @@
     </div>
 
     <script>
-        // Tự động sinh link mã QR khi trang tải xong
         window.addEventListener('load', () => {
-            const BANK_ID = "MB"; // Mã ngân hàng
-            const ACCOUNT = "017120299999"; // Số tài khoản của bạn
+            const BANK_ID = "MB";
+            const ACCOUNT = "017120299999";
             const TEMPLATE = "compact2";
             
             const amount = <%= order.totalAmount %>;
             const content = "IDCARD: <%= order.cartId %>";
             const encodedContent = encodeURIComponent(content);
             
-            // Link gọi ảnh từ VietQR
             const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT}-${TEMPLATE}.png?amount=${amount}&addInfo=${encodedContent}&accountName=Admin`;
 
             document.getElementById('vietqr-img').src = qrUrl;
