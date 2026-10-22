@@ -292,85 +292,60 @@ async function generateUniqueCartId() {
 }
 
 // 3. API Tạo Giỏ Hàng (Lưu vào DB trước khi thanh toán)
-// 3. API Tạo Giỏ Hàng (Lưu vào DB trước khi thanh toán)
 exports.createOrderCart = async (req, res) => {
-    try {
-        const { truyenId, selectedParts, email } = req.body;
+	try {
+		 const { truyenId, selectedParts, email } = req.body;
 
-        // Lấy địa chỉ IP của máy khách
-        const clientIp = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '')
-            .split(',')[0].trim();
+		 // Validate đầu vào
+		 if (!email || !email.endsWith("@gmail.com")) {
+		 	return res.status(400).json({ success: false, message: "Vui lòng nhập đúng Gmail" });
+		 }
+		 if (!truyenId || !selectedParts || !Array.isArray(selectedParts) || selectedParts.length === 0) {
+		 	return res.status(400).json({ success: false, message: "Vui lòng chọn ít nhất 1 tập truyện" });
+		 }
 
-        // Validate đầu vào
-        if (!email || !email.endsWith("@gmail.com")) {
-            return res.status(400).json({ success: false, message: "Vui lòng nhập đúng Gmail" });
-        }
-        if (!truyenId || !selectedParts || !Array.isArray(selectedParts) || selectedParts.length === 0) {
-            return res.status(400).json({ success: false, message: "Vui lòng chọn ít nhất 1 tập truyện" });
-        }
+		 const truyen = await Truyen.findById(truyenId);
+		 if (!truyen) {
+		 	return res.status(404).json({ success: false, message: "Không tìm thấy truyện" });
+		 }
 
-        // ==================== BẮT ĐẦU: CHECK SPAM (3 ĐƠN / 1 GIỜ) ====================
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+		 // Tính toán tổng tiền ở backend để chống hack đổi giá ở frontend
+		 let totalAmount = 0;
+		 const pricePerChapter = truyen.price || 1000;
 
-        // Đếm số đơn đã tạo trong 1 giờ qua theo IP hoặc Email
-        const recentOrdersCount = await Order.countDocuments({
-            createdAt: { $gte: oneHourAgo },$or: [
-                { ipAddress: clientIp },
-                { email: email }
-            ]
-        });
+		 selectedParts.forEach(partCode => {
+		 	const [start, end] = partCode.split('-').map(Number);
+		 	const chapterCount = end - start + 1;
+		 	totalAmount += (chapterCount * pricePerChapter);
+		 });
 
-        if (recentOrdersCount >= 3) {
-            return res.status(429).json({ 
-                success: false, 
-                message: "Bạn đã tạo tối đa 3 đơn hàng trong vòng 1 giờ qua. Vui lòng thanh toán đơn cũ hoặc quay lại sau!" 
-            });
-        }
-        // ==================== KẾT THÚC: CHECK SPAM ====================
+		 // Tạo mã ID 6 số duy nhất
+		 const cartId = await generateUniqueCartId();
 
-        const truyen = await Truyen.findById(truyenId);
-        if (!truyen) {
-            return res.status(404).json({ success: false, message: "Không tìm thấy truyện" });
-        }
+		 // Lưu giỏ hàng vào Database
+		 const newOrder = new Order({
+		 	cartId: cartId,
+		 	email: email,
+		 	truyenId: truyen._id,
+		 	selectedParts: selectedParts,
+		 	totalAmount: totalAmount,
+		 	status: 'pending'
+		 });
 
-        // Tính toán tổng tiền ở backend để chống hack đổi giá ở frontend
-        let totalAmount = 0;
-        const pricePerChapter = truyen.price || 1000;
+		 await newOrder.save();
 
-        selectedParts.forEach(partCode => {
-            const [start, end] = partCode.split('-').map(Number);
-            const chapterCount = end - start + 1;
-            totalAmount += (chapterCount * pricePerChapter);
-        });
+		 // Trả về dữ liệu cho frontend để nó chuyển trang sang /payment?cartId=...
+		 res.json({
+		 	success: true,
+		 	cartId: cartId,
+		 	totalAmount: totalAmount,
+		 	transferContent: `IDCARD: ${cartId}`
+		 });
 
-        // Tạo mã ID 6 số duy nhất
-        const cartId = await generateUniqueCartId();
-
-        // Lưu giỏ hàng vào Database (lưu kèm ipAddress)
-        const newOrder = new Order({
-            cartId: cartId,
-            email: email,
-            ipAddress: clientIp, // <-- Lưu thêm IP của máy tạo đơn
-            truyenId: truyen._id,
-            selectedParts: selectedParts,
-            totalAmount: totalAmount,
-            status: 'pending'
-        });
-
-        await newOrder.save();
-
-        // Trả về dữ liệu cho frontend để nó chuyển trang sang /payment?cartId=...
-        res.json({
-            success: true,
-            cartId: cartId,
-            totalAmount: totalAmount,
-            transferContent: `IDCARD: ${cartId}`
-        });
-
-    } catch (error) {
-        console.error("Lỗi tạo giỏ hàng:", error);
-        res.status(500).json({ success: false, message: "Lỗi Server, vui lòng thử lại" });
-    }
+	} catch (error) {
+		 console.error("Lỗi tạo giỏ hàng:", error);
+		 res.status(500).json({ success: false, message: "Lỗi Server, vui lòng thử lại" });
+	}
 };
 // 4. Trang Thanh Toán (Đọc dữ liệu từ Giỏ hàng hiển thị ra QR)
 exports.getPayment = async (req, res) => {
