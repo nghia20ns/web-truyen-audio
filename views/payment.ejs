@@ -5,111 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Ép trình duyệt áp dụng duy nhất chế độ sáng -->
     <meta name="color-scheme" content="light only">
-    <title>Thanh toán hóa đơn</title>
+    <title>Thanh toán đơn hàng</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="/images/logo.png" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             color-scheme: light only !important;
             forced-color-adjust: none !important;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #059669;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border-color: #e2e8f0;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body { 
-            font-family: 'Quicksand', sans-serif; 
-            background: #f3f4f6; 
-            color: #333; 
-            margin: 0; 
-            padding: 0; 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg-page); 
+            color: var(--text-main); 
+            line-height: 1.5;
+            padding-bottom: 40px;
         }
 
         .payment-container { 
-            max-width: 500px; 
-            margin: 20px auto; 
-            padding: 15px; 
+            max-width: 520px; 
+            margin: 24px auto; 
+            padding: 0 16px; 
         }
 
-        .receipt-card {
-            background: #ffffff; 
-            border-radius: 12px; 
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        /* CARD CHUNG */
+        .card {
+            background: var(--bg-card); 
+            border-radius: 16px; 
+            padding: 24px;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04); 
+            border: 1px solid var(--border-color);
             margin-bottom: 20px;
         }
 
-        .header-title { 
-            text-align: center; 
-            font-size: 1.2rem; 
-            font-weight: 700; 
-            color: #111; 
-            margin: 0 0 15px 0; 
-            border-bottom: 1px dashed #e5e7eb; 
-            padding-bottom: 15px; 
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
         }
 
+        .card-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: var(--text-main); 
+        }
+
+        /* CHI TIẾT ĐƠN HÀNG */
         .info-row { 
             display: flex; 
             justify-content: space-between; 
+            align-items: baseline;
             margin-bottom: 12px; 
-            font-size: 0.95rem; 
+            font-size: 0.92rem; 
         }
 
         .info-label { 
-            color: #6b7280; 
-            font-weight: 600; 
+            color: var(--text-sub); 
+            font-weight: 500; 
+            flex-shrink: 0;
         }
 
         .info-value { 
-            color: #111; 
-            font-weight: 700; 
+            color: var(--text-main); 
+            font-weight: 600; 
             text-align: right; 
-            max-width: 65%; 
-            word-wrap: break-word; 
+            max-width: 68%; 
+            word-break: break-word; 
         }
         
-        .total-amount { 
-            font-size: 1.4rem; 
-            color: #059669; 
+        .total-row {
+            margin-top: 14px; 
+            padding-top: 14px; 
+            border-top: 1px dashed var(--border-color);
+            align-items: center;
         }
 
+        .total-amount { 
+            font-size: 1.35rem; 
+            font-weight: 800; 
+            color: var(--success); 
+        }
+
+        /* KHỐI QR CODE */
         .qr-section { 
             text-align: center; 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
         }
 
-        .qr-title { 
-            font-size: 1.1rem; 
-            color: #4f46e5; 
-            font-weight: 700; 
-            margin-bottom: 5px; 
+        .qr-subtext {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 16px;
         }
-        
-        /* KHỐI BỌC NỀN TRẮNG CHỐNG ĐẢO MÀU */
+/* CĂN CHÍNH GIỮA TUYỆT ĐỐI CHO KHỐI QR */
         .qr-wrapper {
             background-color: #ffffff !important;
-            display: inline-block;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
-            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin: 0 auto 16px auto !important; /* Tự động chia đều 2 bên trái/phải */
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             color-scheme: light only !important;
             forced-color-adjust: none !important;
-            isolation: isolate;
         }
 
-        /* ẢNH QR: KHÓA BỘ LỌC VÀ CHỐNG FORCE DARK MODE */
         .qr-img { 
-            width: 100%; 
-            max-width: 250px; 
+            width: 230px; 
+            max-width: 100%;
+            height: auto;
             border-radius: 6px; 
-            display: block; 
+            display: block;
+            margin: 0 auto;
             background-color: #ffffff !important; 
-            color-scheme: light only !important;
-            forced-color-adjust: none !important;
             filter: none !important;
             -webkit-filter: none !important;
         }
@@ -122,179 +151,373 @@
             }
         }
 
-        .copy-box { 
-            background: #f9fafb; 
-            padding: 12px; 
-            border-radius: 8px; 
-            border: 1px dashed #4f46e5; 
-            margin-top: 10px; 
-            text-align: center; 
+        /* THÔNG TIN CHUYỂN KHOẢN THỦ CÔNG */
+        .manual-transfer-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            text-align: left;
         }
 
-        .copy-wrapper {
+        .manual-transfer-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 6px;
+            gap: 6px;
         }
 
-        .copy-code { 
-            font-family: monospace; 
-            font-size: 1.2rem; 
-            font-weight: 800; 
-            color: #dc2626; 
-            letter-spacing: 1px; 
+        .data-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 0.88rem;
         }
 
-        .btn-copy {
+        .data-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .data-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .data-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-value {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .data-value.highlight-red {
+            color: #dc2626;
+            font-family: monospace;
+            font-size: 1.05rem;
+        }
+
+        /* NÚT COPY BASIC */
+        .btn-copy-basic {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             padding: 6px 12px;
-            background: #4f46e5;
-            color: #ffffff;
-            border: none;
+            background: #ffffff;
+            color: #374151;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
         }
 
-        .btn-copy:hover {
-            background: #4338ca;
+        .btn-copy-basic:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
         }
 
-        .btn-copy.copied {
-            background: #059669;
+        .btn-copy-basic:active {
+            transform: scale(0.97);
         }
-        
+
+        .btn-copy-basic.copied {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .btn-copy-basic svg {
+            flex-shrink: 0;
+        }
+
+        /* LƯU Ý */
         .note-box { 
             background: #fffbeb; 
-            padding: 12px; 
-            border-radius: 8px; 
-            border-left: 4px solid #f59e0b; 
-            font-size: 0.85rem; 
+            padding: 14px 16px; 
+            border-radius: 12px; 
+            border: 1px solid #fef3c7;
+            font-size: 0.83rem; 
             color: #92400e; 
-            margin-top: 15px; 
-            line-height: 1.5; 
+            margin-top: 20px; 
+            line-height: 1.6; 
             text-align: left; 
         }
 
+        .note-box ul { 
+            margin: 6px 0 0 0; 
+            padding-left: 18px; 
+        }
+
+        .note-box li {
+            margin-bottom: 4px;
+        }
+
+        /* NÚT QUAY LẠI */
         .btn-back { 
-            display: block; 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%; 
-            text-align: center; 
-            background: #e5e7eb; 
-            color: #374151; 
+            background: #f1f5f9; 
+            color: #475569; 
             padding: 12px; 
-            border-radius: 8px; 
-            font-weight: 700; 
+            border-radius: 10px; 
+            font-size: 0.9rem;
+            font-weight: 600; 
             text-decoration: none; 
-            margin-top: 15px; 
+            margin-top: 16px; 
             transition: 0.2s; 
-            box-sizing: border-box; 
         }
 
         .btn-back:hover { 
-            background: #d1d5db; 
+            background: #e2e8f0; 
+            color: #1e293b;
+        }
+        .btn-zalo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #0068ff;
+            color: #ffffff;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .btn-zalo:hover {
+            background: #0052cc;
+        }
+
+        .btn-zalo:active {
+            transform: scale(0.96);
         }
     </style>
 </head>
 <body>
+    <%- include('partials/header') %>
 
     <div class="payment-container">
         
-        <div class="receipt-card">
-            <h2 class="header-title">Chi tiết đơn hàng</h2>
+        <!-- BẢNG TỔNG QUAN ĐƠN HÀNG -->
+        <div class="card">
+            <div class="card-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <h2 class="card-title">Thông tin thanh toán</h2>
+            </div>
 
             <div class="info-row">
-                <span class="info-label">Tên truyện:</span>
+                <span class="info-label">Tên truyện</span>
                 <span class="info-value"><%= truyen.name %></span>
             </div>
 
             <div class="info-row">
-                <span class="info-label">Tập đã chọn:</span>
+                <span class="info-label">Tập đã chọn</span>
                 <span class="info-value">
-                    <% 
-                        const partsList = order.selectedParts.map(p => 'Tập ' + p).join(', '); 
-                    %>
+                    <% const partsList = order.selectedParts.map(p => 'Tập ' + p).join(', '); %>
                     <%= partsList %>
                 </span>
             </div>
 
             <div class="info-row">
-                <span class="info-label">Email nhận:</span>
+                <span class="info-label">Email nhận file</span>
                 <span class="info-value" style="color: #2563eb;"><%= order.email %></span>
             </div>
 
-            <div class="info-row" style="border-top: 1px solid #f3f4f6; margin-top: 15px; padding-top: 15px;">
-                <span class="info-label" style="font-size: 1.1rem; line-height: 1.4rem;">Tổng thanh toán:</span>
-                <span class="info-value total-amount"><%= order.totalAmount.toLocaleString('vi-VN') %>đ</span>
+            <div class="info-row total-row">
+                <span class="info-label" style="font-weight: 700; color: var(--text-main);">Tổng thanh toán</span>
+                <span class="info-value total-amount"><%= order.totalAmount.toLocaleString('vi-VN') %> đ</span>
             </div>
         </div>
 
-        <div class="qr-section">
-            <div class="qr-title">Mã QR Thanh Toán</div>
-            <div style="font-size: 0.85rem; color: #6b7280;">Nếu ae dùng ngân hàng không quét được thì thử đổi trình duyệt sang chế độ <b>light mode</b> để quét nhé.</div>
-            
-            <!-- Khối bọc độc lập giữ nền trắng -->
+        <!-- KHỐI QUÉT MÃ VÀ CHUYỂN KHOẢN -->
+        <div class="card qr-section">
+            <h2 class="card-title" style="margin-bottom: 6px;">Mở app ngân hàng để quét mã QR thanh toán</h2>
+            <p class="qr-subtext">Nếu ae quét mã không được thì thử chuyển trình duyệt <b>dark mode</b> sang <b>light mode</b> để quét nhé.</p>
+
+            <!-- Khung ảnh QR -->
             <div class="qr-wrapper">
-                <img id="vietqr-img" class="qr-img" src="" alt="QR Đang tải vui lòng chờ trong giây lát...">
+                <img id="vietqr-img" class="qr-img" src="" alt="Đang tạo mã thanh toán...">
             </div>
 
-            <div class="copy-box">
-                <div style="font-size: 0.85rem; color: #4b5563; margin-bottom: 5px;">
-                    Nội dung chuyển khoản (Nếu quét mã mà nó không được thì ae điền nội dung như dưới kèm số tiền tương ứng nhé):
+            <!-- Khối thông tin chuyển khoản thủ công (phòng trường hợp không quét được QR) -->
+            <div class="manual-transfer-box">
+                <div class="manual-transfer-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span>Không quét được? Chuyển khoản thủ công</span>
                 </div>
-                
-                <div class="copy-wrapper">
-                    <span class="copy-code" id="transfer-content">IDCARD: <%= order.cartId %></span>
-                    <button type="button" class="btn-copy" onclick="copyTransferContent(this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                        <span class="btn-text">Sao chép</span>
+
+                <!-- 1. Ngân hàng -->
+                <div class="data-item">
+                    <div class="data-meta">
+                        <span class="data-label">Ngân hàng</span>
+                        <span class="data-value" id="val-bank">MB Bank (Quân Đội)</span>
+                    </div>
+                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, 'MB Bank')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>Sao chép</span>
+                    </button>
+                </div>
+
+                <!-- 2. Chủ tài khoản -->
+                <div class="data-item">
+                    <div class="data-meta">
+                        <span class="data-label">Chủ tài khoản</span>
+                        <span class="data-value">VO QUOC NGHIA</span>
+                    </div>
+                </div>
+
+                <!-- 3. Số tài khoản -->
+                <div class="data-item">
+                    <div class="data-meta">
+                        <span class="data-label">Số tài khoản</span>
+                        <span class="data-value" id="val-stk">017120299999</span>
+                    </div>
+                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, '017120299999')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>Sao chép</span>
+                    </button>
+                </div>
+
+                <!-- 4. Số tiền -->
+                <div class="data-item">
+                    <div class="data-meta">
+                        <span class="data-label">Số tiền</span>
+                        <span class="data-value"><%= order.totalAmount.toLocaleString('vi-VN') %> đ</span>
+                    </div>
+                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, '<%= order.totalAmount %>')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>Sao chép</span>
+                    </button>
+                </div>
+
+                <!-- 5. Nội dung -->
+                <div class="data-item">
+                    <div class="data-meta">
+                        <span class="data-label">Nội dung chuyển khoản (bắt buộc chính xác)</span>
+                        <span class="data-value highlight-red" id="val-content">IDCARD: <%= order.cartId %></span>
+                    </div>
+                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, 'IDCARD: <%= order.cartId %>')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>Sao chép</span>
                     </button>
                 </div>
             </div>
+<div class="manual-transfer-box" style="margin-top: 15px; border-color: #bfdbfe; background: #eff6ff;">
+                <div class="manual-transfer-title" style="color: #1d4ed8;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span>Không có tài khoản ngân hàng?</span>
+                </div>
 
+                <div class="data-item" style="border-bottom: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                    <div class="data-meta" style="flex: 1; min-width: 200px;">
+                        <span style="font-size: 0.88rem; color: #1e3a8a; line-height: 1.4;">
+                            Liên hệ Zalo để hỗ trợ thanh toán bằng <strong>thẻ cào điện thoại</strong>.
+                        </span>
+                    </div>
+
+                    <!-- Nút mở trực tiếp Zalo -->
+                    <a href="https://zalo.me/0336672088" target="_blank" rel="noopener noreferrer" class="btn-zalo">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                        <span>Nhắn Zalo</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Ghi chú quan trọng -->
             <div class="note-box">
                 <strong>💡 Lưu ý quan trọng:</strong>
-                <ul style="margin: 5px 0 0 0; padding-left: 15px;">
-                    <li>Việc gửi truyện là thủ công, nên sẽ có độ trễ một chút.</li>
-                    <li>Nếu chưa nhận được truyện, bạn vui lòng liên hệ qua Zalo để được xử lý nhanh nhất.</li>
-                    <li>Sau khi chuyển khoản thành công, truyện sẽ gửi vào <strong>Google Drive</strong> của Email: <b><%= order.email %></b>.</li>
+                <ul>
+                    <li>Vui lòng nhập <b>chính xác nội dung chuyển khoản</b> để đơn hàng được duyệt tự động.</li>
+                    <li>File truyện sẽ được cấp quyền qua <strong>Google Drive</strong> đến Email: <b><%= order.email %></b>.</li>
+                    <li>Nếu sau 5-10 phút chưa nhận được file, vui lòng liên hệ Zalo hỗ trợ để được kiểm tra ngay.</li>
                 </ul>
             </div>
             
-            <a href="/truyen/<%= truyen._id %>" class="btn-back">Về lại trang truyện</a>
+            <a href="/truyen/<%= truyen._id %>" class="btn-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <span>Quay lại trang truyện</span>
+            </a>
         </div>
 
     </div>
 
     <script>
-        function copyTransferContent(btn) {
-            const textToCopy = document.getElementById('transfer-content').innerText.trim();
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const textSpan = btn.querySelector('.btn-text');
-                const originalText = textSpan.innerText;
-                
-                textSpan.innerText = 'Đã chép!';
+        // Hàm sao chép đa năng (hỗ trợ cả các thiết bị cũ)
+        function copyValue(btn, text) {
+            if (!text) return;
+
+            const updateButtonState = () => {
+                const span = btn.querySelector('span');
+                const orig = span.innerText;
+                span.innerText = 'Đã chép!';
                 btn.classList.add('copied');
-                
+
                 setTimeout(() => {
-                    textSpan.innerText = originalText;
+                    span.innerText = orig;
                     btn.classList.remove('copied');
                 }, 2000);
-            }).catch(err => {
-                console.error('Lỗi khi sao chép:', err);
-            });
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(updateButtonState).catch(() => fallbackCopy(text, updateButtonState));
+            } else {
+                fallbackCopy(text, updateButtonState);
+            }
         }
 
+        function fallbackCopy(text, callback) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.focus();
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                callback();
+            } catch (err) {
+                alert('Không thể tự động sao chép, bạn vui lòng copy thủ công nhé!');
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        // Tải ảnh VietQR
         window.addEventListener('load', () => {
             const BANK_ID = "MB";
             const ACCOUNT = "017120299999";
