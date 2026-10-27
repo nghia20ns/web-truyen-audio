@@ -920,3 +920,44 @@ input:focus, textarea:focus {
         white-space: nowrap; 
     }
 }
+.copy-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f3f4f6;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px dashed #d1d5db;
+}
+
+.copy-code {
+    font-weight: 600;
+    color: #1f2937;
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+.btn-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    color: #2563eb;
+    background: #ffffff;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-copy:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.btn-copy.copied {
+    background: #dcfce7;
+    color: #16a34a;
+    border-color: #86efac;
+}
