@@ -2,6 +2,8 @@ const Truyen = require('../models/Truyen');
 const Category = require('../models/Category'); 
 const Order = require('../models/Order'); // Model lưu giỏ hàng
 const mongoose = require('mongoose');
+const banks = require('../config/banks');
+const Setting = require('../models/Setting');
 
 // Hàm chuẩn hóa tiếng Việt & ký tự đặc biệt
 // ==========================================
@@ -347,6 +349,7 @@ exports.createOrderCart = async (req, res) => {
 		 res.status(500).json({ success: false, message: "Lỗi Server, vui lòng thử lại" });
 	}
 };
+
 // 4. Trang Thanh Toán (Đọc dữ liệu từ Giỏ hàng hiển thị ra QR)
 exports.getPayment = async (req, res) => {
     try {
@@ -360,9 +363,15 @@ exports.getPayment = async (req, res) => {
             return res.send('Không tìm thấy đơn hàng hoặc đơn hàng đã hết hạn.');
         }
 
+        // Lấy ngân hàng đang được Admin kích hoạt (mặc định là MB nếu chưa cấu hình)
+        const setting = await Setting.findOne();
+        const activeKey = (setting && setting.activeBank) ? setting.activeBank : 'MB';
+        const currentBank = banks[activeKey] || banks.MB;
+
         res.render('payment', { 
             order: order,
-            truyen: order.truyenId // Truyền thêm biến truyen để view dễ lấy tên truyện
+            truyen: order.truyenId, // Truyền thêm biến truyen để view dễ lấy tên truyện
+            bank: currentBank       // Truyền thông tin ngân hàng đang chọn sang payment.ejs
         });
     } catch (error) {
         console.error("Lỗi trang thanh toán:", error);

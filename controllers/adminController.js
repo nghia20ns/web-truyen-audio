@@ -6,6 +6,10 @@ const cloudinary = require('../config/cloudinary');
 const fs = require('fs');
 const Category = require('../models/Category'); // <-- QUAN TRỌNG: Nhớ import dòng này
 const Order = require('../models/Order');
+
+const banks = require('../config/banks');
+const Setting = require('../models/Setting');
+
 // --- 1. LOGIN / LOGOUT (Giữ nguyên) ---
 exports.getLogin = (req, res) => {
     if (req.session.adminId) return res.redirect('/admin');
@@ -489,5 +493,44 @@ exports.apiQuickSearch = async (req, res) => {
     } catch (error) {
         console.error('Lỗi API Quick Search:', error);
         return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// 1. Hiển thị trang chọn ngân hàng
+exports.getBankConfig = async (req, res) => {
+    try {
+        let setting = await Setting.findOne();
+        if (!setting) {
+            setting = await Setting.create({ activeBank: 'MB' });
+        }
+        res.render('admin/bank-config', {
+            banks,
+            activeBank: setting.activeBank || 'MB',
+            success: req.query.success || null
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Lỗi server');
+    }
+};
+
+// 2. Lưu lựa chọn chuyển đổi ngân hàng
+exports.postBankConfig = async (req, res) => {
+    try {
+        const { activeBank } = req.body;
+        if (!['MB', 'TCB'].includes(activeBank)) {
+            return res.status(400).send('Ngân hàng không hợp lệ');
+        }
+
+        await Setting.findOneAndUpdate(
+            {},
+            { $set: { activeBank } },
+            { upsert: true, new: true }
+        );
+
+        res.redirect('/admin/bank-config?success=1');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Lỗi cập nhật ngân hàng');
     }
 };

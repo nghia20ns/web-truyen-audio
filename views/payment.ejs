@@ -115,14 +115,15 @@
             color: var(--text-sub);
             margin-bottom: 16px;
         }
-/* CĂN CHÍNH GIỮA TUYỆT ĐỐI CHO KHỐI QR */
+
+        /* CĂN CHÍNH GIỮA TUYỆT ĐỐI CHO KHỐI QR */
         .qr-wrapper {
             background-color: #ffffff !important;
             display: flex;
             align-items: center;
             justify-content: center;
             width: fit-content;
-            margin: 0 auto 16px auto !important; /* Tự động chia đều 2 bên trái/phải */
+            margin: 0 auto 16px auto !important;
             padding: 14px;
             border-radius: 14px;
             border: 1px solid var(--border-color);
@@ -291,6 +292,7 @@
             background: #e2e8f0; 
             color: #1e293b;
         }
+
         .btn-zalo {
             display: inline-flex;
             align-items: center;
@@ -376,33 +378,33 @@
                     <span>Không quét được? Chuyển khoản thủ công</span>
                 </div>
 
-                <!-- 1. Ngân hàng -->
+                <!-- 1. Ngân hàng (Tự động theo lựa chọn Admin) -->
                 <div class="data-item">
                     <div class="data-meta">
                         <span class="data-label">Ngân hàng</span>
-                        <span class="data-value" id="val-bank">MB Bank (Quân Đội)</span>
+                        <span class="data-value" id="val-bank"><%= bank.name %></span>
                     </div>
-                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, 'MB Bank')">
+                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, '<%= bank.shortName %>')">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                         <span>Sao chép</span>
                     </button>
                 </div>
 
-                <!-- 2. Chủ tài khoản -->
+                <!-- 2. Chủ tài khoản (Tự động theo lựa chọn Admin) -->
                 <div class="data-item">
                     <div class="data-meta">
                         <span class="data-label">Chủ tài khoản</span>
-                        <span class="data-value">VO QUOC NGHIA</span>
+                        <span class="data-value"><%= bank.accountName %></span>
                     </div>
                 </div>
 
-                <!-- 3. Số tài khoản -->
+                <!-- 3. Số tài khoản (Tự động theo lựa chọn Admin) -->
                 <div class="data-item">
                     <div class="data-meta">
                         <span class="data-label">Số tài khoản</span>
-                        <span class="data-value" id="val-stk">017120299999</span>
+                        <span class="data-value" id="val-stk"><%= bank.accountNumber %></span>
                     </div>
-                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, '017120299999')">
+                    <button type="button" class="btn-copy-basic" onclick="copyValue(this, '<%= bank.accountNumber %>')">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                         <span>Sao chép</span>
                     </button>
@@ -432,7 +434,8 @@
                     </button>
                 </div>
             </div>
-<div class="manual-transfer-box" style="margin-top: 15px; border-color: #bfdbfe; background: #eff6ff;">
+
+            <div class="manual-transfer-box" style="margin-top: 15px; border-color: #bfdbfe; background: #eff6ff;">
                 <div class="manual-transfer-title" style="color: #1d4ed8;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -458,6 +461,7 @@
                     </a>
                 </div>
             </div>
+
             <!-- Ghi chú quan trọng -->
             <div class="note-box">
                 <strong>💡 Lưu ý quan trọng:</strong>
@@ -518,17 +522,18 @@
             document.body.removeChild(tempInput);
         }
 
-        // Tải ảnh VietQR
+        // Tải ảnh VietQR tự động theo ngân hàng Admin đã chọn
         window.addEventListener('load', () => {
-            const BANK_ID = "MB";
-            const ACCOUNT = "017120299999";
+            const BANK_ID = "<%= bank.id %>";
+            const ACCOUNT = "<%= bank.accountNumber %>";
+            const ACCOUNT_NAME = encodeURIComponent("<%= bank.accountName %>");
             const TEMPLATE = "compact2";
             
             const amount = <%= order.totalAmount %>;
             const content = "IDCARD: <%= order.cartId %>";
             const encodedContent = encodeURIComponent(content);
             
-            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT}-${TEMPLATE}.png?amount=${amount}&addInfo=${encodedContent}&accountName=Vo Quoc Nghia`;
+            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT}-${TEMPLATE}.png?amount=${amount}&addInfo=${encodedContent}&accountName=${ACCOUNT_NAME}`;
 
             document.getElementById('vietqr-img').src = qrUrl;
         });

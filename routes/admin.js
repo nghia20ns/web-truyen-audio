@@ -80,7 +80,8 @@ router.post('/quick-ytb/update/:id', adminController.postQuickYtbUpdate);
 router.get('/quick-search', adminController.renderQuickSearch);
 
 // Route API trả kết quả AJAX
-router.get('/api/quick-search', adminController.apiQuickSearch);
-
+router.get('/api/quick-search',requireAuth, adminController.apiQuickSearch);
+router.get('/bank-config', requireAuth,adminController.getBankConfig);
+router.post('/bank-config',requireAuth, adminController.postBankConfig);
 
 module.exports = router;
