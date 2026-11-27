@@ -297,13 +297,21 @@
     <div class="container">
 
         <% if (!keyword && (typeof currentCatSlug === 'undefined' || !currentCatSlug) && typeof listHot !== 'undefined' && listHot.length > 0) { %>
+            <% 
+                // Tạo bản sao và xáo trộn ngẫu nhiên danh sách truyện Hot mỗi lần tải trang
+                let shuffledHot = [...listHot];
+                for (let i = shuffledHot.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledHot[i], shuffledHot[j]] = [shuffledHot[j], shuffledHot[i]];
+                }
+            %>
             <div class="vip-hot-section">
                 <h2 class="vip-hot-title">
                     <span style="font-size: 1.2rem;">🔥</span> Truyện Đang Hot
                 </h2>
                 
                 <div class="vip-scroll-track">
-                    <% listHot.forEach(hot => { %>
+                    <% shuffledHot.forEach(hot => { %>
                         <div class="vip-hot-card-wrapper">
                             <a href="/truyen/<%= hot._id %>" style="text-decoration: none; color: inherit; display: block; height: 100%;">
                                 <div class="card">
@@ -320,7 +328,7 @@
                                         <img src="<%= imgHot %>" class="card-img-top" alt="<%= hot.name %>" loading="lazy">
                                         <div class="hot-flash-badge">HOT</div>
                                     </div>
-        
+
                                     <div class="card-body" style="padding: 8px; text-align: center;">
                                         <div class="story-card-hot-title"><%= hot.name %></div>
                                         <div style="font-size: 0.65rem; color: #6b7280; font-weight: 600;">
@@ -338,7 +346,6 @@
                 </div>
             </div>
         <% } %>
-
         <div class="search-container" style="position: relative; max-width: 600px; margin: 0 auto 20px auto;">
             <input type="text" id="liveSearch" class="search-input" 
                    placeholder="Nhập tên truyện cần tìm..." 
